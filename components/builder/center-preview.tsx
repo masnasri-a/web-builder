@@ -430,7 +430,7 @@ function SectionRenderer({
               &ldquo;{(c.quote as string) || "Kutipan akan muncul di sini."}&rdquo;
             </blockquote>
           </Anim>
-          {c.source && (
+          {!!c.source && (
             <Anim variant="fadeIn" delay={350}>
               <p
                 className="mt-4 text-xs font-semibold uppercase tracking-widest opacity-60"

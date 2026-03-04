@@ -375,7 +375,7 @@ function AnimatedSection({
               &ldquo;{c.quote as string}&rdquo;
             </blockquote>
           </Anim>
-          {c.source && (
+          {!!c.source && (
             <Anim variant="fadeIn" delay={360}>
               <p className="mt-4 text-xs uppercase tracking-widest" style={{ color: primary, opacity: 0.55 }}>
                 — {c.source as string}
