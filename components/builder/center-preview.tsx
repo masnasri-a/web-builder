@@ -89,7 +89,7 @@ export function CenterPreview({
 
       <div
         className={cn(
-          "relative rounded-2xl shadow-2xl transition-all duration-300 overflow-hidden",
+          "relative rounded-2xl shadow-2xl transition-all duration-300",
           isMobile ? "w-93.75" : "w-3xl"
         )}
         style={style}
