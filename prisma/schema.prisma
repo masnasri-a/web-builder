@@ -1,0 +1,141 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Tier {
+  FREE
+  PRO
+  UNLIMITED
+}
+
+enum Attendance {
+  PENDING
+  ATTENDING
+  NOT_ATTENDING
+}
+
+// ─── NextAuth Required Tables ─────────────────────────
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── Core Models ──────────────────────────────────────
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+  role          Role      @default(USER)
+  tier          Tier      @default(FREE)
+  isSuspended   Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts    Account[]
+  sessions    Session[]
+  invitations Invitation[]
+}
+
+// Theme — managed by admin, applied by users
+model Theme {
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  previewImage String?
+  // config: { primaryColor, secondaryColor, accentColor, fontFamily, bgColor, bgImage }
+  config       Json
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  invitations Invitation[]
+}
+
+// Invitation — one per wedding
+model Invitation {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  userId       String
+  themeId      String
+
+  groomName    String
+  brideName    String
+  eventDate    DateTime
+  eventVenue   String
+  eventAddress String?
+  eventTime    String?
+
+  // JSON: [{ id, type, visible, order, content: {...} }]
+  sections    Json
+  // JSON: { primaryColor, fontFamily, bgColor, ... } per-invitation overrides
+  themeConfig Json
+
+  musicUrl    String?
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user   User    @relation(fields: [userId], references: [id])
+  theme  Theme   @relation(fields: [themeId], references: [id])
+  guests Guest[]
+}
+
+// Guest / RSVP
+model Guest {
+  id           String     @id @default(cuid())
+  invitationId String
+  name         String
+  phone        String?
+  email        String?
+  attendance   Attendance @default(PENDING)
+  guestCount   Int        @default(1)
+  message      String?
+  createdAt    DateTime   @default(now())
+
+  invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+}
