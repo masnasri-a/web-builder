@@ -13,6 +13,7 @@ export type BuilderState = {
   eventAddress: string
   eventTime: string
   musicUrl: string
+  themeSlug: string
   sections: Section[]
   themeConfig: ThemeConfig
   activeSection: string | null
@@ -129,13 +130,13 @@ export function useBuilder(initial: Omit<BuilderState, "activeSection" | "isMobi
 
   const save = useCallback(async () => {
     dispatch({ type: "SET_FIELD", field: "isSaving", value: true })
-    const { id, slug, groomName, brideName, eventDate, eventVenue, eventAddress, eventTime, musicUrl, sections, themeConfig } = state
+    const { id, slug, groomName, brideName, eventDate, eventVenue, eventAddress, eventTime, musicUrl, themeSlug, sections, themeConfig } = state
 
     await fetch(`/api/invitations/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        slug, groomName, brideName, eventDate, eventVenue, eventAddress, eventTime, musicUrl, sections, themeConfig,
+        slug, groomName, brideName, eventDate, eventVenue, eventAddress, eventTime, musicUrl, themeSlug, sections, themeConfig,
       }),
     })
 

@@ -15,17 +15,20 @@ import {
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-
-const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/invitations", label: "My Invitations", icon: Heart },
-  { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
-]
+import { LanguageSwitcher } from "@/components/language-switcher"
+import { useT } from "@/components/locale-provider"
 
 export function DashboardSidebar() {
   const pathname = usePathname()
   const { data: session } = useSession()
+  const t = useT()
+
+  const navItems = [
+    { href: "/dashboard", label: t("dashboard.nav.dashboard"), icon: LayoutDashboard },
+    { href: "/dashboard/invitations", label: t("dashboard.nav.invitations"), icon: Heart },
+    { href: "/dashboard/analytics", label: t("dashboard.nav.analytics"), icon: BarChart3 },
+    { href: "/dashboard/settings", label: t("dashboard.nav.settings"), icon: Settings },
+  ]
 
   const initials = session?.user?.name
     ? session.user.name.slice(0, 2).toUpperCase()
@@ -39,7 +42,7 @@ export function DashboardSidebar() {
           <Sparkles className="h-4 w-4 text-primary-foreground" />
         </div>
         <span className="text-base font-semibold tracking-tight">
-          Undangan.io
+          Selembar.id
         </span>
       </Link>
 
@@ -47,14 +50,14 @@ export function DashboardSidebar() {
       <Button asChild size="sm" className="mb-6 w-full rounded-xl">
         <Link href="/dashboard/invitations/new">
           <Plus className="h-4 w-4" />
-          New Invitation
+          {t("dashboard.newInvitation")}
         </Link>
       </Button>
 
       {/* Main Menu */}
       <nav className="flex-1 space-y-1">
         <p className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-          Main Menu
+          Menu
         </p>
         {navItems.map(({ href, label, icon: Icon }) => {
           const isActive =
@@ -79,8 +82,14 @@ export function DashboardSidebar() {
         })}
       </nav>
 
-      {/* User + Logout */}
-      <div className="space-y-1 border-t border-border pt-4">
+      {/* Language + User + Logout */}
+      <div className="space-y-2 border-t border-border pt-4">
+        {/* Language switcher */}
+        <div className="px-2">
+          <LanguageSwitcher compact={false} className="w-full justify-center" />
+        </div>
+
+        {/* User info */}
         <div className="flex items-center gap-3 rounded-xl px-3 py-2">
           <Avatar className="h-8 w-8">
             <AvatarImage src={session?.user?.image ?? ""} />
@@ -95,12 +104,14 @@ export function DashboardSidebar() {
             </p>
           </div>
         </div>
+
+        {/* Logout */}
         <button
           onClick={() => signOut({ callbackUrl: "/" })}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           <LogOut className="h-4 w-4 shrink-0" />
-          Log Out
+          {t("dashboard.logOut")}
         </button>
       </div>
     </aside>

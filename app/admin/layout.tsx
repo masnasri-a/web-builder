@@ -33,7 +33,7 @@ export default async function AdminLayout({
             <Sparkles className="h-4 w-4 text-primary-foreground" />
           </div>
           <div>
-            <p className="text-sm font-semibold">Undangan.io</p>
+            <p className="text-sm font-semibold">Selembar.id</p>
             <p className="text-[10px] text-muted-foreground">Admin CMS</p>
           </div>
         </Link>

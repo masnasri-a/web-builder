@@ -10,6 +10,7 @@ import { FontLoader } from "@/components/invitation/font-loader"
 import { SplashScreen } from "@/components/invitation/splash-screen"
 import dynamic from "next/dynamic"
 import { Instagram, Music, Play, VolumeX } from "lucide-react"
+import { getThemeBySlug } from "@/lib/themeRegistry"
 
 const Masonry = dynamic(
   () => import("@/components/ui/masonry").then((m) => ({ default: m.Masonry })),
@@ -18,6 +19,7 @@ const Masonry = dynamic(
 
 interface CenterPreviewProps {
   isMobile: boolean
+  invitationId: string
   groomName: string
   brideName: string
   eventDate: string
@@ -25,6 +27,7 @@ interface CenterPreviewProps {
   eventAddress: string
   sections: Section[]
   themeConfig: ThemeConfig
+  themeSlug?: string
   activeSection: string | null
   musicUrl?: string
   onSelectSection: (id: string) => void
@@ -33,6 +36,7 @@ interface CenterPreviewProps {
 
 export function CenterPreview({
   isMobile,
+  invitationId,
   groomName,
   brideName,
   eventDate,
@@ -40,6 +44,7 @@ export function CenterPreview({
   eventAddress,
   sections,
   themeConfig,
+  themeSlug,
   activeSection,
   musicUrl,
   onSelectSection,
@@ -105,30 +110,54 @@ export function CenterPreview({
           />
         )}
 
-        {visible.map((section) => (
-          <div
-            key={section.id}
-            onClick={() => onSelectSection(section.id)}
-            style={{ scrollSnapAlign: "start" }}
-            className={cn(
-              "cursor-pointer transition-all",
-              activeSection === section.id &&
-                "outline-2 outline-primary -outline-offset-2"
-            )}
-          >
-            <SectionRenderer
-              section={section}
-              groomName={groomName}
-              brideName={brideName}
-              eventDate={eventDate}
-              eventVenue={eventVenue}
-              eventAddress={eventAddress}
-              themeConfig={themeConfig}
-              isActive={activeSection === section.id}
-              onUpdateContent={onUpdateContent}
-            />
-          </div>
-        ))}
+        {(() => {
+          const registryEntry = themeSlug ? getThemeBySlug(themeSlug) : undefined
+          if (registryEntry) {
+            const ThemeComponent = registryEntry.component
+            const inv = {
+              id: invitationId,
+              groomName: groomName || "Groom",
+              brideName: brideName || "Bride",
+              eventDate,
+              eventVenue: eventVenue || "Venue",
+              eventAddress: eventAddress || null,
+            }
+            return (
+              <ThemeComponent
+                inv={inv}
+                sections={visible}
+                themeConfig={themeConfig}
+                activeSection={activeSection}
+                onSectionClick={onSelectSection}
+              />
+            )
+          }
+
+          return visible.map((section) => (
+            <div
+              key={section.id}
+              onClick={() => onSelectSection(section.id)}
+              style={{ scrollSnapAlign: "start" }}
+              className={cn(
+                "cursor-pointer transition-all",
+                activeSection === section.id &&
+                  "outline-2 outline-primary -outline-offset-2"
+              )}
+            >
+              <SectionRenderer
+                section={section}
+                groomName={groomName}
+                brideName={brideName}
+                eventDate={eventDate}
+                eventVenue={eventVenue}
+                eventAddress={eventAddress}
+                themeConfig={themeConfig}
+                isActive={activeSection === section.id}
+                onUpdateContent={onUpdateContent}
+              />
+            </div>
+          ))
+        })()}
 
         {/* Music player mock (shows controls but no actual audio in builder) */}
         {musicUrl && !showSplash && (

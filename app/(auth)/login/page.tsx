@@ -9,10 +9,13 @@ import { Sparkles, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { LanguageSwitcher } from "@/components/language-switcher"
+import { useT } from "@/components/locale-provider"
 
 export default function LoginPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const t = useT()
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -44,10 +47,8 @@ export default function LoginPage() {
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary">
             <Sparkles className="h-6 w-6 text-primary-foreground" />
           </div>
-          <h1 className="text-xl font-semibold">Sign in to Undangan.io</h1>
-          <p className="text-sm text-muted-foreground">
-            Welcome back! Enter your credentials.
-          </p>
+          <h1 className="text-xl font-semibold">{t("auth.login.title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("auth.login.subtitle")}</p>
         </div>
 
         {/* Form */}
@@ -56,7 +57,7 @@ export default function LoginPage() {
           className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-sm"
         >
           <div className="space-y-1.5">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("auth.login.email")}</Label>
             <Input
               id="email"
               name="email"
@@ -67,7 +68,7 @@ export default function LoginPage() {
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t("auth.login.password")}</Label>
             <Input
               id="password"
               name="password"
@@ -79,19 +80,20 @@ export default function LoginPage() {
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? t("auth.login.loading") : t("auth.login.submit")}
           </Button>
         </form>
 
         <p className="text-center text-sm text-muted-foreground">
-          Don&apos;t have an account?{" "}
-          <Link
-            href="/register"
-            className="font-medium text-primary hover:underline"
-          >
-            Sign up
+          {t("auth.login.noAccount")}{" "}
+          <Link href="/register" className="font-medium text-primary hover:underline">
+            {t("auth.login.signUp")}
           </Link>
         </p>
+
+        <div className="flex justify-center">
+          <LanguageSwitcher compact={false} />
+        </div>
       </div>
     </div>
   )

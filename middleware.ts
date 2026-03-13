@@ -1,8 +1,22 @@
 import NextAuth from "next-auth"
 import { authConfig } from "@/lib/auth.config"
 import { NextResponse } from "next/server"
+import type { Locale } from "@/lib/i18n/translations"
 
 const { auth } = NextAuth(authConfig)
+
+const SUPPORTED_LOCALES: Locale[] = ["id", "en"]
+const DEFAULT_LOCALE: Locale = "id"
+
+function detectLocale(req: Parameters<Parameters<typeof auth>[0]>[0]): Locale {
+  // 1. Cookie takes priority
+  const cookie = req.cookies.get("SELEMBAR_LOCALE")?.value as Locale | undefined
+  if (cookie && SUPPORTED_LOCALES.includes(cookie)) return cookie
+  // 2. Accept-Language header
+  const acceptLang = req.headers.get("accept-language") ?? ""
+  if (acceptLang.toLowerCase().startsWith("en")) return "en"
+  return DEFAULT_LOCALE
+}
 
 export default auth((req) => {
   const { pathname } = req.nextUrl
@@ -25,7 +39,11 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/dashboard", req.url))
   }
 
-  return NextResponse.next()
+  // Attach detected locale as a request header for Server Components
+  const locale = detectLocale(req)
+  const response = NextResponse.next()
+  response.headers.set("x-locale", locale)
+  return response
 })
 
 export const config = {

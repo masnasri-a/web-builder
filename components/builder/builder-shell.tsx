@@ -11,6 +11,7 @@ import { CenterPreview } from "./center-preview"
 import { RightPanel } from "./right-panel"
 import { useBuilder } from "@/hooks/use-builder"
 import type { InvitationWithRelations } from "@/types"
+import { getThemeBySlug } from "@/lib/themeRegistry"
 
 interface BuilderShellProps {
   invitation: InvitationWithRelations
@@ -37,9 +38,16 @@ export function BuilderShell({ invitation }: BuilderShellProps) {
     eventAddress: invitation.eventAddress ?? "",
     eventTime: invitation.eventTime ?? "",
     musicUrl: invitation.musicUrl ?? "",
+    themeSlug: invitation.theme.slug,
     sections: invitation.sections,
     themeConfig: invitation.themeConfig,
   })
+
+  function handleThemeChange(slug: string) {
+    setField("themeSlug", slug)
+    const entry = getThemeBySlug(slug)
+    if (entry) updateThemeConfig(entry.defaultConfig)
+  }
 
   const [isPublished, setIsPublished] = useState(invitation.isPublished)
   const [hasCopied, setHasCopied] = useState(false)
@@ -199,15 +207,20 @@ export function BuilderShell({ invitation }: BuilderShellProps) {
         <LeftPanel
           sections={state.sections}
           musicUrl={state.musicUrl}
+          themeSlug={state.themeSlug}
+          themeConfig={state.themeConfig}
           activeSection={state.activeSection}
           onToggleSection={toggleSection}
           onSelectSection={selectSection}
           onReorderSections={reorderSections}
           onMusicChange={(url) => setField("musicUrl", url)}
+          onThemeChange={handleThemeChange}
+          onThemeConfigChange={updateThemeConfig}
         />
 
         <CenterPreview
           isMobile={state.isMobilePreview}
+          invitationId={state.id}
           groomName={state.groomName}
           brideName={state.brideName}
           eventDate={state.eventDate}
@@ -215,6 +228,7 @@ export function BuilderShell({ invitation }: BuilderShellProps) {
           eventAddress={state.eventAddress}
           sections={state.sections}
           themeConfig={state.themeConfig}
+          themeSlug={state.themeSlug}
           activeSection={state.activeSection}
           musicUrl={state.musicUrl}
           onSelectSection={selectSection}

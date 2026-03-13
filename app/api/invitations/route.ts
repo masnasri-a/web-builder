@@ -10,7 +10,8 @@ const createSchema = z.object({
   eventDate: z.string(),
   eventVenue: z.string().min(1).max(200),
   eventAddress: z.string().max(300).optional(),
-  themeId: z.string().min(1),
+  themeSlug: z.string().optional(),
+  themeId: z.string().optional(),
   slug: z.string().min(3).max(80).regex(/^[a-z0-9-]+$/),
 })
 
@@ -45,7 +46,7 @@ export async function POST(req: Request) {
       )
     }
 
-    const { groomName, brideName, eventDate, eventVenue, eventAddress, themeId, slug } = parsed.data
+    const { groomName, brideName, eventDate, eventVenue, eventAddress, themeSlug, themeId, slug } = parsed.data
 
     // Check slug uniqueness
     const existing = await db.invitation.findUnique({ where: { slug } })
@@ -56,24 +57,34 @@ export async function POST(req: Request) {
       )
     }
 
-    // Get theme config as base
-    const theme = await db.theme.findFirst({
-      where: { isActive: true },
-      orderBy: { createdAt: "asc" },
-    })
+    // Resolve theme: prefer themeSlug lookup, then themeId, then first active theme
+    let resolvedTheme = null
+    if (themeSlug) {
+      resolvedTheme = await db.theme.findUnique({ where: { slug: themeSlug, isActive: true } })
+    }
+    if (!resolvedTheme && themeId) {
+      resolvedTheme = await db.theme.findFirst({ where: { id: themeId, isActive: true } })
+    }
+    if (!resolvedTheme) {
+      resolvedTheme = await db.theme.findFirst({ where: { isActive: true }, orderBy: { createdAt: "asc" } })
+    }
+
+    if (!resolvedTheme) {
+      return NextResponse.json({ error: "No active theme found. Please seed themes first." }, { status: 422 })
+    }
 
     const invitation = await db.invitation.create({
       data: {
         slug,
         userId: session.user.id,
-        themeId: theme?.id ?? themeId,
+        themeId: resolvedTheme.id,
         groomName,
         brideName,
         eventDate: new Date(eventDate),
         eventVenue,
         eventAddress: eventAddress ?? null,
         sections: DEFAULT_SECTIONS as unknown as object[],
-        themeConfig: (theme?.config ?? DEFAULT_THEME_CONFIG) as unknown as object,
+        themeConfig: (resolvedTheme.config ?? DEFAULT_THEME_CONFIG) as unknown as object,
       },
     })
 

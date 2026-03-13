@@ -91,32 +91,32 @@ async function main() {
   console.log("\nCreating admin user...")
   const adminHash = await bcrypt.hash("admin123456", 12)
   await db.user.upsert({
-    where: { email: "admin@undangan.io" },
+    where: { email: "admin@selembar.id" },
     update: {},
     create: {
-      email: "admin@undangan.io",
+      email: "admin@selembar.id",
       name: "Admin",
       passwordHash: adminHash,
       role: "ADMIN",
       tier: "UNLIMITED",
     },
   })
-  console.log("  ✓ admin@undangan.io (password: admin123456)")
+  console.log("  ✓ admin@selembar.id (password: admin123456)")
 
   console.log("\nCreating demo user...")
   const demoHash = await bcrypt.hash("demo123456", 12)
   await db.user.upsert({
-    where: { email: "demo@undangan.io" },
+    where: { email: "demo@selembar.id" },
     update: {},
     create: {
-      email: "demo@undangan.io",
+      email: "demo@selembar.id",
       name: "Demo User",
       passwordHash: demoHash,
       role: "USER",
       tier: "FREE",
     },
   })
-  console.log("  ✓ demo@undangan.io (password: demo123456)")
+  console.log("  ✓ demo@selembar.id (password: demo123456)")
 
   console.log("\n✅ Seed complete!")
 }

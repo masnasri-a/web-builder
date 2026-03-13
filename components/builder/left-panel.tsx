@@ -4,8 +4,9 @@ import { useRef, useState, useEffect } from "react"
 import { Switch } from "@/components/ui/switch"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
-import { GripVertical, Music, Layers } from "lucide-react"
-import type { Section } from "@/types"
+import { GripVertical, Music, Layers, Palette } from "lucide-react"
+import type { Section, ThemeConfig } from "@/types"
+import { ThemePickerModal } from "./theme-picker-modal"
 
 function MusicSelector({
   value,
@@ -77,21 +78,29 @@ const SECTION_LABELS: Record<string, string> = {
 interface LeftPanelProps {
   sections: Section[]
   musicUrl: string
+  themeSlug: string
+  themeConfig: ThemeConfig
   activeSection: string | null
   onToggleSection: (id: string) => void
   onSelectSection: (id: string) => void
   onReorderSections: (sections: Section[]) => void
   onMusicChange: (url: string) => void
+  onThemeChange: (slug: string) => void
+  onThemeConfigChange: (config: Partial<ThemeConfig>) => void
 }
 
 export function LeftPanel({
   sections,
   musicUrl,
+  themeSlug,
+  themeConfig,
   activeSection,
   onToggleSection,
   onSelectSection,
   onReorderSections,
   onMusicChange,
+  onThemeChange,
+  onThemeConfigChange,
 }: LeftPanelProps) {
   const sorted = [...sections].sort((a, b) => a.order - b.order)
 
@@ -143,6 +152,24 @@ export function LeftPanel({
 
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-5">
+          {/* Theme picker */}
+          <div>
+            <div className="mb-2 flex items-center gap-2">
+              <Palette className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                Theme
+              </span>
+            </div>
+            <ThemePickerModal
+              themeSlug={themeSlug}
+              themeConfig={themeConfig}
+              onThemeChange={onThemeChange}
+              onThemeConfigChange={onThemeConfigChange}
+            />
+          </div>
+
+          <Separator />
+
           {/* Sections */}
           <div>
             <div className="mb-2 flex items-center gap-2">

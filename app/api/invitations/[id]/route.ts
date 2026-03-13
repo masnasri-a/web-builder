@@ -40,8 +40,15 @@ export async function PATCH(
     const body = await req.json()
     const {
       groomName, brideName, eventDate, eventVenue, eventAddress, eventTime,
-      musicUrl, sections, themeConfig, slug, isPublished,
+      musicUrl, themeSlug, sections, themeConfig, slug, isPublished,
     } = body
+
+    // Resolve themeSlug → themeId if provided
+    let themeId: string | undefined
+    if (themeSlug !== undefined) {
+      const theme = await db.theme.findUnique({ where: { slug: themeSlug } })
+      if (theme) themeId = theme.id
+    }
 
     const updated = await db.invitation.update({
       where: { id },
@@ -53,6 +60,7 @@ export async function PATCH(
         ...(eventAddress !== undefined && { eventAddress }),
         ...(eventTime !== undefined && { eventTime }),
         ...(musicUrl !== undefined && { musicUrl }),
+        ...(themeId !== undefined && { themeId }),
         ...(sections !== undefined && { sections }),
         ...(themeConfig !== undefined && { themeConfig }),
         ...(slug !== undefined && { slug }),

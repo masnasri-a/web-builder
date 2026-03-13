@@ -8,11 +8,21 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { slugify } from "@/lib/utils"
 import { DEFAULT_THEME_CONFIG } from "@/types"
+import { themeRegistry } from "@/lib/themeRegistry"
 
 export function ThemeForm() {
   const [loading, setLoading] = useState(false)
   const [name, setName] = useState("")
   const [config, setConfig] = useState({ ...DEFAULT_THEME_CONFIG })
+
+  function loadFromTemplate(slug: string) {
+    if (!slug) return
+    const entry = themeRegistry.find((t) => t.id === slug)
+    if (!entry) return
+    setName(entry.name)
+    setConfig({ ...entry.defaultConfig })
+    toast.info(`Template "${entry.name}" loaded`)
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -46,6 +56,38 @@ export function ThemeForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* ── Load from template ── */}
+      <div className="space-y-1.5">
+        <Label className="text-xs">Load from Template</Label>
+        <div className="flex items-center gap-2">
+          <select
+            defaultValue=""
+            onChange={(e) => loadFromTemplate(e.target.value)}
+            className="flex-1 rounded-xl border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          >
+            <option value="">— choose a preset —</option>
+            {themeRegistry.map((t) => (
+              <option key={t.id} value={t.id}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+          {/* colour swatches */}
+          <div className="flex gap-1">
+            {themeRegistry.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                title={t.name}
+                onClick={() => loadFromTemplate(t.id)}
+                className="h-6 w-6 rounded-full border-2 border-background ring-1 ring-border transition-transform hover:scale-110"
+                style={{ backgroundColor: t.previewColor }}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
       <div className="space-y-1.5">
         <Label>Theme Name</Label>
         <Input

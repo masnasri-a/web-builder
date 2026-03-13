@@ -6,6 +6,8 @@ import { SplashScreen } from "@/components/invitation/splash-screen"
 import { MusicPlayer } from "@/components/invitation/music-player"
 import { FontLoader } from "@/components/invitation/font-loader"
 import type { Section, ThemeConfig } from "@/types"
+import { getThemeBySlug } from "@/lib/themeRegistry"
+import { RomanticFloralTheme } from "@/components/invitation/themes"
 
 interface GuestPageClientProps {
   inv: GuestInvitation
@@ -14,6 +16,7 @@ interface GuestPageClientProps {
   fonts: string[]
   guestName?: string
   musicUrl?: string | null
+  themeSlug?: string
 }
 
 export function GuestPageClient({
@@ -23,8 +26,12 @@ export function GuestPageClient({
   fonts,
   guestName,
   musicUrl,
+  themeSlug,
 }: GuestPageClientProps) {
   const [entered, setEntered] = useState(false)
+
+  const registryEntry = themeSlug ? getThemeBySlug(themeSlug) : undefined
+  const ThemeComponent = registryEntry?.component ?? RomanticFloralTheme
 
   const style: React.CSSProperties = {
     backgroundColor: themeConfig.bgColor,
@@ -38,7 +45,11 @@ export function GuestPageClient({
     <div className="h-dvh overflow-y-scroll" style={style}>
       <FontLoader fontFamily={fonts} />
 
-      <GuestSections sections={sections} inv={inv} themeConfig={themeConfig} />
+      {registryEntry ? (
+        <ThemeComponent inv={inv} sections={sections} themeConfig={themeConfig} />
+      ) : (
+        <GuestSections sections={sections} inv={inv} themeConfig={themeConfig} />
+      )}
 
       {/* Splash screen overlay (fixed, full-screen) */}
       {!entered && (
