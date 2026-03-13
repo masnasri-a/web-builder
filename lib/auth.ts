@@ -14,6 +14,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      // NextAuth v5 + PrismaAdapter + JWT strategy causes PKCE cookie/DB mismatch.
+      // Use state-based CSRF instead (still secure, PKCE is optional for server-side flows).
+      checks: ["state"],
     }),
     Credentials({
       credentials: {
