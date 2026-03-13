@@ -48,18 +48,40 @@ type Template = {
 
 const TEMPLATES: Template[] = [
   {
+    id: "islami",
+    label: "Islami",
+    body: `Assalamualaikum Wr. Wb.
+
+Yth. {name},
+
+Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud mengundang Bapak/Ibu/Saudara/i untuk hadir dalam acara pernikahan kami:
+
+🤵👰 Pernikahan {groomName} & {brideName}
+
+{link}
+
+📅 {date}
+📍 {venue}
+{address}{mapsBlock}
+
+Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu kepada kami.
+
+Wassalamualaikum Wr. Wb.`,
+  },
+  {
     id: "formal",
     label: "Formal",
-    body: `Assalamu'alaikum Wr. Wb. / Salam sejahtera,
-
-Kepada Yth. {name},
+    body: `Kepada Yth. {name},
 
 Dengan penuh kebahagiaan, kami mengundang kehadiran Bapak/Ibu/Saudara/i pada pernikahan kami:
 
 💍 {groomName} & {brideName}
 
-Lihat undangan digital kami di:
 {link}
+
+📅 {date}
+📍 {venue}
+{address}{mapsBlock}
 
 Atas kehadiran dan doa restu Anda, kami mengucapkan terima kasih 🙏`,
   },
@@ -72,25 +94,13 @@ Kamu diundang ke pernikahan kami! 🎊
 
 💑 {groomName} & {brideName}
 
-Cek undangan digitalnya di sini ya:
+Cek undangan digitalnya:
 {link}
 
+📅 {date}
+📍 {venue}{mapsBlock}
+
 Sampai jumpa di hari bahagia kami! 🥰`,
-  },
-  {
-    id: "islami",
-    label: "Islami",
-    body: `Bismillahirrahmanirrahim...
-
-Assalamu'alaikum {name} 🤍
-
-Insya Allah kami akan melangsungkan pernikahan:
-💍 {groomName} & {brideName}
-
-Mohon doa restu dan kehadirannya ya 🙏
-Detail undangan: {link}
-
-Jazakallah khair 🌿`,
   },
 ]
 
@@ -103,18 +113,51 @@ function normalizePhone(raw: string): string {
   return "62" + digits
 }
 
+/** Slugify a guest name for the ?to= URL parameter */
+function slugifyName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[&+]/g, "dan")
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9\-]/g, "")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+}
+
+function formatDate(dateStr: string): string {
+  try {
+    return new Date(dateStr).toLocaleDateString("id-ID", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    })
+  } catch {
+    return dateStr
+  }
+}
+
 function buildMessage(
   template: string,
   name: string,
   groomName: string,
   brideName: string,
-  link: string
+  link: string,
+  date: string,
+  venue: string,
+  address: string,
+  mapsUrl: string
 ): string {
+  const mapsBlock = mapsUrl ? `\n📍 Maps: ${mapsUrl}` : ""
   return template
     .replace(/{name}/g, name)
     .replace(/{groomName}/g, groomName)
     .replace(/{brideName}/g, brideName)
     .replace(/{link}/g, link)
+    .replace(/{date}/g, date)
+    .replace(/{venue}/g, venue)
+    .replace(/{address}/g, address ? `\n${address}` : "")
+    .replace(/{mapsBlock}/g, mapsBlock)
 }
 
 function buildWaUrl(phone: string, message: string): string {
@@ -156,6 +199,10 @@ interface BroadcastPanelProps {
   groomName: string
   brideName: string
   isPublished: boolean
+  eventDate: string
+  eventVenue: string
+  eventAddress?: string | null
+  mapsUrl?: string | null
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -166,6 +213,10 @@ export function BroadcastPanel({
   groomName,
   brideName,
   isPublished,
+  eventDate,
+  eventVenue,
+  eventAddress,
+  mapsUrl,
 }: BroadcastPanelProps) {
   const storageKey = `broadcast_contacts_${invitationId}`
 
@@ -173,7 +224,7 @@ export function BroadcastPanel({
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
-  const [templateId, setTemplateId] = useState("formal")
+  const [templateId, setTemplateId] = useState("islami")
   const [customBody, setCustomBody] = useState("")
   const [hasCopied, setHasCopied] = useState(false)
   const [broadcastOpen, setBroadcastOpen] = useState(false)
@@ -182,7 +233,18 @@ export function BroadcastPanel({
   const fileRef = useRef<HTMLInputElement>(null)
 
   const origin = typeof window !== "undefined" ? window.location.origin : ""
-  const publicUrl = `${origin}/${slug}`
+  const baseUrl = `${origin}/${slug}`
+
+  /** Build a personalized URL for a specific guest name */
+  function guestUrl(contactName: string) {
+    const slug = slugifyName(contactName)
+    return slug ? `${baseUrl}?to=${slug}` : baseUrl
+  }
+
+  const formattedDate = formatDate(eventDate)
+  const venue = eventVenue
+  const address = eventAddress ?? ""
+  const maps = mapsUrl ?? ""
 
   const activeTemplate =
     templateId === "custom"
@@ -267,14 +329,15 @@ export function BroadcastPanel({
   }
 
   async function handleCopyUrl() {
-    await navigator.clipboard.writeText(publicUrl)
+    await navigator.clipboard.writeText(baseUrl)
     setHasCopied(true)
     toast.success("URL copied!")
     setTimeout(() => setHasCopied(false), 2000)
   }
 
   function sendSingle(contact: Contact) {
-    const msg = buildMessage(activeTemplate, contact.name, groomName, brideName, publicUrl)
+    const link = guestUrl(contact.name)
+    const msg = buildMessage(activeTemplate, contact.name, groomName, brideName, link, formattedDate, venue, address, maps)
     window.open(buildWaUrl(contact.phone, msg), "_blank")
     setContacts((prev) =>
       prev.map((c) => (c.id === contact.id ? { ...c, status: "sent" } : c))
@@ -306,12 +369,17 @@ export function BroadcastPanel({
   function openCurrentWa() {
     const current = broadcastQueue[broadcastIndex]
     if (!current) return
-    const msg = buildMessage(activeTemplate, current.name, groomName, brideName, publicUrl)
+    const link = guestUrl(current.name)
+    const msg = buildMessage(activeTemplate, current.name, groomName, brideName, link, formattedDate, venue, address, maps)
     window.open(buildWaUrl(current.phone, msg), "_blank")
   }
 
-  const selectedContacts = contacts.filter((c) => selected.has(c.id))
   const currentBroadcastContact = broadcastQueue[broadcastIndex]
+
+  // Preview uses first contact or placeholder
+  const previewName = contacts[0]?.name ?? "Nama Tamu"
+  const previewLink = contacts[0] ? guestUrl(contacts[0].name) : `${baseUrl}?to=nama-tamu`
+  const previewMsg = buildMessage(activeTemplate, previewName, groomName, brideName, previewLink, formattedDate, venue, address, maps)
 
   return (
     <div className="flex h-full flex-col">
@@ -345,7 +413,7 @@ export function BroadcastPanel({
                 ) : (
                   <Copy className="h-3 w-3" />
                 )}
-                <span className="max-w-[240px] truncate">{publicUrl}</span>
+                <span className="max-w-[240px] truncate">{baseUrl}</span>
               </button>
             )}
           </div>
@@ -527,14 +595,14 @@ export function BroadcastPanel({
             {templateId === "custom" && (
               <div className="mt-3">
                 <Label className="text-xs text-muted-foreground mb-1.5 block">
-                  Gunakan {"{name}"}, {"{groomName}"}, {"{brideName}"}, {"{link}"}
+                  Variabel: {"{name}"} {"{groomName}"} {"{brideName}"} {"{link}"} {"{date}"} {"{venue}"} {"{address}"} {"{mapsBlock}"}
                 </Label>
                 <Textarea
                   value={customBody}
                   onChange={(e) => setCustomBody(e.target.value)}
                   placeholder="Tulis pesan kamu di sini..."
                   className="rounded-xl text-sm"
-                  rows={6}
+                  rows={8}
                 />
               </div>
             )}
@@ -542,20 +610,17 @@ export function BroadcastPanel({
 
           {/* Preview */}
           <div className="flex-1 rounded-2xl border border-border bg-card p-4">
-            <p className="mb-3 text-sm font-semibold">Preview Pesan</p>
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-sm font-semibold">Preview Pesan</p>
+              <span className="text-xs text-muted-foreground">URL unik per tamu</span>
+            </div>
             <div className="rounded-xl bg-muted/50 p-4">
               <pre className="whitespace-pre-wrap text-sm leading-relaxed font-sans text-foreground">
-                {buildMessage(
-                  activeTemplate,
-                  contacts[0]?.name ?? "Nama Tamu",
-                  groomName,
-                  brideName,
-                  publicUrl
-                )}
+                {previewMsg}
               </pre>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
-              Preview menggunakan kontak pertama sebagai contoh
+              Setiap tamu mendapat link unik dengan namanya (contoh: <code className="bg-muted px-1 rounded">{previewLink}</code>)
             </p>
           </div>
 
@@ -616,17 +681,24 @@ export function BroadcastPanel({
                 <p className="text-xs text-muted-foreground">
                   +{currentBroadcastContact.phone}
                 </p>
+                <p className="mt-1 text-xs text-muted-foreground truncate">
+                  🔗 {guestUrl(currentBroadcastContact.name)}
+                </p>
               </div>
 
               {/* Message preview */}
-              <div className="max-h-48 overflow-y-auto rounded-xl border border-border bg-card p-3">
+              <div className="max-h-52 overflow-y-auto rounded-xl border border-border bg-card p-3">
                 <pre className="whitespace-pre-wrap text-xs leading-relaxed font-sans text-muted-foreground">
                   {buildMessage(
                     activeTemplate,
                     currentBroadcastContact.name,
                     groomName,
                     brideName,
-                    publicUrl
+                    guestUrl(currentBroadcastContact.name),
+                    formattedDate,
+                    venue,
+                    address,
+                    maps
                   )}
                 </pre>
               </div>

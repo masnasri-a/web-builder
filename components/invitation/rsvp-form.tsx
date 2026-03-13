@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
+import { useGuestContext } from "@/components/invitation/guest-context"
 
 interface RsvpFormProps {
   invitationId: string
@@ -11,6 +12,7 @@ interface RsvpFormProps {
 }
 
 export function RsvpForm({ invitationId, primaryColor, deadline }: RsvpFormProps) {
+  const { guestName } = useGuestContext()
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
@@ -24,7 +26,7 @@ export function RsvpForm({ invitationId, primaryColor, deadline }: RsvpFormProps
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         invitationId,
-        name: fd.get("name"),
+        name: guestName ?? fd.get("name"),
         phone: fd.get("phone"),
         attendance: fd.get("attendance"),
         guestCount: Number(fd.get("guestCount") ?? 1),
@@ -67,18 +69,28 @@ export function RsvpForm({ invitationId, primaryColor, deadline }: RsvpFormProps
         </p>
       )}
 
-      <input
-        name="name"
-        required
-        placeholder="Your Name"
-        className="w-full rounded-xl border bg-transparent px-4 py-3 text-sm placeholder:opacity-50 focus:outline-none focus:ring-2"
-        style={
-          {
-            borderColor: `${primaryColor}30`,
-            "--tw-ring-color": primaryColor,
-          } as React.CSSProperties
-        }
-      />
+      {guestName ? (
+        <div
+          className="flex items-center rounded-xl border px-4 py-3 text-sm"
+          style={{ borderColor: `${primaryColor}30` }}
+        >
+          <span className="opacity-50 mr-2">Konfirmasi sebagai:</span>
+          <span className="font-medium">{guestName}</span>
+        </div>
+      ) : (
+        <input
+          name="name"
+          required
+          placeholder="Nama kamu"
+          className="w-full rounded-xl border bg-transparent px-4 py-3 text-sm placeholder:opacity-50 focus:outline-none focus:ring-2"
+          style={
+            {
+              borderColor: `${primaryColor}30`,
+              "--tw-ring-color": primaryColor,
+            } as React.CSSProperties
+          }
+        />
+      )}
 
       <input
         name="phone"

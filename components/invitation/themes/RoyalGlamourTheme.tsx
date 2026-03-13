@@ -13,6 +13,7 @@ import { RsvpForm } from "@/components/invitation/rsvp-form"
 import { Navigation } from "lucide-react"
 import type { Section } from "@/types"
 import type { ThemeTemplateProps } from "./index"
+import { GiftSection } from "@/components/invitation/gift-section"
 
 // ─── Palette constants ────────────────────────────────────────────────────────
 const NAVY  = "#0D1B4B" // deep navy   — background
@@ -558,6 +559,35 @@ function RoyalSection({
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+      )
+    }
+
+    // ── Gift ──────────────────────────────────────────────────────────────────
+    case "gift": {
+      const banks = (c.banks as import("@/components/invitation/gift-section").BankAccount[]) ?? []
+      return (
+        <section
+          id={section.id}
+          className="relative min-h-dvh flex flex-col items-center justify-center px-8 py-16 overflow-hidden"
+          style={{ backgroundColor: NAVY, color: TXT, ...snap }}
+        >
+          <OrnateFrame />
+          <div className="relative z-10 max-w-sm mx-auto w-full">
+            <Anim variant="fadeUp" delay={0}>
+              <GiftSection
+                invitationId={inv.id}
+                title={c.title as string | undefined}
+                description={c.description as string | undefined}
+                showQris={c.showQris as boolean | undefined}
+                qrisImage={c.qrisImage as string | null | undefined}
+                banks={banks}
+                allowTransferProof={c.allowTransferProof as boolean | undefined}
+                primaryColor={G}
+                accentColor={CHAMP}
+              />
+            </Anim>
           </div>
         </section>
       )

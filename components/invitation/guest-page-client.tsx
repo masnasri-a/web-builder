@@ -8,6 +8,7 @@ import { FontLoader } from "@/components/invitation/font-loader"
 import type { Section, ThemeConfig } from "@/types"
 import { getThemeBySlug } from "@/lib/themeRegistry"
 import { RomanticFloralTheme } from "@/components/invitation/themes"
+import { GuestContextProvider } from "@/components/invitation/guest-context"
 
 interface GuestPageClientProps {
   inv: GuestInvitation
@@ -42,6 +43,7 @@ export function GuestPageClient({
   }
 
   return (
+    <GuestContextProvider guestName={guestName}>
     <div className="h-dvh overflow-y-scroll" style={style}>
       <FontLoader fontFamily={fonts} />
 
@@ -66,5 +68,6 @@ export function GuestPageClient({
       {/* Music player — only shown after entering, only if musicUrl provided */}
       {musicUrl && <MusicPlayer musicUrl={musicUrl} autoPlay={entered} />}
     </div>
+    </GuestContextProvider>
   )
 }

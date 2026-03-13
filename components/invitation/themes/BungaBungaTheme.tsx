@@ -13,6 +13,7 @@ import { RsvpForm } from "@/components/invitation/rsvp-form"
 import { Navigation } from "lucide-react"
 import type { Section } from "@/types"
 import type { ThemeTemplateProps } from "./index"
+import { GiftSection } from "@/components/invitation/gift-section"
 
 // ─── Palette ──────────────────────────────────────────────────────────────────
 const FUCHSIA = "#D4456C"  // coral fuchsia
@@ -374,6 +375,34 @@ function BungaSection({
           <Anim variant="fadeIn" delay={0}><p className="mb-6 text-[10px] tracking-[0.35em] uppercase" style={{ color: GREEN, opacity: 0.7 }}>Gallery</p></Anim>
           <div className="columns-2 gap-2 px-4 w-full max-w-sm mx-auto">
             {images.map((url, i) => (<div key={i} className="mb-2 overflow-hidden rounded-2xl" style={{ border: `1.5px solid ${FUCHSIA}45` }}><Image src={url} alt={`Gallery ${i + 1}`} width={200} height={200} className="w-full h-auto object-cover" /></div>))}
+          </div>
+        </section>
+      )
+    }
+
+    // ── Gift ──────────────────────────────────────────────────────────────────
+    case "gift": {
+      const banks = (c.banks as import("@/components/invitation/gift-section").BankAccount[]) ?? []
+      return (
+        <section
+          id={section.id}
+          className="min-h-dvh flex flex-col items-center justify-center px-8 py-16"
+          style={{ backgroundColor: BG, color: TXT, ...snap }}
+        >
+          <div className="max-w-sm mx-auto w-full">
+            <Anim variant="fadeUp" delay={0}>
+              <GiftSection
+                invitationId={inv.id}
+                title={c.title as string | undefined}
+                description={c.description as string | undefined}
+                showQris={c.showQris as boolean | undefined}
+                qrisImage={c.qrisImage as string | null | undefined}
+                banks={banks}
+                allowTransferProof={c.allowTransferProof as boolean | undefined}
+                primaryColor={FUCHSIA}
+                accentColor={YELLOW}
+              />
+            </Anim>
           </div>
         </section>
       )

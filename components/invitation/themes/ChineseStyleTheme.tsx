@@ -13,6 +13,7 @@ import { RsvpForm } from "@/components/invitation/rsvp-form"
 import { Navigation } from "lucide-react"
 import type { Section } from "@/types"
 import type { ThemeTemplateProps } from "./index"
+import { GiftSection } from "@/components/invitation/gift-section"
 
 // ─── Palette constants ────────────────────────────────────────────────────────
 const P   = "#C0392B" // deep red — primary
@@ -575,6 +576,34 @@ function ChineseSection({
                 />
               </div>
             ))}
+          </div>
+        </section>
+      )
+    }
+
+    // ── Gift ──────────────────────────────────────────────────────────────────
+    case "gift": {
+      const banks = (c.banks as import("@/components/invitation/gift-section").BankAccount[]) ?? []
+      return (
+        <section
+          id={section.id}
+          className="min-h-dvh flex flex-col items-center justify-center px-8 py-16"
+          style={{ backgroundColor: BG, color: TXT, ...snap }}
+        >
+          <div className="max-w-sm mx-auto w-full">
+            <Anim variant="fadeUp" delay={0}>
+              <GiftSection
+                invitationId={inv.id}
+                title={c.title as string | undefined}
+                description={c.description as string | undefined}
+                showQris={c.showQris as boolean | undefined}
+                qrisImage={c.qrisImage as string | null | undefined}
+                banks={banks}
+                allowTransferProof={c.allowTransferProof as boolean | undefined}
+                primaryColor={P}
+                accentColor={G}
+              />
+            </Anim>
           </div>
         </section>
       )

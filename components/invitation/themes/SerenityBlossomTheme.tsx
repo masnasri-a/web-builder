@@ -15,6 +15,7 @@ import { Navigation, Instagram } from "lucide-react"
 import type { Section } from "@/types"
 import type { ThemeTemplateProps } from "./index"
 import type { GuestInvitation } from "@/components/invitation/guest-sections"
+import { GiftSection } from "@/components/invitation/gift-section"
 
 const Masonry = dynamic(
   () => import("@/components/ui/masonry").then((m) => ({ default: m.Masonry })),
@@ -485,6 +486,34 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
           )}
         </section>
       )
+
+    // ── Gift ──────────────────────────────────────────────────────────────────
+    case "gift": {
+      const banks = (c.banks as import("@/components/invitation/gift-section").BankAccount[]) ?? []
+      return (
+        <section
+          id={section.id}
+          className="min-h-dvh flex flex-col items-center justify-center px-8 py-16"
+          style={{ backgroundColor: BG, color: TXT, ...snap }}
+        >
+          <div className="max-w-sm mx-auto w-full">
+            <Anim variant="fadeUp" delay={0}>
+              <GiftSection
+                invitationId={inv.id}
+                title={c.title as string | undefined}
+                description={c.description as string | undefined}
+                showQris={c.showQris as boolean | undefined}
+                qrisImage={c.qrisImage as string | null | undefined}
+                banks={banks}
+                allowTransferProof={c.allowTransferProof as boolean | undefined}
+                primaryColor={SAKURA}
+                accentColor={LAVENDER}
+              />
+            </Anim>
+          </div>
+        </section>
+      )
+    }
 
     default:
       return null
