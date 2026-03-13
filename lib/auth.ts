@@ -1,6 +1,7 @@
 import NextAuth from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import Credentials from "next-auth/providers/credentials"
+import Google from "next-auth/providers/google"
 import bcrypt from "bcryptjs"
 import { db } from "@/lib/db"
 import { authConfig } from "@/lib/auth.config"
@@ -10,6 +11,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   adapter: PrismaAdapter(db) as any,
   providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
     Credentials({
       credentials: {
         email: { label: "Email", type: "email" },
@@ -43,4 +48,34 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id!
+        // For Credentials, role/tier come from authorize()
+        // For Google OAuth, we fetch them from DB (PrismaAdapter creates the user)
+        if (user.role) {
+          token.role = user.role as "USER" | "ADMIN"
+          token.tier = (user as { tier?: string }).tier as "FREE" | "PRO" | "UNLIMITED" | undefined ?? "FREE"
+        } else {
+          // OAuth user — fetch role/tier from DB
+          const dbUser = await db.user.findUnique({
+            where: { id: user.id! },
+            select: { role: true, tier: true },
+          })
+          token.role = (dbUser?.role ?? "USER") as "USER" | "ADMIN"
+          token.tier = (dbUser?.tier ?? "FREE") as "FREE" | "PRO" | "UNLIMITED"
+        }
+      }
+      return token
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id as string
+        session.user.role = token.role as "USER" | "ADMIN"
+        session.user.tier = token.tier as "FREE" | "PRO" | "UNLIMITED"
+      }
+      return session
+    },
+  },
 })

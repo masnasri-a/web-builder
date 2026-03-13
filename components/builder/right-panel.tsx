@@ -501,6 +501,13 @@ function SectionConfig({
             </div>
           </>
         )}
+        {type === "gift" && (
+          <GiftSectionConfig
+            content={content as Record<string, unknown>}
+            invitationId={invitationId}
+            onChange={(partial) => onUpdateContent(id, partial)}
+          />
+        )}
         {type === "quote" && (
           <>
             <div className="space-y-2">
@@ -631,6 +638,193 @@ function EventsEditor({
           Belum ada acara. Klik + Tambah untuk menambahkan.
         </p>
       )}
+    </div>
+  )
+}
+
+// ── Gift section config ──────────────────────────────────────────────────────
+
+interface BankAccount {
+  id: string
+  bank: string
+  accountNumber: string
+  accountName: string
+}
+
+function Toggle({
+  checked,
+  onChange,
+}: {
+  checked: boolean
+  onChange: (v: boolean) => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      className={`relative h-5 w-9 rounded-full transition-colors ${checked ? "bg-primary" : "bg-muted"}`}
+    >
+      <span
+        className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${checked ? "translate-x-4" : "translate-x-0.5"}`}
+      />
+    </button>
+  )
+}
+
+function GiftSectionConfig({
+  content,
+  invitationId,
+  onChange,
+}: {
+  content: Record<string, unknown>
+  invitationId: string
+  onChange: (partial: Record<string, unknown>) => void
+}) {
+  const banks = (content.banks as BankAccount[]) ?? []
+  const showQris = !!content.showQris
+  const allowTransferProof = !!content.allowTransferProof
+
+  function addBank() {
+    onChange({
+      banks: [
+        ...banks,
+        { id: Date.now().toString(), bank: "", accountNumber: "", accountName: "" },
+      ],
+    })
+  }
+
+  function updateBank(index: number, field: keyof BankAccount, value: string) {
+    onChange({
+      banks: banks.map((b, i) => (i === index ? { ...b, [field]: value } : b)),
+    })
+  }
+
+  function removeBank(index: number) {
+    onChange({ banks: banks.filter((_, i) => i !== index) })
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Title */}
+      <div className="space-y-1.5">
+        <Label className="text-xs">Judul Section</Label>
+        <Input
+          value={(content.title as string) ?? ""}
+          onChange={(e) => onChange({ title: e.target.value })}
+          placeholder="Hadiah Pernikahan"
+          className="rounded-xl text-sm"
+        />
+      </div>
+
+      {/* Description */}
+      <div className="space-y-1.5">
+        <Label className="text-xs">Deskripsi</Label>
+        <Textarea
+          value={(content.description as string) ?? ""}
+          onChange={(e) => onChange({ description: e.target.value })}
+          placeholder="Doa dan kehadiran Anda adalah hadiah terindah..."
+          rows={2}
+          className="rounded-xl text-sm"
+        />
+      </div>
+
+      {/* Bank accounts */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label className="text-xs">Rekening Bank</Label>
+          <button
+            type="button"
+            onClick={addBank}
+            disabled={banks.length >= 5}
+            className="rounded-lg bg-primary px-2 py-0.5 text-[10px] font-medium text-white hover:opacity-90 disabled:opacity-40"
+          >
+            + Tambah
+          </button>
+        </div>
+        {banks.map((bank, i) => (
+          <div key={bank.id} className="rounded-xl border border-border p-2.5 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                Bank {i + 1}
+              </span>
+              <button
+                type="button"
+                onClick={() => removeBank(i)}
+                className="text-muted-foreground hover:text-destructive"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+            <Input
+              value={bank.bank}
+              onChange={(e) => updateBank(i, "bank", e.target.value)}
+              placeholder="BCA / Mandiri / BNI"
+              className="rounded-lg text-xs h-7"
+            />
+            <Input
+              value={bank.accountNumber}
+              onChange={(e) => updateBank(i, "accountNumber", e.target.value)}
+              placeholder="Nomor Rekening"
+              className="rounded-lg text-xs h-7 font-mono"
+            />
+            <Input
+              value={bank.accountName}
+              onChange={(e) => updateBank(i, "accountName", e.target.value)}
+              placeholder="Nama Pemilik Rekening"
+              className="rounded-lg text-xs h-7"
+            />
+          </div>
+        ))}
+        {banks.length === 0 && (
+          <p className="text-[11px] text-muted-foreground">
+            Belum ada rekening. Klik + Tambah untuk menambahkan.
+          </p>
+        )}
+      </div>
+
+      {/* QRIS */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label className="text-xs">Tampilkan QRIS</Label>
+          <Toggle checked={showQris} onChange={(v) => onChange({ showQris: v })} />
+        </div>
+        {showQris && (
+          <div className="space-y-1.5">
+            {(content.qrisImage as string) && (
+              <div className="relative inline-block">
+                <Image
+                  src={content.qrisImage as string}
+                  alt="QRIS"
+                  width={100}
+                  height={100}
+                  className="rounded-xl object-contain border border-border"
+                />
+                <button
+                  onClick={() => onChange({ qrisImage: null })}
+                  className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-white"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            )}
+            <ImageUploader
+              invitationId={invitationId}
+              type="gallery"
+              onUploaded={(url) => onChange({ qrisImage: url })}
+            />
+            <p className="text-[10px] text-muted-foreground">Upload foto QRIS kamu.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Allow transfer proof */}
+      <div className="flex items-center justify-between">
+        <Label className="text-xs">Izinkan Upload Bukti Transfer</Label>
+        <Toggle
+          checked={allowTransferProof}
+          onChange={(v) => onChange({ allowTransferProof: v })}
+        />
+      </div>
     </div>
   )
 }

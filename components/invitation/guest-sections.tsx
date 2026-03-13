@@ -7,6 +7,7 @@ import { CountdownTimer } from "@/components/invitation/countdown-timer"
 import { RsvpForm } from "@/components/invitation/rsvp-form"
 import type { Section, ThemeConfig } from "@/types"
 import { Instagram, Navigation } from "lucide-react"
+import { GiftSection } from "@/components/invitation/gift-section"
 
 const Masonry = dynamic(
   () => import("@/components/ui/masonry").then((m) => ({ default: m.Masonry })),
@@ -494,6 +495,33 @@ function AnimatedSection({
               blurToFocus={true}
               maxColumns={2}
             />
+          </div>
+        </section>
+      )
+    }
+
+    case "gift": {
+      const banks = (c.banks as import("@/components/invitation/gift-section").BankAccount[]) ?? []
+      return (
+        <section
+          id={sectionId}
+          className="min-h-dvh flex flex-col items-center justify-center px-8 py-16"
+          style={{ ...fontStyle, ...snapStyle }}
+        >
+          <div className="max-w-sm mx-auto w-full">
+            <Anim variant="fadeUp" delay={0}>
+              <GiftSection
+                invitationId={inv.id}
+                title={c.title as string | undefined}
+                description={c.description as string | undefined}
+                showQris={c.showQris as boolean | undefined}
+                qrisImage={c.qrisImage as string | null | undefined}
+                banks={banks}
+                allowTransferProof={c.allowTransferProof as boolean | undefined}
+                primaryColor={primary}
+                accentColor={accent}
+              />
+            </Anim>
           </div>
         </section>
       )

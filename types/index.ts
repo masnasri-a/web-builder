@@ -8,6 +8,7 @@ export type SectionType =
   | "closing"
   | "maps"
   | "quote"
+  | "gift"
 
 export type Section = {
   id: string
@@ -163,6 +164,20 @@ export const DEFAULT_SECTIONS: Section[] = [
       quote:
         "Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya...",
       source: "QS. Ar-Rum: 21",
+    },
+  },
+  {
+    id: "gift",
+    type: "gift",
+    visible: false,
+    order: 9,
+    content: {
+      title: "Hadiah Pernikahan",
+      description: "Doa dan kehadiran Anda adalah hadiah terindah bagi kami.",
+      showQris: false,
+      qrisImage: null,
+      banks: [],
+      allowTransferProof: false,
     },
   },
 ]

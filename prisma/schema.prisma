@@ -120,9 +120,10 @@ model Invitation {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  user   User    @relation(fields: [userId], references: [id])
-  theme  Theme   @relation(fields: [themeId], references: [id])
-  guests Guest[]
+  user       User        @relation(fields: [userId], references: [id])
+  theme      Theme       @relation(fields: [themeId], references: [id])
+  guests     Guest[]
+  giftProofs GiftProof[]
 }
 
 // Guest / RSVP
@@ -136,6 +137,20 @@ model Guest {
   guestCount   Int        @default(1)
   message      String?
   createdAt    DateTime   @default(now())
+
+  invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+}
+
+// Gift transfer proof submitted by guests
+model GiftProof {
+  id           String   @id @default(cuid())
+  invitationId String
+  guestName    String
+  amount       Int?     // in IDR (optional)
+  bankFrom     String?  // sender's bank name
+  note         String?  // personal message
+  proofUrl     String   // S3 URL of the uploaded proof image
+  createdAt    DateTime @default(now())
 
   invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
 }
