@@ -37,7 +37,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Dynamic invitation pages
   try {
     const invitations = await db.invitation.findMany({
-      where: { published: true },
+      where: { isPublished: true },
       select: { slug: true, updatedAt: true },
       orderBy: { updatedAt: "desc" },
       take: 1000,
