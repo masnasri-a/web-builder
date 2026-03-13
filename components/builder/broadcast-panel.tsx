@@ -50,21 +50,22 @@ const TEMPLATES: Template[] = [
   {
     id: "islami",
     label: "Islami",
-    body: `Assalamualaikum Wr. Wb.
+    body: `Assalamualaikum Wr. Wb. ✨
 
 Yth. {name},
 
 Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud mengundang Bapak/Ibu/Saudara/i untuk hadir dalam acara pernikahan kami:
 
-🤵👰 Pernikahan {groomName} & {brideName}
+💍 *Pernikahan {groomName} & {brideName}* 💍
 
+📲 Undangan Digital:
 {link}
 
-📅 {date}
-📍 {venue}
-{address}{mapsBlock}
+🗓️ *Waktu & Tempat*
+- Hari/Tgl : {date}
+- Tempat   : {venue}{address}{mapsBlock}
 
-Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu kepada kami.
+Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu kepada kami. 🤍
 
 Wassalamualaikum Wr. Wb.`,
   },
@@ -73,15 +74,16 @@ Wassalamualaikum Wr. Wb.`,
     label: "Formal",
     body: `Kepada Yth. {name},
 
-Dengan penuh kebahagiaan, kami mengundang kehadiran Bapak/Ibu/Saudara/i pada pernikahan kami:
+Dengan penuh kebahagiaan 🎉, kami mengundang kehadiran Bapak/Ibu/Saudara/i pada pernikahan kami:
 
-💍 {groomName} & {brideName}
+💍 *{groomName} & {brideName}* 💍
 
+📲 Undangan Digital:
 {link}
 
-📅 {date}
-📍 {venue}
-{address}{mapsBlock}
+🗓️ *Detail Acara*
+- Hari/Tgl : {date}
+- Tempat   : {venue}{address}{mapsBlock}
 
 Atas kehadiran dan doa restu Anda, kami mengucapkan terima kasih 🙏`,
   },
@@ -90,17 +92,17 @@ Atas kehadiran dan doa restu Anda, kami mengucapkan terima kasih 🙏`,
     label: "Kasual",
     body: `Halo {name}! 👋
 
-Kamu diundang ke pernikahan kami! 🎊
+Kamu diundang ke pernikahan kami! 🎉🎊
 
-💑 {groomName} & {brideName}
+💍 *{groomName} & {brideName}* 💍
 
-Cek undangan digitalnya:
+Cek undangan digitalnya 👇
 {link}
 
-📅 {date}
-📍 {venue}{mapsBlock}
+🗓️ {date}
+📍 {venue}{address}{mapsBlock}
 
-Sampai jumpa di hari bahagia kami! 🥰`,
+Sampai jumpa di hari bahagia kami! ❤️`,
   },
 ]
 
@@ -148,7 +150,7 @@ function buildMessage(
   address: string,
   mapsUrl: string
 ): string {
-  const mapsBlock = mapsUrl ? `\n📍 Maps: ${mapsUrl}` : ""
+  const mapsBlock = mapsUrl ? `\n- Maps    : ${mapsUrl}` : ""
   return template
     .replace(/{name}/g, name)
     .replace(/{groomName}/g, groomName)
@@ -156,7 +158,7 @@ function buildMessage(
     .replace(/{link}/g, link)
     .replace(/{date}/g, date)
     .replace(/{venue}/g, venue)
-    .replace(/{address}/g, address ? `\n${address}` : "")
+    .replace(/{address}/g, address ? `\n             ${address}` : "")
     .replace(/{mapsBlock}/g, mapsBlock)
 }
 
