@@ -99,7 +99,7 @@ export default async function AdminPage() {
                   </td>
                   <td className="px-5 py-3.5">
                     <span className={`inline-flex items-center rounded-lg px-2.5 py-0.5 text-xs font-medium ${
-                      user.tier === "UNLIMITED"
+                      user.tier === "PLATINUM" || user.tier === "LUXURY"
                         ? "bg-primary/10 text-primary"
                         : user.tier === "PRO"
                           ? "bg-amber-50 text-amber-700"

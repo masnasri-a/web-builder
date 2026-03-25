@@ -6,7 +6,7 @@ import { z } from "zod"
 const updateSchema = z.object({
   userId: z.string().min(1),
   action: z.enum(["suspend", "unsuspend", "upgrade"]),
-  tier: z.enum(["FREE", "PRO", "UNLIMITED"]).optional(),
+  tier: z.enum(["BASIC", "PRO", "PLATINUM", "LUXURY"]).optional(),
 })
 
 export async function GET() {

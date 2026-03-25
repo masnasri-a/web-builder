@@ -14,6 +14,7 @@ import { Navigation } from "lucide-react"
 import type { Section } from "@/types"
 import type { ThemeTemplateProps } from "./index"
 import { GiftSection } from "@/components/invitation/gift-section"
+import { UcapanWall } from "@/components/invitation/ucapan-wall"
 
 // ─── Palette ──────────────────────────────────────────────────────────────────
 const MAROON = "#7D1535"
@@ -159,6 +160,21 @@ function Divider() {
   )
 }
 
+// ─── Module-level sub-components ──────────────────────────────────────────────
+
+function PhinisiPersonCard({ photo, name, parents, bio }: { photo?: string; name: string; parents?: string; bio?: string }) {
+  return (
+    <div className="space-y-3 text-center">
+      <div className="mx-auto h-24 w-24 overflow-hidden rounded-full" style={{ border: `2.5px solid ${GOLD}` }}>
+        {photo && <Image src={photo} alt={name} width={96} height={96} className="h-full w-full object-cover" />}
+      </div>
+      <h2 className="text-2xl font-bold" style={{ color: MAROON, fontFamily: "Cinzel, serif" }}>{name}</h2>
+      {parents && <p className="text-sm opacity-60" style={{ color: WOOD }}>{parents}</p>}
+      {bio && <p className="mx-auto max-w-[180px] text-sm leading-relaxed opacity-72" style={{ color: WOOD }}>{bio}</p>}
+    </div>
+  )
+}
+
 // ─── Per-section renderer ─────────────────────────────────────────────────────
 
 function PhinisiSection({
@@ -251,16 +267,6 @@ function PhinisiSection({
     // ── Couple ────────────────────────────────────────────────────────────────
     case "couple": {
       const layout = (c.coupleLayout as string) ?? "side-by-side"
-      const PersonCard = ({ photo, name, parents, bio }: { photo?: string; name: string; parents?: string; bio?: string }) => (
-        <div className="space-y-3 text-center">
-          <div className="mx-auto h-24 w-24 overflow-hidden rounded-full" style={{ border: `2.5px solid ${GOLD}` }}>
-            {photo && <Image src={photo} alt={name} width={96} height={96} className="h-full w-full object-cover" />}
-          </div>
-          <h2 className="text-2xl font-bold" style={{ color: MAROON, fontFamily: "Cinzel, serif" }}>{name}</h2>
-          {parents && <p className="text-sm opacity-60" style={{ color: WOOD }}>{parents}</p>}
-          {bio && <p className="mx-auto max-w-[180px] text-sm leading-relaxed opacity-72" style={{ color: WOOD }}>{bio}</p>}
-        </div>
-      )
       return (
         <section id={section.id} className="min-h-dvh flex flex-col items-center justify-center px-8 py-16 text-center" style={{ backgroundColor: BG, ...snap }}>
           <Anim variant="scaleIn" delay={0}><CompassRose size={40} /></Anim>
@@ -269,15 +275,15 @@ function PhinisiSection({
           </Anim>
           {layout === "side-by-side" ? (
             <div className="flex justify-center gap-10">
-              <Anim variant="slideLeft" delay={150}><PersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} /></Anim>
+              <Anim variant="slideLeft" delay={150}><PhinisiPersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} /></Anim>
               <Anim variant="scaleIn" delay={300} className="self-center"><span className="text-3xl font-light" style={{ color: GOLD }}>&amp;</span></Anim>
-              <Anim variant="slideRight" delay={150}><PersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} /></Anim>
+              <Anim variant="slideRight" delay={150}><PhinisiPersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} /></Anim>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-8">
-              <Anim variant="fadeUp" delay={150}><PersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} /></Anim>
+              <Anim variant="fadeUp" delay={150}><PhinisiPersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} /></Anim>
               <span className="text-3xl font-light" style={{ color: GOLD }}>&amp;</span>
-              <Anim variant="fadeUp" delay={300}><PersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} /></Anim>
+              <Anim variant="fadeUp" delay={300}><PhinisiPersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} /></Anim>
             </div>
           )}
         </section>
@@ -421,6 +427,27 @@ function PhinisiSection({
         </section>
       )
     }
+
+    // ── Ucapan ────────────────────────────────────────────────────────────────
+    case "ucapan":
+      return (
+        <section
+          id={section.id}
+          className="relative min-h-dvh flex flex-col items-center justify-center py-12"
+          style={{ backgroundColor: BG, color: WOOD, ...snap }}
+        >
+          <div className="w-full max-w-sm px-8">
+            <Anim variant="fadeIn" delay={0}>
+              <p className="mb-6 text-center text-[10px] tracking-[0.4em] uppercase opacity-60">
+                {(c.title as string) || "Ucapan & Doa"}
+              </p>
+            </Anim>
+            <Anim variant="fadeUp" delay={120}>
+              <UcapanWall invitationId={inv.id} primaryColor={MAROON} />
+            </Anim>
+          </div>
+        </section>
+      )
 
     default: return null
   }

@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { toast } from "sonner"
-import { Sparkles, Loader2 } from "lucide-react"
+import { Sparkles, Loader2, User, Store } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -23,10 +23,28 @@ function GoogleIcon() {
   )
 }
 
+type Role = "INDIVIDUAL" | "VENDOR"
+
+const ROLES: { value: Role; label: string; desc: string; icon: typeof User }[] = [
+  {
+    value: "INDIVIDUAL",
+    label: "Individual",
+    desc: "Klaim voucher dari vendor",
+    icon: User,
+  },
+  {
+    value: "VENDOR",
+    label: "Vendor",
+    desc: "Buat & bagikan voucher ke pelanggan",
+    icon: Store,
+  },
+]
+
 export default function RegisterPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
+  const [role, setRole] = useState<Role>("INDIVIDUAL")
   const t = useT()
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -41,6 +59,11 @@ export default function RegisterPage() {
         name: fd.get("name"),
         email: fd.get("email"),
         password: fd.get("password"),
+        role,
+        ...(role === "VENDOR" && {
+          shopName: fd.get("shopName"),
+          description: fd.get("description"),
+        }),
       }),
     })
 
@@ -52,13 +75,13 @@ export default function RegisterPage() {
       return
     }
 
-    toast.success("Account created! Please sign in.")
+    toast.success("Akun berhasil dibuat! Silakan masuk.")
     router.push("/login")
   }
 
   async function handleGoogle() {
     setGoogleLoading(true)
-    await signIn("google", { callbackUrl: "/dashboard" })
+    await signIn("google", { callbackUrl: "/auth/callback" })
   }
 
   return (
@@ -73,17 +96,39 @@ export default function RegisterPage() {
           <p className="text-sm text-muted-foreground">{t("auth.register.subtitle")}</p>
         </div>
 
+        {/* Role Selector */}
+        <div className="grid grid-cols-2 gap-3">
+          {ROLES.map(({ value, label, desc, icon: Icon }) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setRole(value)}
+              className={`flex flex-col items-center gap-2 rounded-2xl border p-4 text-center transition-all ${
+                role === value
+                  ? "border-primary bg-primary/5 ring-2 ring-primary/20"
+                  : "border-border bg-card hover:bg-muted"
+              }`}
+            >
+              <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${role === value ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+                <Icon className="h-4 w-4" />
+              </div>
+              <div>
+                <p className={`text-sm font-semibold ${role === value ? "text-primary" : "text-foreground"}`}>
+                  {label}
+                </p>
+                <p className="text-[11px] text-muted-foreground leading-tight">{desc}</p>
+              </div>
+            </button>
+          ))}
+        </div>
+
         {/* Google SSO */}
         <button
           onClick={handleGoogle}
           disabled={googleLoading}
           className="flex w-full items-center justify-center gap-3 rounded-2xl border border-border bg-card px-4 py-2.5 text-sm font-medium shadow-sm transition-colors hover:bg-muted disabled:opacity-60"
         >
-          {googleLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <GoogleIcon />
-          )}
+          {googleLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <GoogleIcon />}
           Continue with Google
         </button>
 
@@ -95,43 +140,38 @@ export default function RegisterPage() {
         </div>
 
         {/* Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-sm"
-        >
+        <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-sm">
           <div className="space-y-1.5">
             <Label htmlFor="name">{t("auth.register.name")}</Label>
-            <Input
-              id="name"
-              name="name"
-              placeholder="Ahmad Fauzi"
-              required
-              autoComplete="name"
-            />
+            <Input id="name" name="name" placeholder="Ahmad Fauzi" required autoComplete="name" />
           </div>
+
           <div className="space-y-1.5">
             <Label htmlFor="email">{t("auth.register.email")}</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="you@example.com"
-              required
-              autoComplete="email"
-            />
+            <Input id="email" name="email" type="email" placeholder="you@example.com" required autoComplete="email" />
           </div>
+
           <div className="space-y-1.5">
             <Label htmlFor="password">{t("auth.register.password")}</Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="Min. 8 karakter"
-              required
-              minLength={8}
-              autoComplete="new-password"
-            />
+            <Input id="password" name="password" type="password" placeholder="Min. 8 karakter" required minLength={8} autoComplete="new-password" />
           </div>
+
+          {/* Vendor-only fields */}
+          {role === "VENDOR" && (
+            <>
+              <div className="h-px bg-border" />
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Info Vendor</p>
+              <div className="space-y-1.5">
+                <Label htmlFor="shopName">Nama Toko / Brand</Label>
+                <Input id="shopName" name="shopName" placeholder="My Wedding Studio" required />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="description">Deskripsi <span className="text-muted-foreground font-normal">(opsional)</span></Label>
+                <Input id="description" name="description" placeholder="Layanan fotografi pernikahan profesional" />
+              </div>
+            </>
+          )}
+
           <Button type="submit" className="w-full" disabled={loading}>
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
             {loading ? t("auth.register.loading") : t("auth.register.submit")}

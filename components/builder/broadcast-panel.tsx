@@ -257,6 +257,7 @@ export function BroadcastPanel({
   useEffect(() => {
     try {
       const raw = localStorage.getItem(storageKey)
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (raw) setContacts(JSON.parse(raw))
     } catch {
       // ignore
@@ -298,7 +299,7 @@ export function BroadcastPanel({
   function toggleSelect(id: string) {
     setSelected((prev) => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
+      if (next.has(id)) { next.delete(id) } else { next.add(id) }
       return next
     })
   }

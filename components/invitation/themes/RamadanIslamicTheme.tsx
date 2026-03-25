@@ -14,6 +14,7 @@ import { Navigation } from "lucide-react"
 import type { Section } from "@/types"
 import type { ThemeTemplateProps } from "./index"
 import { GiftSection } from "@/components/invitation/gift-section"
+import { UcapanWall } from "@/components/invitation/ucapan-wall"
 
 // ─── Palette constants ────────────────────────────────────────────────────────
 const P   = "#1A5C38" // emerald — primary
@@ -91,7 +92,6 @@ function MosqueSilhouette() {
 
 /** 8-pointed star background pattern tile (used as repeat) */
 function StarPattern() {
-  const ids = Array.from({ length: 60 }, (_, i) => i)
   return (
     <svg
       aria-hidden="true"
@@ -133,6 +133,35 @@ function MandalaCorner({ rotate = 0 }: { rotate?: number }) {
       <circle cx="4"  cy="16" r="2"   fill={G} opacity="0.3" />
       <circle cx="30" cy="30" r="2.5" fill={G} opacity="0.25" />
     </svg>
+  )
+}
+
+// ─── Module-level sub-components ──────────────────────────────────────────────
+
+function IslamicPersonCard({ photo, name, parents, bio }: { photo?: string; name: string; parents?: string; bio?: string }) {
+  return (
+    <div className="space-y-3 text-center">
+      <div
+        className="mx-auto h-24 w-24 overflow-hidden"
+        style={{
+          border: `2px solid ${G}`,
+          clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+        }}
+      >
+        {photo && (
+          <Image src={photo} alt={name} width={96} height={96} className="h-full w-full object-cover" />
+        )}
+      </div>
+      <h2 className="text-2xl font-bold" style={{ color: P, fontFamily: "Cormorant Garamond, serif" }}>
+        {name}
+      </h2>
+      {parents && <p className="text-sm opacity-60" style={{ color: TXT }}>{parents}</p>}
+      {bio && (
+        <p className="mx-auto max-w-[180px] text-sm leading-relaxed opacity-72" style={{ color: TXT }}>
+          {bio}
+        </p>
+      )}
+    </div>
   )
 }
 
@@ -241,33 +270,6 @@ function IslamicSection({
     case "couple": {
       const layout = (c.coupleLayout as string) ?? "side-by-side"
 
-      const PersonCard = ({
-        photo, name, parents, bio,
-      }: { photo?: string; name: string; parents?: string; bio?: string }) => (
-        <div className="space-y-3 text-center">
-          <div
-            className="mx-auto h-24 w-24 overflow-hidden"
-            style={{
-              border: `2px solid ${G}`,
-              clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-            }}
-          >
-            {photo && (
-              <Image src={photo} alt={name} width={96} height={96} className="h-full w-full object-cover" />
-            )}
-          </div>
-          <h2 className="text-2xl font-bold" style={{ color: P, fontFamily: "Cormorant Garamond, serif" }}>
-            {name}
-          </h2>
-          {parents && <p className="text-sm opacity-60" style={{ color: TXT }}>{parents}</p>}
-          {bio && (
-            <p className="mx-auto max-w-[180px] text-sm leading-relaxed opacity-72" style={{ color: TXT }}>
-              {bio}
-            </p>
-          )}
-        </div>
-      )
-
       return (
         <section
           id={section.id}
@@ -286,7 +288,7 @@ function IslamicSection({
             {layout === "side-by-side" ? (
               <div className="flex justify-center gap-10">
                 <Anim variant="slideLeft" delay={150}>
-                  <PersonCard
+                  <IslamicPersonCard
                     photo={c.groomPhoto as string} name={inv.groomName}
                     parents={c.groomParents as string} bio={c.groomBio as string}
                   />
@@ -295,7 +297,7 @@ function IslamicSection({
                   <span className="text-3xl font-light" style={{ color: G }}>&amp;</span>
                 </Anim>
                 <Anim variant="slideRight" delay={150}>
-                  <PersonCard
+                  <IslamicPersonCard
                     photo={c.bridePhoto as string} name={inv.brideName}
                     parents={c.brideParents as string} bio={c.brideBio as string}
                   />
@@ -304,14 +306,14 @@ function IslamicSection({
             ) : (
               <div className="flex flex-col items-center gap-8">
                 <Anim variant="fadeUp" delay={150}>
-                  <PersonCard
+                  <IslamicPersonCard
                     photo={c.groomPhoto as string} name={inv.groomName}
                     parents={c.groomParents as string} bio={c.groomBio as string}
                   />
                 </Anim>
                 <span className="text-3xl font-light" style={{ color: G }}>&amp;</span>
                 <Anim variant="fadeUp" delay={300}>
-                  <PersonCard
+                  <IslamicPersonCard
                     photo={c.bridePhoto as string} name={inv.brideName}
                     parents={c.brideParents as string} bio={c.brideBio as string}
                   />
@@ -630,6 +632,27 @@ function IslamicSection({
       )
     }
 
+    // ── Ucapan ────────────────────────────────────────────────────────────────
+    case "ucapan":
+      return (
+        <section
+          id={section.id}
+          className="relative min-h-dvh flex flex-col items-center justify-center py-12"
+          style={{ backgroundColor: BG, color: TXT, ...snap }}
+        >
+          <div className="w-full max-w-sm px-8">
+            <Anim variant="fadeIn" delay={0}>
+              <p className="mb-6 text-center text-[10px] tracking-[0.4em] uppercase opacity-60">
+                {(c.title as string) || "Ucapan & Doa"}
+              </p>
+            </Anim>
+            <Anim variant="fadeUp" delay={120}>
+              <UcapanWall invitationId={inv.id} primaryColor={P} />
+            </Anim>
+          </div>
+        </section>
+      )
+
     default:
       return null
   }
@@ -640,7 +663,7 @@ const MandallaCorner = MandalaCorner
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export function RamadanIslamicTheme({ inv, sections, themeConfig, activeSection, onSectionClick }: ThemeTemplateProps) {
+export function RamadanIslamicTheme({ inv, sections, activeSection, onSectionClick }: ThemeTemplateProps) {
   const sorted = [...sections].sort((a, b) => a.order - b.order)
 
   return (

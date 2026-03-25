@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { z } from "zod"
-import { FREE_TIER_LIMIT, PRO_TIER_LIMIT } from "@/types"
+import { getTierConfig } from "@/lib/tier"
 
 const schema = z.object({
   invitationId: z.string().min(1),
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     const invitation = await db.invitation.findUnique({
       where: { id: invitationId, isPublished: true },
       include: {
-        user: { select: { tier: true } },
+        user: { select: { id: true } },
         _count: { select: { guests: true } },
       },
     })
@@ -40,20 +40,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invitation not found" }, { status: 404 })
     }
 
-    // Enforce RSVP limit based on owner tier
-    const tier = invitation.user.tier
-    const limit =
-      tier === "UNLIMITED"
-        ? Infinity
-        : tier === "PRO"
-          ? PRO_TIER_LIMIT
-          : FREE_TIER_LIMIT
+    // Enforce RSVP limit from TierConfig
+    const tierCfg = await getTierConfig(invitation.user.id as string)
+    const limit = tierCfg?.maxRsvpGuests ?? 10
 
-    if (invitation._count.guests >= limit) {
+    if (limit > 0 && invitation._count.guests >= limit) {
       return NextResponse.json(
-        {
-          error: `RSVP limit reached (${limit} guests). Please contact the couple directly.`,
-        },
+        { error: `RSVP limit reached (${limit} guests). Please contact the couple directly.` },
         { status: 429 }
       )
     }

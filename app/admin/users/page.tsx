@@ -45,11 +45,13 @@ export default async function AdminUsersPage() {
                 </td>
                 <td className="px-5 py-3.5">
                   <span className={`inline-flex rounded-lg px-2.5 py-0.5 text-xs font-medium ${
-                    user.tier === "UNLIMITED"
-                      ? "bg-primary/10 text-primary"
-                      : user.tier === "PRO"
-                        ? "bg-amber-50 text-amber-700"
-                        : "bg-muted text-muted-foreground"
+                    user.tier === "LUXURY"
+                      ? "bg-amber-100 text-amber-800"
+                      : user.tier === "PLATINUM"
+                        ? "bg-primary/10 text-primary"
+                        : user.tier === "PRO"
+                          ? "bg-amber-50 text-amber-700"
+                          : "bg-muted text-muted-foreground"
                   }`}>
                     {user.tier}
                   </span>
@@ -122,17 +124,22 @@ function UpgradeButton({
   userId: string
   currentTier: string
 }) {
+  const TIERS = ["BASIC", "PRO", "PLATINUM", "LUXURY"] as const
+  const idx = TIERS.indexOf(currentTier as typeof TIERS[number])
+  const nextTier = idx < TIERS.length - 1 ? TIERS[idx + 1] : null
+
   async function upgrade() {
     "use server"
-    const nextTier =
-      currentTier === "FREE" ? "PRO" : currentTier === "PRO" ? "UNLIMITED" : "FREE"
+    const tiers = ["BASIC", "PRO", "PLATINUM", "LUXURY"] as const
+    const i = tiers.indexOf(currentTier as typeof tiers[number])
+    const next = i < tiers.length - 1 ? tiers[i + 1] : tiers[i]
     await db.user.update({
       where: { id: userId },
-      data: { tier: nextTier as "FREE" | "PRO" | "UNLIMITED" },
+      data: { tier: next },
     })
   }
 
-  if (currentTier === "UNLIMITED") return null
+  if (!nextTier) return null
 
   return (
     <form action={upgrade}>
@@ -140,7 +147,7 @@ function UpgradeButton({
         type="submit"
         className="rounded-lg bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
       >
-        → {currentTier === "FREE" ? "PRO" : "UNLIMITED"}
+        → {nextTier}
       </button>
     </form>
   )

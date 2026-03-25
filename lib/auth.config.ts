@@ -1,11 +1,13 @@
 import type { NextAuthConfig } from "next-auth"
 
+type UserRole = "USER" | "ADMIN" | "SUPER_ADMIN" | "VENDOR" | "INDIVIDUAL"
+
 declare module "next-auth" {
   interface Session {
     user: {
       id: string
-      role: "USER" | "ADMIN"
-      tier: "FREE" | "PRO" | "UNLIMITED"
+      role: UserRole
+      tier: "BASIC" | "PRO" | "PLATINUM" | "LUXURY"
       email: string
       name: string | null
       image: string | null
@@ -13,8 +15,8 @@ declare module "next-auth" {
   }
 
   interface User {
-    role: "USER" | "ADMIN"
-    tier: "FREE" | "PRO" | "UNLIMITED"
+    role: UserRole
+    tier: "BASIC" | "PRO" | "PLATINUM" | "LUXURY"
   }
 }
 
@@ -26,16 +28,16 @@ export const authConfig = {
       if (user) {
         const t = token as Record<string, unknown>
         t.id = user.id!
-        t.role = user.role as "USER" | "ADMIN"
-        t.tier = user.tier as "FREE" | "PRO" | "UNLIMITED"
+        t.role = user.role as UserRole
+        t.tier = user.tier as "BASIC" | "PRO" | "PLATINUM" | "LUXURY"
       }
       return token
     },
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id as string
-        session.user.role = token.role as "USER" | "ADMIN"
-        session.user.tier = token.tier as "FREE" | "PRO" | "UNLIMITED"
+        session.user.role = token.role as UserRole
+        session.user.tier = token.tier as "BASIC" | "PRO" | "PLATINUM" | "LUXURY"
       }
       return session
     },

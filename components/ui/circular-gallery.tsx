@@ -21,15 +21,6 @@ function lerp(p1: number, p2: number, t: number) {
   return p1 + (p2 - p1) * t
 }
 
-function autoBind(instance: any) {
-  const proto = Object.getPrototypeOf(instance)
-  Object.getOwnPropertyNames(proto).forEach((key) => {
-    if (key !== "constructor" && typeof instance[key] === "function") {
-      instance[key] = instance[key].bind(instance)
-    }
-  })
-}
-
 function createTextTexture(
   gl: any,
   text: string,

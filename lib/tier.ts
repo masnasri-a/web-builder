@@ -1,0 +1,239 @@
+import { db } from "@/lib/db"
+
+export type TierConfigData = Awaited<ReturnType<typeof getTierConfig>>
+
+/** Returns the TierConfig for a given user, seeding defaults if missing. */
+export async function getTierConfig(userId: string) {
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { role: true, tier: true },
+  })
+  if (!user) return null
+
+  const roleType = user.role === "VENDOR" ? "VENDOR" : "USER"
+
+  let config = await db.tierConfig.findUnique({
+    where: { roleType_tier: { roleType, tier: user.tier } },
+  })
+
+  // Auto-seed missing config with safe defaults
+  if (!config) {
+    config = await db.tierConfig.create({
+      data: { roleType, tier: user.tier, ...DEFAULT_CONFIGS[roleType][user.tier] },
+    })
+  }
+
+  return config
+}
+
+/** Raw lookup by roleType + tier (no auto-seed). */
+export async function getTierConfigRaw(roleType: string, tier: string) {
+  return db.tierConfig.findUnique({
+    where: { roleType_tier: { roleType, tier: tier as never } },
+  })
+}
+
+// ─── Default values ──────────────────────────────────────────────────────────
+
+const USER_DEFAULTS = {
+  BASIC: {
+    label: "Basic",
+    description: "Untuk pasangan yang ingin memulai",
+    isPopular: false,
+    isVisible: true,
+    ctaLabel: "Mulai Gratis",
+    price: 0,
+    maxInvitations: 1,
+    maxRsvpGuests: 10,
+    maxGalleryImages: 5,
+    allowGallery: true,
+    allowMusic: false,
+    allowCountdown: true,
+    allowRsvp: true,
+    allowMaps: true,
+    allowGift: false,
+    allowUcapan: true,
+    allowQuote: true,
+    allowBroadcast: false,
+    allowCustomDomain: false,
+    allowAnalytics: false,
+    allThemes: false,
+    allowedThemeIds: [] as string[],
+  },
+  PRO: {
+    label: "Pro",
+    description: "Fitur lengkap untuk undangan impian",
+    isPopular: true,
+    isVisible: true,
+    ctaLabel: "Upgrade ke Pro",
+    price: 99000,
+    maxInvitations: 5,
+    maxRsvpGuests: 100,
+    maxGalleryImages: 20,
+    allowGallery: true,
+    allowMusic: true,
+    allowCountdown: true,
+    allowRsvp: true,
+    allowMaps: true,
+    allowGift: true,
+    allowUcapan: true,
+    allowQuote: true,
+    allowBroadcast: true,
+    allowCustomDomain: true,
+    allowAnalytics: true,
+    allThemes: true,
+    allowedThemeIds: [] as string[],
+  },
+  PLATINUM: {
+    label: "Platinum",
+    description: "Tak terbatas untuk momen terbaik",
+    isPopular: false,
+    isVisible: true,
+    ctaLabel: "Pilih Platinum",
+    price: 199000,
+    maxInvitations: 0,
+    maxRsvpGuests: 0,
+    maxGalleryImages: 0,
+    allowGallery: true,
+    allowMusic: true,
+    allowCountdown: true,
+    allowRsvp: true,
+    allowMaps: true,
+    allowGift: true,
+    allowUcapan: true,
+    allowQuote: true,
+    allowBroadcast: true,
+    allowCustomDomain: true,
+    allowAnalytics: true,
+    allThemes: true,
+    allowedThemeIds: [] as string[],
+  },
+  LUXURY: {
+    label: "Luxury",
+    description: "Pengalaman premium & white-label",
+    isPopular: false,
+    isVisible: true,
+    ctaLabel: "Pilih Luxury",
+    price: 399000,
+    maxInvitations: 0,
+    maxRsvpGuests: 0,
+    maxGalleryImages: 0,
+    allowGallery: true,
+    allowMusic: true,
+    allowCountdown: true,
+    allowRsvp: true,
+    allowMaps: true,
+    allowGift: true,
+    allowUcapan: true,
+    allowQuote: true,
+    allowBroadcast: true,
+    allowCustomDomain: true,
+    allowAnalytics: true,
+    allThemes: true,
+    allowedThemeIds: [] as string[],
+  },
+}
+
+const VENDOR_DEFAULTS = {
+  BASIC: {
+    label: "Basic",
+    description: "Mulai jualan undangan digital",
+    isPopular: false,
+    isVisible: true,
+    ctaLabel: "Daftar Gratis",
+    price: 0,
+    maxInvitations: 3,
+    maxRsvpGuests: 50,
+    maxGalleryImages: 10,
+    allowGallery: true,
+    allowMusic: false,
+    allowCountdown: true,
+    allowRsvp: true,
+    allowMaps: true,
+    allowGift: true,
+    allowUcapan: true,
+    allowQuote: true,
+    allowBroadcast: true,
+    allowCustomDomain: false,
+    allowAnalytics: false,
+    allThemes: false,
+    allowedThemeIds: [] as string[],
+  },
+  PRO: {
+    label: "Pro",
+    description: "Skalakan bisnis undanganmu",
+    isPopular: true,
+    isVisible: true,
+    ctaLabel: "Upgrade ke Pro",
+    price: 149000,
+    maxInvitations: 20,
+    maxRsvpGuests: 500,
+    maxGalleryImages: 50,
+    allowGallery: true,
+    allowMusic: true,
+    allowCountdown: true,
+    allowRsvp: true,
+    allowMaps: true,
+    allowGift: true,
+    allowUcapan: true,
+    allowQuote: true,
+    allowBroadcast: true,
+    allowCustomDomain: true,
+    allowAnalytics: true,
+    allThemes: true,
+    allowedThemeIds: [] as string[],
+  },
+  PLATINUM: {
+    label: "Platinum",
+    description: "Volume tinggi tanpa batas",
+    isPopular: false,
+    isVisible: true,
+    ctaLabel: "Pilih Platinum",
+    price: 299000,
+    maxInvitations: 0,
+    maxRsvpGuests: 0,
+    maxGalleryImages: 0,
+    allowGallery: true,
+    allowMusic: true,
+    allowCountdown: true,
+    allowRsvp: true,
+    allowMaps: true,
+    allowGift: true,
+    allowUcapan: true,
+    allowQuote: true,
+    allowBroadcast: true,
+    allowCustomDomain: true,
+    allowAnalytics: true,
+    allThemes: true,
+    allowedThemeIds: [] as string[],
+  },
+  LUXURY: {
+    label: "Luxury",
+    description: "Enterprise & white-label penuh",
+    isPopular: false,
+    isVisible: true,
+    ctaLabel: "Hubungi Kami",
+    price: 599000,
+    maxInvitations: 0,
+    maxRsvpGuests: 0,
+    maxGalleryImages: 0,
+    allowGallery: true,
+    allowMusic: true,
+    allowCountdown: true,
+    allowRsvp: true,
+    allowMaps: true,
+    allowGift: true,
+    allowUcapan: true,
+    allowQuote: true,
+    allowBroadcast: true,
+    allowCustomDomain: true,
+    allowAnalytics: true,
+    allThemes: true,
+    allowedThemeIds: [] as string[],
+  },
+}
+
+export const DEFAULT_CONFIGS: Record<string, Record<string, object>> = {
+  USER: USER_DEFAULTS,
+  VENDOR: VENDOR_DEFAULTS,
+}

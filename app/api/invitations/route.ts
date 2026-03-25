@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { z } from "zod"
 import { DEFAULT_SECTIONS, DEFAULT_THEME_CONFIG } from "@/types"
+import { getTierConfig } from "@/lib/tier"
 
 const createSchema = z.object({
   groomName: z.string().min(1).max(100),
@@ -47,6 +48,18 @@ export async function POST(req: Request) {
     }
 
     const { groomName, brideName, eventDate, eventVenue, eventAddress, themeSlug, themeId, slug } = parsed.data
+
+    // Check tier limit for invitations
+    const tierConfig = await getTierConfig(session.user.id)
+    if (tierConfig && tierConfig.maxInvitations > 0) {
+      const count = await db.invitation.count({ where: { userId: session.user.id } })
+      if (count >= tierConfig.maxInvitations) {
+        return NextResponse.json(
+          { error: `Batas undangan paket ${tierConfig.tier} sudah tercapai (${tierConfig.maxInvitations}). Upgrade paketmu untuk membuat lebih banyak undangan.` },
+          { status: 403 }
+        )
+      }
+    }
 
     // Check slug uniqueness
     const existing = await db.invitation.findUnique({ where: { slug } })

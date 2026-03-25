@@ -9,6 +9,7 @@ export type SectionType =
   | "maps"
   | "quote"
   | "gift"
+  | "ucapan"
 
 export type Section = {
   id: string
@@ -178,6 +179,15 @@ export const DEFAULT_SECTIONS: Section[] = [
       qrisImage: null,
       banks: [],
       allowTransferProof: false,
+    },
+  },
+  {
+    id: "ucapan",
+    type: "ucapan",
+    visible: false,
+    order: 10,
+    content: {
+      title: "Ucapan & Doa",
     },
   },
 ]

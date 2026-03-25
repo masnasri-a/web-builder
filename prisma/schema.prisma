@@ -11,12 +11,16 @@ datasource db {
 enum Role {
   USER
   ADMIN
+  SUPER_ADMIN
+  VENDOR
+  INDIVIDUAL
 }
 
 enum Tier {
-  FREE
+  BASIC
   PRO
-  UNLIMITED
+  PLATINUM
+  LUXURY
 }
 
 enum Attendance {
@@ -71,14 +75,19 @@ model User {
   image         String?
   passwordHash  String?
   role          Role      @default(USER)
-  tier          Tier      @default(FREE)
+  tier          Tier      @default(BASIC)
   isSuspended   Boolean   @default(false)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts    Account[]
-  sessions    Session[]
-  invitations Invitation[]
+  accounts      Account[]
+  sessions      Session[]
+  invitations   Invitation[]
+  vendorProfile VendorProfile?
+  voucherClaims VoucherClaim[]
+  paymentOrders PaymentOrder[]
+  subscriptions Subscription[]
+  tierHistory   TierHistory[]
 }
 
 // Theme — managed by admin, applied by users
@@ -123,6 +132,7 @@ model Invitation {
   user       User        @relation(fields: [userId], references: [id])
   theme      Theme       @relation(fields: [themeId], references: [id])
   guests     Guest[]
+  wishes     Wish[]
   giftProofs GiftProof[]
 }
 
@@ -139,6 +149,188 @@ model Guest {
   createdAt    DateTime   @default(now())
 
   invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+}
+
+// Ucapan / public wishes submitted by guests
+model Wish {
+  id           String   @id @default(cuid())
+  invitationId String
+  name         String
+  message      String
+  createdAt    DateTime @default(now())
+
+  invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+}
+
+// ─── Tier Configuration ───────────────────────────────
+// roleType: "USER" (covers USER + INDIVIDUAL) | "VENDOR"
+// 0 on maxInvitations / maxRsvpGuests / maxGalleryImages means unlimited
+model TierConfig {
+  id                String   @id @default(cuid())
+  roleType          String   // "USER" | "VENDOR"
+  tier              Tier
+
+  // Display (for landing page)
+  label             String   @default("")       // e.g. "Basic", "Pro", "Platinum", "Luxury"
+  description       String   @default("")       // short tagline shown on landing page
+  isPopular         Boolean  @default(false)    // shows "Most Popular" badge
+  isVisible         Boolean  @default(true)     // show this tier on landing page
+  ctaLabel          String   @default("Mulai Sekarang")
+
+  // Pricing
+  price             Int      @default(0)        // IDR / period
+  durationDays      Int      @default(30)       // subscription duration (0 = lifetime / never expires)
+
+  // Limits  (0 = unlimited)
+  maxInvitations    Int      @default(1)
+  maxRsvpGuests     Int      @default(10)
+  maxGalleryImages  Int      @default(5)
+
+  // Section feature flags
+  allowGallery      Boolean  @default(true)
+  allowMusic        Boolean  @default(false)
+  allowCountdown    Boolean  @default(true)
+  allowRsvp         Boolean  @default(true)
+  allowMaps         Boolean  @default(true)
+  allowGift         Boolean  @default(false)
+  allowUcapan       Boolean  @default(true)
+  allowQuote        Boolean  @default(true)
+
+  // Platform features
+  allowBroadcast    Boolean  @default(false)
+  allowCustomDomain Boolean  @default(false)
+  allowAnalytics    Boolean  @default(false)
+
+  // Theme access  (allThemes=true ignores allowedThemeIds)
+  allThemes         Boolean  @default(false)
+  allowedThemeIds   Json     @default("[]")   // string[]
+
+  updatedAt         DateTime @updatedAt
+
+  @@unique([roleType, tier])
+}
+
+// ─── FAQ & Support ────────────────────────────────────
+model FaqItem {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SupportConfig {
+  id        String   @id @default(cuid())
+  waNumber  String   // e.g. "6281234567890" (no + prefix)
+  waMessage String   @default("Halo, saya butuh bantuan terkait Selembar.id")
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Vendor & Voucher System ──────────────────────────
+model VendorProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  shopName    String
+  description String?
+  discount    Float    @default(5.0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vouchers Voucher[]
+}
+
+enum VoucherType {
+  FREE
+  DISCOUNT
+}
+
+model Voucher {
+  id              String      @id @default(cuid())
+  code            String      @unique
+  type            VoucherType
+  description     String?
+  discountPercent Float?
+  vendorProfileId String?
+  isActive        Boolean     @default(true)
+  expiresAt       DateTime?
+  maxClaims       Int?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  vendorProfile VendorProfile? @relation(fields: [vendorProfileId], references: [id])
+  claims        VoucherClaim[]
+}
+
+model VoucherClaim {
+  id        String   @id @default(cuid())
+  voucherId String
+  userId    String
+  claimedAt DateTime @default(now())
+
+  voucher Voucher @relation(fields: [voucherId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([voucherId, userId])
+}
+
+// ─── Checkout / Payment Orders ────────────────────────
+// Tracks every checkout attempt server-side so the webhook can validate
+// discounted amounts correctly (no price ever comes from the FE).
+model PaymentOrder {
+  id            String   @id @default(cuid())
+  userId        String
+  tier          Tier
+  originalPrice Int
+  finalPrice    Int
+  voucherCode   String?
+  saweriaId     String?
+  status        String   @default("PENDING") // PENDING | COMPLETED | EXPIRED
+  createdAt     DateTime @default(now())
+  expiresAt     DateTime
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription Subscription?
+}
+
+// ─── Subscription ─────────────────────────────────────
+// One active subscription per user. Expired subs are kept for history.
+model Subscription {
+  id        String   @id @default(cuid())
+  userId    String
+  tier      Tier
+  status    String   @default("ACTIVE") // ACTIVE | EXPIRED | CANCELLED
+  startedAt DateTime @default(now())
+  expiresAt DateTime // null-like: use year 9999 for "lifetime"
+  createdAt DateTime @default(now())
+
+  // Optional link to the payment that created this sub (null for free/voucher)
+  orderId   String?      @unique
+  order     PaymentOrder? @relation(fields: [orderId], references: [id])
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, status])
+}
+
+// ─── Tier History ─────────────────────────────────────
+// Full immutable audit log of every tier change.
+model TierHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  fromTier  Tier
+  toTier    Tier
+  reason    String   // PAYMENT | SUBSCRIPTION_EXPIRED | ADMIN | VOUCHER_FREE | CANCELLED
+  notes     String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 // Gift transfer proof submitted by guests

@@ -18,25 +18,59 @@ function detectLocale(req: Parameters<Parameters<typeof auth>[0]>[0]): Locale {
   return DEFAULT_LOCALE
 }
 
+type UserRole = "USER" | "ADMIN" | "SUPER_ADMIN" | "VENDOR" | "INDIVIDUAL"
+
+function getRoleHome(role: UserRole): string {
+  switch (role) {
+    case "SUPER_ADMIN": return "/super-admin"
+    case "VENDOR":      return "/vendor"
+    case "INDIVIDUAL":  return "/individual"
+    case "ADMIN":       return "/admin"
+    default:            return "/dashboard"
+  }
+}
+
 export default auth((req) => {
   const { pathname } = req.nextUrl
   const session = req.auth
+  const role = session?.user?.role as UserRole | undefined
 
-  // Protect dashboard routes
+  // Protect dashboard routes — any authenticated user can access
   if (pathname.startsWith("/dashboard") && !session) {
     return NextResponse.redirect(new URL("/login", req.url))
   }
 
   // Protect admin routes — require ADMIN role
   if (pathname.startsWith("/admin")) {
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session || role !== "ADMIN") {
       return NextResponse.redirect(new URL("/login", req.url))
     }
   }
 
-  // Redirect authenticated users away from auth pages
-  if ((pathname === "/login" || pathname === "/register") && session) {
-    return NextResponse.redirect(new URL("/dashboard", req.url))
+  // Protect super-admin routes
+  if (pathname.startsWith("/super-admin")) {
+    if (!session || role !== "SUPER_ADMIN") {
+      return NextResponse.redirect(new URL("/login", req.url))
+    }
+  }
+
+  // Protect vendor routes
+  if (pathname.startsWith("/vendor")) {
+    if (!session || role !== "VENDOR") {
+      return NextResponse.redirect(new URL("/login", req.url))
+    }
+  }
+
+  // Protect individual routes
+  if (pathname.startsWith("/individual")) {
+    if (!session || role !== "INDIVIDUAL") {
+      return NextResponse.redirect(new URL("/login", req.url))
+    }
+  }
+
+  // Redirect authenticated users away from auth pages to role-appropriate home
+  if ((pathname === "/login" || pathname === "/register") && session && role) {
+    return NextResponse.redirect(new URL(getRoleHome(role), req.url))
   }
 
   // Attach detected locale as a request header for Server Components

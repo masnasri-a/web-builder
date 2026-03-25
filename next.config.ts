@@ -8,6 +8,16 @@ const nextConfig: NextConfig = {
         hostname: "s3.nevaobjects.id",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "plus.unsplash.com",
+        pathname: "/**",
+      },
     ],
   },
 };

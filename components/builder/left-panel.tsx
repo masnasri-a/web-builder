@@ -74,6 +74,7 @@ const SECTION_LABELS: Record<string, string> = {
   maps: "Lokasi / Maps",
   quote: "Kutipan / Quote",
   gift: "Hadiah / Gift",
+  ucapan: "Ucapan & Doa",
 }
 
 interface LeftPanelProps {

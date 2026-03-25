@@ -5,9 +5,10 @@ import { DashboardHeader } from "@/components/layout/dashboard-header"
 import { StatCard } from "@/components/dashboard/stat-card"
 import { GuestLimitBar } from "@/components/dashboard/guest-limit-bar"
 import { InvitationCard } from "@/components/dashboard/invitation-card"
-import { Heart, Users, BarChart3, Sparkles } from "lucide-react"
+import { Heart, Users, Sparkles } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { getTierConfig } from "@/lib/tier"
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -34,12 +35,15 @@ export default async function DashboardPage() {
     0
   )
   const liveInvitations = user.invitations.filter((i) => i.isPublished).length
-  const recentGuests = await db.guest.findMany({
-    where: { invitation: { userId: session.user.id } },
-    orderBy: { createdAt: "desc" },
-    take: 5,
-    include: { invitation: { select: { groomName: true, brideName: true } } },
-  })
+  const [recentGuests, tierConfig] = await Promise.all([
+    db.guest.findMany({
+      where: { invitation: { userId: session.user.id } },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      include: { invitation: { select: { groomName: true, brideName: true } } },
+    }),
+    getTierConfig(session.user.id),
+  ])
 
   return (
     <div className="flex flex-col">
@@ -76,7 +80,7 @@ export default async function DashboardPage() {
           />
           <StatCard
             title="Upgrade Plan"
-            value="$9.99"
+            value="199K"
             subtitle="Per Month"
             variant="teal"
           />
@@ -85,7 +89,8 @@ export default async function DashboardPage() {
         {/* Guest Limit Bar */}
         <GuestLimitBar
           used={totalGuests}
-          tier={user.tier as "FREE" | "PRO" | "UNLIMITED"}
+          tier={user.tier}
+          limit={tierConfig?.maxRsvpGuests ?? 10}
         />
 
         {/* Recent Invitations */}

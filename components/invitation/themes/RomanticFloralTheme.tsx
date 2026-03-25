@@ -14,6 +14,7 @@ import { Navigation } from "lucide-react"
 import type { Section } from "@/types"
 import type { ThemeTemplateProps } from "./index"
 import { GiftSection } from "@/components/invitation/gift-section"
+import { UcapanWall } from "@/components/invitation/ucapan-wall"
 
 // ─── Palette constants ────────────────────────────────────────────────────────
 const P    = "#C47C8A" // dusty rose — primary / text headings
@@ -109,6 +110,31 @@ function FloralDivider() {
   )
 }
 
+// ─── Module-level sub-components ──────────────────────────────────────────────
+
+function FloralPersonCard({ photo, name, parents, bio }: { photo?: string; name: string; parents?: string; bio?: string }) {
+  return (
+    <div className="space-y-3 text-center">
+      <div
+        className="mx-auto h-24 w-24 overflow-hidden rounded-full"
+        style={{ border: `2.5px solid ${BLSH}`, boxShadow: `0 0 0 4px ${BLSH}30` }}
+      >
+        {photo && (
+          <Image src={photo} alt={name} width={96} height={96} className="h-full w-full object-cover" />
+        )}
+      </div>
+      <h2
+        className="text-2xl font-bold"
+        style={{ color: P, fontFamily: "Cormorant Garamond, serif" }}
+      >
+        {name}
+      </h2>
+      {parents && <p className="text-sm opacity-60" style={{ color: TXT }}>{parents}</p>}
+      {bio && <p className="mx-auto max-w-[180px] text-sm leading-relaxed opacity-72" style={{ color: TXT }}>{bio}</p>}
+    </div>
+  )
+}
+
 // ─── Per-section renderer ─────────────────────────────────────────────────────
 
 function FloralSection({
@@ -197,29 +223,6 @@ function FloralSection({
     case "couple": {
       const layout = (c.coupleLayout as string) ?? "side-by-side"
 
-      const PersonCard = ({
-        photo, name, parents, bio,
-      }: { photo?: string; name: string; parents?: string; bio?: string }) => (
-        <div className="space-y-3 text-center">
-          <div
-            className="mx-auto h-24 w-24 overflow-hidden rounded-full"
-            style={{ border: `2.5px solid ${BLSH}`, boxShadow: `0 0 0 4px ${BLSH}30` }}
-          >
-            {photo && (
-              <Image src={photo} alt={name} width={96} height={96} className="h-full w-full object-cover" />
-            )}
-          </div>
-          <h2
-            className="text-2xl font-bold"
-            style={{ color: P, fontFamily: "Cormorant Garamond, serif" }}
-          >
-            {name}
-          </h2>
-          {parents && <p className="text-sm opacity-60" style={{ color: TXT }}>{parents}</p>}
-          {bio && <p className="mx-auto max-w-[180px] text-sm leading-relaxed opacity-72" style={{ color: TXT }}>{bio}</p>}
-        </div>
-      )
-
       return (
         <section
           id={section.id}
@@ -236,23 +239,23 @@ function FloralSection({
           {layout === "side-by-side" ? (
             <div className="flex justify-center gap-10">
               <Anim variant="slideLeft" delay={150}>
-                <PersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} />
+                <FloralPersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} />
               </Anim>
               <Anim variant="scaleIn" delay={300} className="self-center">
                 <span className="text-3xl italic font-light" style={{ color: BLSH }}>&amp;</span>
               </Anim>
               <Anim variant="slideRight" delay={150}>
-                <PersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} />
+                <FloralPersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} />
               </Anim>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-8">
               <Anim variant="fadeUp" delay={150}>
-                <PersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} />
+                <FloralPersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} />
               </Anim>
               <span className="text-3xl italic font-light" style={{ color: BLSH }}>&amp;</span>
               <Anim variant="fadeUp" delay={300}>
-                <PersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} />
+                <FloralPersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} />
               </Anim>
             </div>
           )}
@@ -550,6 +553,27 @@ function FloralSection({
       )
     }
 
+    // ── Ucapan ────────────────────────────────────────────────────────────────
+    case "ucapan":
+      return (
+        <section
+          id={section.id}
+          className="relative min-h-dvh flex flex-col items-center justify-center py-12"
+          style={{ backgroundColor: BG, color: TXT, ...snap }}
+        >
+          <div className="w-full max-w-sm px-8">
+            <Anim variant="fadeIn" delay={0}>
+              <p className="mb-6 text-center text-[10px] tracking-[0.4em] uppercase opacity-60">
+                {(c.title as string) || "Ucapan & Doa"}
+              </p>
+            </Anim>
+            <Anim variant="fadeUp" delay={120}>
+              <UcapanWall invitationId={inv.id} primaryColor={P} />
+            </Anim>
+          </div>
+        </section>
+      )
+
     default:
       return null
   }
@@ -557,7 +581,7 @@ function FloralSection({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export function RomanticFloralTheme({ inv, sections, themeConfig, activeSection, onSectionClick }: ThemeTemplateProps) {
+export function RomanticFloralTheme({ inv, sections, activeSection, onSectionClick }: ThemeTemplateProps) {
   const sorted = [...sections].sort((a, b) => a.order - b.order)
 
   return (

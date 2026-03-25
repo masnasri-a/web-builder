@@ -16,6 +16,7 @@ import type { Section } from "@/types"
 import type { ThemeTemplateProps } from "./index"
 import type { GuestInvitation } from "@/components/invitation/guest-sections"
 import { GiftSection } from "@/components/invitation/gift-section"
+import { UcapanWall } from "@/components/invitation/ucapan-wall"
 
 const Masonry = dynamic(
   () => import("@/components/ui/masonry").then((m) => ({ default: m.Masonry })),
@@ -38,7 +39,6 @@ const snap: React.CSSProperties = {
 
 /** Kawung motif — 4-petal lotus circle (classic Javanese batik) */
 function KawungMotif({ size = 56, opacity = 1 }: { size?: number; opacity?: number }) {
-  const r = size / 2
   return (
     <svg aria-hidden="true" width={size} height={size} viewBox="0 0 56 56" style={{ opacity }}>
       {/* 4 overlapping ellipses forming kawung petals */}
@@ -97,6 +97,34 @@ function ParangDiagonal({ width = 300, height = 200, opacity = 0.08 }: { width?:
     <svg aria-hidden="true" width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ opacity, display: "block" }}>
       {lines}
     </svg>
+  )
+}
+
+// ─── Module-level sub-components ──────────────────────────────────────────────
+
+function BlueJavaPersonCard({ photo, name, parents, bio, instagram }: { photo?: string; name: string; parents?: string; bio?: string; instagram?: string }) {
+  return (
+    <div className="space-y-3 text-center">
+      <div
+        className="mx-auto h-20 w-20 overflow-hidden rounded-full"
+        style={{ border: `2.5px solid ${GOLD}`, boxShadow: `0 0 0 4px ${GOLD}30` }}
+      >
+        {photo && (
+          <Image src={photo} alt={name} width={80} height={80} className="object-cover w-full h-full" />
+        )}
+      </div>
+      <h2 className="text-2xl font-bold" style={{ color: INDIGO, fontFamily: "Cormorant Garamond, serif" }}>
+        {name}
+      </h2>
+      {parents && <p className="text-xs opacity-60" style={{ color: TXT }}>{parents}</p>}
+      {bio && <p className="mx-auto max-w-40 text-sm leading-relaxed opacity-70" style={{ color: TXT }}>{bio}</p>}
+      {instagram && (
+        <a href={`https://instagram.com/${instagram}`} target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 text-xs opacity-60" style={{ color: BLUE }}>
+          <Instagram className="h-3 w-3" />@{instagram}
+        </a>
+      )}
+    </div>
   )
 }
 
@@ -174,30 +202,6 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
 
     // ── Couple ────────────────────────────────────────────────────────────────
     case "couple": {
-      const PersonCard = ({ photo, name, parents, bio, instagram }: { photo?: string; name: string; parents?: string; bio?: string; instagram?: string }) => (
-        <div className="space-y-3 text-center">
-          <div
-            className="mx-auto h-20 w-20 overflow-hidden rounded-full"
-            style={{ border: `2.5px solid ${GOLD}`, boxShadow: `0 0 0 4px ${GOLD}30` }}
-          >
-            {photo && (
-              <Image src={photo} alt={name} width={80} height={80} className="object-cover w-full h-full" />
-            )}
-          </div>
-          <h2 className="text-2xl font-bold" style={{ color: INDIGO, fontFamily: "Cormorant Garamond, serif" }}>
-            {name}
-          </h2>
-          {parents && <p className="text-xs opacity-60" style={{ color: TXT }}>{parents}</p>}
-          {bio && <p className="mx-auto max-w-40 text-sm leading-relaxed opacity-70" style={{ color: TXT }}>{bio}</p>}
-          {instagram && (
-            <a href={`https://instagram.com/${instagram}`} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs opacity-60" style={{ color: BLUE }}>
-              <Instagram className="h-3 w-3" />@{instagram}
-            </a>
-          )}
-        </div>
-      )
-
       return (
         <section
           id={section.id}
@@ -212,7 +216,7 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
           </Anim>
           <div className="flex justify-center gap-8 items-center">
             <Anim variant="slideLeft" delay={150}>
-              <PersonCard
+              <BlueJavaPersonCard
                 photo={c.groomPhoto as string}
                 name={inv.groomName}
                 parents={c.groomParents as string}
@@ -224,7 +228,7 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
               <KawungMotif size={36} opacity={0.55} />
             </Anim>
             <Anim variant="slideRight" delay={150}>
-              <PersonCard
+              <BlueJavaPersonCard
                 photo={c.bridePhoto as string}
                 name={inv.brideName}
                 parents={c.brideParents as string}
@@ -516,6 +520,30 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
       )
     }
 
+    // ── Ucapan ────────────────────────────────────────────────────────────────
+    case "ucapan":
+      return (
+        <section
+          id={section.id}
+          className="relative min-h-dvh flex flex-col items-center justify-center py-12"
+          style={{ backgroundColor: BG, color: TXT, ...snap }}
+        >
+          <div className="w-full max-w-sm px-8">
+            <Anim variant="fadeIn" delay={0}>
+              <div className="flex justify-center mb-4"><KawungMotif size={36} opacity={0.55} /></div>
+            </Anim>
+            <Anim variant="fadeIn" delay={80}>
+              <p className="mb-6 text-center text-[10px] tracking-[0.4em] uppercase" style={{ color: BLUE, opacity: 0.65 }}>
+                {(c.title as string) || "Ucapan & Doa"}
+              </p>
+            </Anim>
+            <Anim variant="fadeUp" delay={160}>
+              <UcapanWall invitationId={inv.id} primaryColor={INDIGO} />
+            </Anim>
+          </div>
+        </section>
+      )
+
     default:
       return null
   }
@@ -523,7 +551,7 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 
-export function BlueJavaTheme({ inv, sections, themeConfig, activeSection, onSectionClick }: ThemeTemplateProps) {
+export function BlueJavaTheme({ inv, sections, activeSection, onSectionClick }: ThemeTemplateProps) {
   const sorted = [...sections].sort((a, b) => a.order - b.order)
   return (
     <>

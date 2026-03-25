@@ -98,7 +98,7 @@ async function main() {
       name: "Admin",
       passwordHash: adminHash,
       role: "ADMIN",
-      tier: "UNLIMITED",
+      tier: "LUXURY",
     },
   })
   console.log("  ✓ admin@selembar.id (password: admin123456)")
@@ -113,7 +113,7 @@ async function main() {
       name: "Demo User",
       passwordHash: demoHash,
       role: "USER",
-      tier: "FREE",
+      tier: "BASIC",
     },
   })
   console.log("  ✓ demo@selembar.id (password: demo123456)")

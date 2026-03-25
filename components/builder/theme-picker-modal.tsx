@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { Palette, Check, Sliders } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,

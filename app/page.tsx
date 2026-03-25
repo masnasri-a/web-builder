@@ -1,301 +1,519 @@
 import type { Metadata } from "next"
+import Image from "next/image"
+import Link from "next/link"
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
-import Link from "next/link"
-import { Sparkles, Heart, Users, Globe, Check, ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { LanguageSwitcher } from "@/components/language-switcher"
-import {
-  BuilderIcon,
-  RsvpIcon,
-  MusicIcon,
-  CountdownIcon,
-  MobileIcon,
-  LinkIcon,
-} from "@/components/icons/feature-icons"
-import { getLocale, getT } from "@/lib/i18n/server"
+import { db } from "@/lib/db"
+import { Cormorant_Garamond } from "next/font/google"
+import { Check, ArrowRight, Star, ChevronRight } from "lucide-react"
+import { ChatbotWidget } from "@/components/chatbot/chatbot-widget"
+import { AnimateOnScroll } from "@/components/landing/animate-on-scroll"
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://selembar.id"
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://selembar.id"
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-cormorant",
+})
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getT()
   return {
-    title: `Selembar.id — ${t("landing.hero.badge")}`,
-    description: t("landing.hero.subtitle"),
+    title: "Selembar.id — Undangan Digital Pernikahan Premium & Eksklusif",
+    description: "Buat undangan pernikahan digital yang elegan dan personal. Pilih dari ratusan tema premium, kelola RSVP tamu, dan bagikan kenangan indah dalam satu lembar digital.",
+    keywords: ["undangan digital", "undangan pernikahan", "wedding invitation", "digital invitation", "RSVP online", "undangan online"],
+    authors: [{ name: "Selembar.id by Nuratech" }],
     openGraph: {
+      type: "website",
       url: BASE_URL,
-      title: `Selembar.id — ${t("landing.hero.badge")}`,
-      description: t("landing.hero.subtitle"),
+      title: "Selembar.id — Undangan Digital Premium",
+      description: "Kurasi pengalaman editorial yang tak tertandingi untuk hari istimewa Anda.",
+      siteName: "Selembar.id",
+      images: [{ url: `${BASE_URL}/og-image.jpg`, width: 1200, height: 630, alt: "Selembar.id" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Selembar.id — Undangan Digital Premium",
+      description: "Undangan yang melampaui batas fisik—elegan, personal, dan benar-benar eksklusif.",
     },
     alternates: { canonical: BASE_URL },
+    robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
   }
 }
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Selembar.id",
+  url: BASE_URL,
+  description: "Platform undangan digital pernikahan premium Indonesia",
+  potentialAction: { "@type": "SearchAction", target: `${BASE_URL}/search?q={search_term_string}`, "query-input": "required name=search_term_string" },
+}
+
 const THEMES = [
-  { name: "Classic Elegance", primary: "#14B8A6", accent: "#D4A853", bg: "#FFF9F0" },
-  { name: "Modern Minimal", primary: "#1E293B", accent: "#94A3B8", bg: "#F8FAFC" },
-  { name: "Floral Romance", primary: "#EC4899", accent: "#F9A8D4", bg: "#FFF1F2" },
-  { name: "Rustic Garden", primary: "#65A30D", accent: "#D97706", bg: "#FFFBEB" },
-  { name: "Royal Navy", primary: "#1E40AF", accent: "#C2A459", bg: "#F0F4FF" },
-  { name: "Sunset Gold", primary: "#D97706", accent: "#F97316", bg: "#FFFBF0" },
+  { name: "Classic Elegance", sub: "Timeless Sophistication", primary: "#2B5740", accent: "#C8A96E", bg: "#F5EFE6", text: "#1B3A2D", sample: ["Ahmad & Sari", "24 · 12 · 2026"] },
+  { name: "Modern Minimal", sub: "Avant-Garde Simplicity", primary: "#1E293B", accent: "#94A3B8", bg: "#F8FAFC", text: "#0F172A", sample: ["AHMAD & SARI", "24 · 12 · 2026"] },
+  { name: "Floral Romance", sub: "Natural Whimsy", primary: "#9D4E6A", accent: "#F9A8D4", bg: "#FFF1F2", text: "#831843", sample: ["Ahmad & Sari", "December 24, 2026"] },
 ]
 
-const PRICING_EN = [
-  {
-    name: "Free",
-    price: "Rp 0",
-    period: "forever",
-    features: ["1 invitation", "Up to 10 RSVP slots", "3 themes", "Basic sections"],
-    cta: "Get Started",
-    href: "/register",
-    featured: false,
-  },
-  {
-    name: "Pro",
-    price: "Rp 99k",
-    period: "/ month",
-    features: ["5 invitations", "Up to 100 RSVP slots", "All themes", "Custom domain", "Background music", "Analytics"],
-    cta: "Upgrade to Pro",
-    href: "/register?plan=pro",
-    featured: true,
-  },
-  {
-    name: "Unlimited",
-    price: "Rp 199k",
-    period: "/ month",
-    features: ["Unlimited invitations", "Unlimited RSVP slots", "All themes + custom", "Priority support", "White-label option"],
-    cta: "Go Unlimited",
-    href: "/register?plan=unlimited",
-    featured: false,
-  },
+const STEPS = [
+  { num: "01", title: "Pilih Tema", desc: "Eksplorasi koleksi desain eksklusif kami dan temukan yang paling mewakili kisah cinta Anda.", icon: "✦" },
+  { num: "02", title: "Isi Data", desc: "Lengkapi detail acara, foto, dan musik pilihan Anda melalui editor yang intuitif.", icon: "✎" },
+  { num: "03", title: "Sebar Undangan", desc: "Dapatkan link undangan unik Anda dan bagikan kepada kerabat melalui berbagai platform.", icon: "✉" },
 ]
 
-const PRICING_ID = [
-  {
-    name: "Gratis",
-    price: "Rp 0",
-    period: "selamanya",
-    features: ["1 undangan", "Maks 10 slot RSVP", "3 tema", "Section dasar"],
-    cta: "Mulai Sekarang",
-    href: "/register",
-    featured: false,
-  },
-  {
-    name: "Pro",
-    price: "Rp 99k",
-    period: "/ bulan",
-    features: ["5 undangan", "Maks 100 slot RSVP", "Semua tema", "Domain kustom", "Musik latar", "Analitik"],
-    cta: "Upgrade ke Pro",
-    href: "/register?plan=pro",
-    featured: true,
-  },
-  {
-    name: "Unlimited",
-    price: "Rp 199k",
-    period: "/ bulan",
-    features: ["Undangan tak terbatas", "Slot RSVP tak terbatas", "Semua tema + kustom", "Dukungan prioritas", "Opsi white-label"],
-    cta: "Pilih Unlimited",
-    href: "/register?plan=unlimited",
-    featured: false,
-  },
+const FEATURES = [
+  { title: "Desain Menakjubkan", desc: "Pilih dari ratusan desain yang menakjubkan untuk hari spesial Anda." },
+  { title: "Responsif", desc: "Undangan responsif di semua perangkat ponsel dan tablet." },
+  { title: "RSVP Inteligensi", desc: "Pantau daftar tamu dan konfirmasi kehadiran secara real time dengan dasbor eksklusif." },
+  { title: "Integrasi Presisi", desc: "Lokasi acara yang akurat membantu tamu menemukan tempat dengan navigasi premium." },
 ]
+
+const TESTIMONIALS = [
+  { quote: "Prosesnya sangat cepat dan hasilnya luar biasa elegan. Semua tamu memuji keindahan undangan kami. Terima kasih Selembar.id!", name: "Budi & Melati", date: "12 Juni 2024", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80" },
+  { quote: "Fitur RSVP-nya sangat membantu kami mengelola daftar tamu dengan rapi. Sangat direkomendasikan untuk pasangan milenial!", name: "Reza & Amanda", date: "15 Mei 2024", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80" },
+]
+
+function buildFeatures(cfg: {
+  maxInvitations: number; maxRsvpGuests: number; maxGalleryImages: number
+  allowMusic: boolean; allowCustomDomain: boolean; allowAnalytics: boolean
+  allThemes: boolean; allowBroadcast: boolean; allowGift: boolean
+}) {
+  const feats: string[] = []
+  if (cfg.maxInvitations === 0) feats.push("Undangan tak terbatas")
+  else feats.push(`${cfg.maxInvitations} Undangan`)
+  if (cfg.maxRsvpGuests === 0) feats.push("RSVP tak terbatas")
+  else feats.push(`Reservasi Tamu (RSVP)`)
+  if (cfg.maxGalleryImages > 0) feats.push(`Galeri ${cfg.maxGalleryImages} Foto`)
+  else if (cfg.maxGalleryImages === 0) feats.push("Galeri Unlimited")
+  if (cfg.allThemes) feats.push("Semua Tema Pro")
+  if (cfg.allowMusic) feats.push("Musik Latar Eksklusif")
+  if (cfg.allowCustomDomain) feats.push("Custom Domain Eksklusif")
+  if (cfg.allowAnalytics) feats.push("Analytics Dashboard")
+  if (cfg.allowBroadcast) feats.push("Broadcast WhatsApp")
+  if (cfg.allowGift) feats.push("Fitur Gift & Transfer")
+  return feats
+}
 
 export default async function LandingPage() {
   const session = await auth()
   if (session) redirect("/dashboard")
 
-  const locale = await getLocale()
-  const t = await getT()
-  const PRICING = locale === "id" ? PRICING_ID : PRICING_EN
+  const [tiers, latestInvitation] = await Promise.all([
+    db.tierConfig.findMany({
+      where: { roleType: "USER", isVisible: true },
+      orderBy: { price: "asc" },
+    }),
+    db.invitation.findFirst({
+      where: { isPublished: true },
+      orderBy: { updatedAt: "desc" },
+      select: { groomName: true, brideName: true, eventVenue: true, eventDate: true },
+    }),
+  ])
 
-  const featureItems = [
-    { Icon: BuilderIcon, title: t("landing.features.builder.title"), desc: t("landing.features.builder.desc") },
-    { Icon: RsvpIcon, title: t("landing.features.rsvp.title"), desc: t("landing.features.rsvp.desc") },
-    { Icon: MusicIcon, title: t("landing.features.music.title"), desc: t("landing.features.music.desc") },
-    { Icon: CountdownIcon, title: t("landing.features.countdown.title"), desc: t("landing.features.countdown.desc") },
-    { Icon: MobileIcon, title: t("landing.features.mobile.title"), desc: t("landing.features.mobile.desc") },
-    { Icon: LinkIcon, title: t("landing.features.url.title"), desc: t("landing.features.url.desc") },
-  ]
+  const heroCard = latestInvitation
+    ? {
+        names: `${latestInvitation.groomName} & ${latestInvitation.brideName}`,
+        venue: latestInvitation.eventVenue,
+        date: new Date(latestInvitation.eventDate).toLocaleDateString("id-ID", {
+          day: "numeric", month: "short", year: "numeric",
+        }),
+      }
+    : { names: "Ahmad & Sari", venue: "The Grand Ballroom", date: "24 Dec 2024" }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-border bg-card/80 px-6 backdrop-blur-sm lg:px-12">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary">
-            <Sparkles className="h-4 w-4 text-primary-foreground" />
-          </div>
-          <span className="font-semibold">Selembar.id</span>
-        </Link>
-        <div className="flex items-center gap-3">
-          <LanguageSwitcher />
-          <Button variant="ghost" asChild>
-            <Link href="/login">{t("landing.nav.signIn")}</Link>
-          </Button>
-          <Button asChild>
-            <Link href="/register">{t("landing.nav.getStarted")}</Link>
-          </Button>
-        </div>
-      </nav>
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <style>{`
+        :root {
+          --lp-950: #0D2119;
+          --lp-900: #1B3A2D;
+          --lp-800: #2B5740;
+          --lp-600: #3D7A56;
+          --lp-400: #6DAB83;
+          --lp-gold: #C8A96E;
+          --lp-gold-light: #E8D5A8;
+          --lp-cream: #F5EFE6;
+          --lp-cream-light: #FDFAF5;
+        }
+        .font-serif-lp { font-family: var(--font-cormorant), 'Georgia', serif; }
+        [data-anim] { opacity: 0; transform: translateY(28px); transition: opacity 0.75s cubic-bezier(0.16,1,0.3,1), transform 0.75s cubic-bezier(0.16,1,0.3,1); }
+        [data-anim="fade"] { transform: none; }
+        [data-anim="scale"] { transform: scale(0.95); }
+        [data-anim="left"] { transform: translateX(-28px); }
+        [data-anim="right"] { transform: translateX(28px); }
+        [data-anim].in-view { opacity: 1; transform: none !important; }
+        .lp-btn-primary { background: var(--lp-900); color: white; border-radius: 9999px; padding: 0.75rem 2rem; font-size: 0.875rem; font-weight: 500; letter-spacing: 0.025em; transition: background 0.2s, transform 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .lp-btn-primary:hover { background: var(--lp-800); transform: translateY(-1px); }
+        .lp-btn-outline { border: 1px solid var(--lp-900); color: var(--lp-900); border-radius: 9999px; padding: 0.75rem 2rem; font-size: 0.875rem; font-weight: 500; letter-spacing: 0.025em; transition: background 0.2s, transform 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .lp-btn-outline:hover { background: var(--lp-cream); transform: translateY(-1px); }
+        .lp-tag { display: inline-block; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--lp-gold); }
+        .theme-card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(27,58,45,0.12); }
+        .theme-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .pricing-card:hover { transform: translateY(-4px); }
+        .pricing-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .nav-link { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--lp-900); opacity: 0.7; transition: opacity 0.2s; }
+        .nav-link:hover { opacity: 1; }
+        .hero-float { animation: heroFloat 6s ease-in-out infinite; }
+        @keyframes heroFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .gold-line { width: 40px; height: 1px; background: var(--lp-gold); display: inline-block; }
+      `}</style>
 
-      {/* Hero */}
-      <section className="px-6 py-20 text-center lg:py-32">
-        <div className="mx-auto max-w-3xl">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm text-primary">
-            <Sparkles className="h-3.5 w-3.5" />
-            {t("landing.hero.badge")}
-          </div>
-          <h1 className="mb-6 text-5xl font-bold leading-tight tracking-tight text-foreground lg:text-6xl">
-            {t("landing.hero.title1")}
-            <br />
-            <span className="text-primary">{t("landing.hero.title2")}</span>
-          </h1>
-          <p className="mx-auto mb-10 max-w-xl text-lg text-muted-foreground">
-            {t("landing.hero.subtitle")}
-          </p>
-          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <Button size="lg" asChild className="rounded-xl px-8">
-              <Link href="/register">
-                {t("landing.hero.cta.start")} <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" asChild className="rounded-xl px-8">
-              <Link href="#themes">{t("landing.hero.cta.themes")}</Link>
-            </Button>
-          </div>
+      <div className={`${cormorant.variable} min-h-screen`} style={{ background: "var(--lp-cream-light)", color: "var(--lp-900)" }}>
+        <AnimateOnScroll />
 
-          {/* Social proof */}
-          <div className="mt-12 flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Heart className="h-4 w-4 text-primary" />
-              <span>{t("landing.social.couples")}</span>
+        {/* ── NAV ──────────────────────────────────────────── */}
+        <nav className="sticky top-0 z-50 backdrop-blur-md border-b" style={{ background: "rgba(253,250,245,0.9)", borderColor: "rgba(27,58,45,0.08)" }}>
+          <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-12">
+            <Link href="/" className="flex items-center gap-2">
+              <span className="font-serif-lp text-xl font-semibold tracking-tight" style={{ color: "var(--lp-900)" }}>Selembar.id</span>
+            </Link>
+            <div className="hidden items-center gap-8 md:flex">
+              {[["#", "Home"], ["#themes", "Collections"], ["#features", "The Experience"], ["#pricing", "Concierge"]].map(([href, label]) => (
+                <a key={label} href={href} className="nav-link">{label}</a>
+              ))}
             </div>
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-primary" />
-              <span>{t("landing.social.rsvps")}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Globe className="h-4 w-4 text-primary" />
-              <span>{t("landing.social.seo")}</span>
+            <div className="flex items-center gap-3">
+              <Link href="/login" className="nav-link hidden md:block" style={{ opacity: 0.7 }}>Login</Link>
+              <Link href="/register" className="lp-btn-primary text-sm">Mulai Gratis</Link>
             </div>
           </div>
-        </div>
-      </section>
+        </nav>
 
-      {/* Theme Showcase */}
-      <section id="themes" className="px-6 py-20">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-12 text-center">
-            <h2 className="mb-3 text-3xl font-bold">{t("landing.themes.title")}</h2>
-            <p className="text-muted-foreground">{t("landing.themes.subtitle")}</p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3">
-            {THEMES.map((theme) => (
-              <div
-                key={theme.name}
-                className="group relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
-              >
-                <div
-                  className="flex h-40 flex-col items-center justify-center gap-2"
-                  style={{ backgroundColor: theme.bg }}
-                >
-                  <p className="text-xs tracking-widest uppercase" style={{ color: theme.primary, opacity: 0.6 }}>
-                    Wedding Invitation
-                  </p>
-                  <p className="text-xl font-bold" style={{ color: theme.primary }}>
-                    Ahmad & Sari
-                  </p>
-                  <div className="h-px w-12" style={{ backgroundColor: theme.accent, opacity: 0.5 }} />
-                  <p className="text-xs" style={{ color: theme.primary, opacity: 0.5 }}>
-                    15 September 2025
-                  </p>
+        {/* ── HERO ─────────────────────────────────────────── */}
+        <section className="relative overflow-hidden px-6 lg:px-12" style={{ background: "var(--lp-cream-light)", minHeight: "92vh", display: "flex", alignItems: "center" }}>
+          <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-12 py-20 lg:grid-cols-2 lg:items-center lg:gap-20">
+            {/* Left */}
+            <div>
+              <div className="mb-6 flex items-center gap-3" data-anim="fade">
+                <span className="gold-line" />
+                <span className="lp-tag">Bespoke Digital Invitations</span>
+              </div>
+              <h1 className="font-serif-lp mb-6 leading-[1.1] tracking-tight" style={{ fontSize: "clamp(3rem, 6vw, 5.5rem)", color: "var(--lp-950)", fontWeight: 400 }} data-anim data-delay="100">
+                Momen<br />
+                Berharga dalam<br />
+                <em style={{ color: "var(--lp-800)", fontStyle: "italic" }}>Satu Lembar</em><br />
+                Digital.
+              </h1>
+              <p className="mb-10 max-w-md text-base leading-relaxed" style={{ color: "var(--lp-800)", opacity: 0.8 }} data-anim data-delay="200">
+                Kurasi pengalaman editorial yang tak tertandingi untuk hari istimewa Anda. Undangan yang melampaui batas fisik—elegan, personal, dan benar-benar eksklusif.
+              </p>
+              <div className="flex flex-wrap items-center gap-4" data-anim data-delay="300">
+                <Link href="/register" className="lp-btn-primary">
+                  Mulai Perjalanan Anda <ArrowRight className="h-4 w-4" />
+                </Link>
+                <a href="#themes" className="lp-btn-outline">Lihat Koleksi</a>
+              </div>
+              {/* Social proof */}
+              <div className="mt-12 flex items-center gap-6" data-anim data-delay="400">
+                <div className="flex -space-x-2">
+                  {["bg-emerald-200", "bg-amber-200", "bg-rose-200", "bg-sky-200"].map((c, i) => (
+                    <div key={i} className={`h-8 w-8 rounded-full border-2 border-white ${c} flex items-center justify-center text-xs font-semibold text-gray-600`}>
+                      {["B", "R", "A", "D"][i]}
+                    </div>
+                  ))}
                 </div>
-                <div className="p-3">
-                  <p className="text-sm font-medium">{theme.name}</p>
+                <div>
+                  <div className="flex gap-0.5">{[...Array(5)].map((_, i) => <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />)}</div>
+                  <p className="text-xs mt-0.5" style={{ color: "var(--lp-800)", opacity: 0.7 }}>Dipercaya 1.200+ pasangan</p>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
+            </div>
 
-      {/* Features */}
-      <section className="bg-card px-6 py-20">
-        <div className="mx-auto max-w-4xl">
-          <div className="mb-12 text-center">
-            <h2 className="mb-3 text-3xl font-bold">{t("landing.features.title")}</h2>
-          </div>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featureItems.map(({ Icon, title, desc }) => (
-              <div key={title} className="rounded-2xl border border-border p-5">
-                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/8 text-primary">
-                  <Icon className="h-5 w-5" />
-                </div>
-                <p className="mb-1 font-semibold">{title}</p>
-                <p className="text-sm text-muted-foreground">{desc}</p>
+            {/* Right — photo + floating card */}
+            <div className="relative flex justify-center" data-anim="right" data-delay="150">
+              <div className="relative h-[500px] w-full max-w-[480px] overflow-hidden rounded-3xl shadow-2xl lg:h-[600px]">
+                <Image
+                  src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?auto=format&fit=crop&w=1400&q=80"
+                  alt="Wedding venue decoration"
+                  fill
+                  className="object-cover"
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(13,33,25,0.4) 0%, transparent 60%)" }} />
               </div>
-            ))}
+              {/* Floating invitation card */}
+              <div className="hero-float absolute -bottom-4 -left-4 rounded-2xl border p-5 shadow-xl backdrop-blur-md md:-left-12" style={{ background: "rgba(253,250,245,0.95)", borderColor: "rgba(200,169,110,0.3)", minWidth: 200 }}>
+                <p className="font-serif-lp mb-1 text-xs tracking-widest uppercase" style={{ color: "var(--lp-gold)" }}>Wedding Invitation</p>
+                <p className="font-serif-lp text-xl font-semibold" style={{ color: "var(--lp-950)" }}>{heroCard.names}</p>
+                <div className="my-2 h-px w-full" style={{ background: "var(--lp-gold)", opacity: 0.4 }} />
+                <p className="text-xs" style={{ color: "var(--lp-800)", opacity: 0.8 }}>{heroCard.venue} · {heroCard.date}</p>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Pricing */}
-      <section id="pricing" className="px-6 py-20">
-        <div className="mx-auto max-w-4xl">
-          <div className="mb-12 text-center">
-            <h2 className="mb-3 text-3xl font-bold">{t("landing.pricing.title")}</h2>
-            <p className="text-muted-foreground">{t("landing.pricing.subtitle")}</p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-            {PRICING.map((plan) => (
-              <div
-                key={plan.name}
-                className={`relative rounded-2xl border p-6 ${
-                  plan.featured
-                    ? "border-primary bg-primary text-primary-foreground shadow-xl"
-                    : "border-border bg-card shadow-sm"
-                }`}
-              >
-                {plan.featured && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="rounded-full bg-foreground px-3 py-1 text-[11px] font-semibold text-background">
-                      Most Popular
-                    </span>
+        {/* ── GALLERY ──────────────────────────────────────── */}
+        <section id="themes" className="px-6 py-24 lg:px-12" style={{ background: "var(--lp-cream)" }}>
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-14 text-center" data-anim>
+              <span className="lp-tag">The Curated Gallery</span>
+              <h2 className="font-serif-lp mt-3 text-4xl font-light lg:text-5xl" style={{ color: "var(--lp-950)" }}>Pilih Gaya Cerita Anda</h2>
+              <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed" style={{ color: "var(--lp-800)", opacity: 0.75 }}>
+                Setiap desain adalah kanvas kosong yang menunggu sentuhan personalitas unik Anda.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+              {THEMES.map((t, i) => (
+                <div key={t.name} className="theme-card overflow-hidden rounded-2xl shadow-sm" style={{ background: "white" }} data-anim data-delay={String(i * 100)}>
+                  <div className="flex h-52 flex-col items-center justify-center gap-2 px-6" style={{ background: t.bg }}>
+                    <p className="text-[10px] tracking-widest uppercase" style={{ color: t.primary, opacity: 0.6 }}>The Wedding Of</p>
+                      <p className="font-serif-lp text-xl font-semibold" style={{ color: t.primary }}>{t.sample[0]}</p>
+                    <div className="h-px w-12" style={{ background: t.accent, opacity: 0.6 }} />
+                    <p className="text-xs" style={{ color: t.primary, opacity: 0.6 }}>{t.sample[1]}</p>
                   </div>
-                )}
-                <p className="mb-1 font-semibold">{plan.name}</p>
-                <p className="mb-1 text-3xl font-bold">{plan.price}</p>
-                <p className={`mb-6 text-sm ${plan.featured ? "opacity-75" : "text-muted-foreground"}`}>
-                  {plan.period}
+                  <div className="p-4">
+                    <p className="font-semibold text-sm" style={{ color: "var(--lp-950)" }}>{t.name}</p>
+                    <p className="text-xs mt-0.5" style={{ color: "var(--lp-800)", opacity: 0.65 }}>{t.sub}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-10 text-center" data-anim>
+              <Link href="/register" className="lp-btn-outline" style={{ borderColor: "var(--lp-800)", color: "var(--lp-800)" }}>
+                Lihat Semua Koleksi <ChevronRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 3 STEPS ──────────────────────────────────────── */}
+        <section className="px-6 py-24 lg:px-12" style={{ background: "var(--lp-cream-light)" }}>
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-14 text-center" data-anim>
+              <h2 className="font-serif-lp text-4xl font-light lg:text-5xl" style={{ color: "var(--lp-950)" }}>
+                Buat Undangan Anda<br /><em>dalam 3 Langkah Mudah</em>
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+              {STEPS.map((s, i) => (
+                <div key={s.num} className="relative" data-anim data-delay={String(i * 120)}>
+                  <div className="mb-4 flex items-center gap-4">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl text-2xl" style={{ background: "var(--lp-cream)", color: "var(--lp-800)" }}>
+                      {s.icon}
+                    </div>
+                    <span className="font-serif-lp text-4xl font-light" style={{ color: "var(--lp-gold)", opacity: 0.6 }}>Step {s.num}</span>
+                  </div>
+                  <h3 className="font-serif-lp mb-2 text-2xl font-semibold" style={{ color: "var(--lp-950)" }}>{s.title}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: "var(--lp-800)", opacity: 0.75 }}>{s.desc}</p>
+                  {i < 2 && (
+                    <div className="absolute -right-4 top-7 hidden md:block" style={{ color: "var(--lp-gold)", opacity: 0.4 }}>
+                      <ChevronRight className="h-6 w-6" />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── FEATURES ─────────────────────────────────────── */}
+        <section id="features" className="px-6 py-24 lg:px-12" style={{ background: "var(--lp-cream)" }}>
+          <div className="mx-auto max-w-7xl">
+            <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-2">
+              {/* Photo */}
+              <div className="relative" data-anim="left">
+                <div className="relative h-[500px] overflow-hidden rounded-3xl shadow-xl">
+                  <Image
+                    src="https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=900&q=80"
+                    alt="Happy couple"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  />
+                </div>
+                {/* Stat badge */}
+                <div className="absolute -right-6 top-12 rounded-2xl p-5 shadow-xl" style={{ background: "var(--lp-900)", color: "white" }}>
+                  <p className="font-serif-lp text-3xl font-semibold">1.2k+</p>
+                  <p className="text-xs opacity-80">Pasangan Bahagia</p>
+                </div>
+              </div>
+
+              {/* Features */}
+              <div data-anim="right">
+                <span className="lp-tag">The Luxury Advantage</span>
+                <h2 className="font-serif-lp mt-3 mb-4 text-4xl font-light lg:text-5xl" style={{ color: "var(--lp-950)" }}>
+                  Fitur Eksklusif untuk<br /><em>Hari Sempurna</em>
+                </h2>
+                <p className="mb-10 text-sm leading-relaxed" style={{ color: "var(--lp-800)", opacity: 0.8 }}>
+                  Lebih dari sekadar undangan digital. Kami menyediakan instrumen kurasi yang dirancang untuk menyempurnakan setiap detail perayaan mewah Anda.
                 </p>
-                <ul className="mb-6 space-y-2">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm">
-                      <Check className={`h-4 w-4 shrink-0 ${plan.featured ? "opacity-90" : "text-primary"}`} />
-                      {f}
-                    </li>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  {FEATURES.map((f, i) => (
+                    <div key={f.title} data-anim data-delay={String(i * 80)}>
+                      <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-xl" style={{ background: "rgba(27,58,45,0.08)" }}>
+                        <Check className="h-4 w-4" style={{ color: "var(--lp-600)" }} />
+                      </div>
+                      <h4 className="mb-1 font-semibold text-sm" style={{ color: "var(--lp-950)" }}>{f.title}</h4>
+                      <p className="text-xs leading-relaxed" style={{ color: "var(--lp-800)", opacity: 0.75 }}>{f.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── TESTIMONIALS ─────────────────────────────────── */}
+        <section className="px-6 py-24 lg:px-12" style={{ background: "var(--lp-950)", color: "white" }}>
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-14 text-center" data-anim>
+              <span className="lp-tag">Testimoni dari Pasangan Kami</span>
+              <h2 className="font-serif-lp mt-3 text-4xl font-light lg:text-5xl" style={{ color: "var(--lp-cream-light)" }}>
+                Kisah Bahagia Bersama<br /><em style={{ color: "var(--lp-gold)" }}>Selembar.id</em>
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {TESTIMONIALS.map((t, i) => (
+                <div key={t.name} className="rounded-2xl p-8" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }} data-anim data-delay={String(i * 100)}>
+                  <div className="mb-4 flex gap-0.5">{[...Array(5)].map((_, j) => <Star key={j} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />)}</div>
+                  <p className="font-serif-lp mb-6 text-lg italic leading-relaxed" style={{ color: "rgba(253,250,245,0.9)" }}>&ldquo;{t.quote}&rdquo;</p>
+                  <div className="flex items-center gap-3">
+                    <div className="relative h-10 w-10 overflow-hidden rounded-full">
+                      <Image src={t.avatar} alt={t.name} fill className="object-cover" sizes="40px" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sm" style={{ color: "var(--lp-cream-light)" }}>{t.name}</p>
+                      <p className="text-xs" style={{ color: "var(--lp-gold)", opacity: 0.8 }}>{t.date}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── PRICING ──────────────────────────────────────── */}
+        <section id="pricing" className="px-6 py-24 lg:px-12" style={{ background: "var(--lp-cream-light)" }}>
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-14 text-center" data-anim>
+              <span className="lp-tag">Simple Pricing</span>
+              <h2 className="font-serif-lp mt-3 text-4xl font-light lg:text-5xl" style={{ color: "var(--lp-950)" }}>
+                Investasi untuk<br /><em>Kenangan Abadi</em>
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {tiers.map((tier, i) => {
+                const features = buildFeatures(tier)
+                const isFeatured = tier.isPopular
+                return (
+                  <div
+                    key={tier.tier}
+                    className="pricing-card relative rounded-2xl p-6"
+                    style={{
+                      background: isFeatured ? "var(--lp-900)" : "white",
+                      border: isFeatured ? "none" : "1px solid rgba(27,58,45,0.1)",
+                      boxShadow: isFeatured ? "0 20px 60px rgba(27,58,45,0.3)" : "0 2px 8px rgba(27,58,45,0.06)",
+                    }}
+                    data-anim data-delay={String(i * 80)}
+                  >
+                    {isFeatured && (
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                        <span className="rounded-full px-3 py-1 text-[10px] font-semibold" style={{ background: "var(--lp-gold)", color: "var(--lp-950)" }}>
+                          Pilihan Terlaris
+                        </span>
+                      </div>
+                    )}
+                    <p className="font-serif-lp mb-0.5 text-lg font-semibold" style={{ color: isFeatured ? "var(--lp-cream-light)" : "var(--lp-950)" }}>
+                      {tier.label || tier.tier}
+                    </p>
+                    {tier.description && (
+                      <p className="mb-3 text-xs" style={{ color: isFeatured ? "rgba(245,239,230,0.65)" : "rgba(43,87,64,0.65)" }}>{tier.description}</p>
+                    )}
+                    <p className="font-serif-lp mb-0.5 text-3xl font-light" style={{ color: isFeatured ? "white" : "var(--lp-950)" }}>
+                      {tier.price === 0 ? "Gratis" : `Rp ${Math.floor(tier.price / 1000)}k`}
+                    </p>
+                    <p className="mb-6 text-xs" style={{ color: isFeatured ? "rgba(245,239,230,0.55)" : "rgba(43,87,64,0.55)" }}>
+                      {tier.price === 0 ? "selamanya" : "/ bulan"}
+                    </p>
+                    <ul className="mb-6 space-y-2">
+                      {features.slice(0, 5).map((f) => (
+                        <li key={f} className="flex items-start gap-2 text-xs">
+                          <Check className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: isFeatured ? "var(--lp-gold)" : "var(--lp-600)" }} />
+                          <span style={{ color: isFeatured ? "rgba(245,239,230,0.85)" : "rgba(27,58,45,0.8)" }}>{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Link
+                      href={`/register?plan=${tier.tier.toLowerCase()}`}
+                      className="block w-full rounded-full py-2.5 text-center text-xs font-semibold tracking-wide transition-all"
+                      style={{
+                        background: isFeatured ? "var(--lp-gold)" : "transparent",
+                        color: isFeatured ? "var(--lp-950)" : "var(--lp-800)",
+                        border: isFeatured ? "none" : "1px solid var(--lp-800)",
+                      }}
+                    >
+                      {tier.ctaLabel || "Pilih Paket"}
+                    </Link>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* ── FOOTER ───────────────────────────────────────── */}
+        <footer className="px-6 py-16 lg:px-12" style={{ background: "var(--lp-950)", color: "var(--lp-cream)" }}>
+          <div className="mx-auto max-w-7xl">
+            <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
+              {/* Brand */}
+              <div className="md:col-span-1">
+                <p className="font-serif-lp mb-3 text-2xl font-semibold" style={{ color: "var(--lp-cream-light)" }}>Selembar.id</p>
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(245,239,230,0.55)" }}>
+                  Mewujudkan momen sakral Anda dalam satu lembar digital yang elegan, abadi, dan tak terlupakan.
+                </p>
+              </div>
+
+              {/* Navigation */}
+              <div>
+                <p className="lp-tag mb-4">Navigation</p>
+                <ul className="space-y-2">
+                  {["Home", "Collections", "Experience", "Pricing"].map((l) => (
+                    <li key={l}><a href="#" className="text-xs transition-opacity hover:opacity-100" style={{ color: "rgba(245,239,230,0.6)" }}>{l}</a></li>
                   ))}
                 </ul>
-                <Button asChild variant={plan.featured ? "secondary" : "default"} className="w-full rounded-xl">
-                  <Link href={plan.href}>{plan.cta}</Link>
-                </Button>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border px-6 py-8 text-center text-sm text-muted-foreground">
-        <p>
-          {t("landing.footer")}{" "}
-          <a href="https://nuratech.id" className="hover:underline hover:text-foreground transition-colors" target="_blank" rel="noopener noreferrer">
-            A product by Nuratech.id
-          </a>
-        </p>
-      </footer>
-    </div>
+              {/* Support */}
+              <div>
+                <p className="lp-tag mb-4">Support</p>
+                <ul className="space-y-2">
+                  {[
+                    { label: "FAQs", href: "/faq" },
+                    { label: "Contact Us", href: "/contact" },
+                  ].map(({ label, href }) => (
+                    <li key={label}><Link href={href} className="text-xs transition-opacity hover:opacity-100" style={{ color: "rgba(245,239,230,0.6)" }}>{label}</Link></li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Connect */}
+              <div>
+                <p className="lp-tag mb-4">Connect</p>
+                <ul className="space-y-2">
+                  {["Instagram", "WhatsApp", "TikTok"].map((l) => (
+                    <li key={l}><a href="#" className="text-xs transition-opacity hover:opacity-100" style={{ color: "rgba(245,239,230,0.6)" }}>{l}</a></li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t pt-8 text-xs md:flex-row" style={{ borderColor: "rgba(245,239,230,0.08)", color: "rgba(245,239,230,0.4)" }}>
+              <p>© {new Date().getFullYear()} Selembar.id. Crafted for The Discerning Couple.</p>
+              <div className="flex gap-4">
+                <Link href="/privacy" className="hover:opacity-80 transition-opacity">Privacy Policy</Link>
+                <Link href="/terms" className="hover:opacity-80 transition-opacity">Terms of Use</Link>
+                <a href="https://nuratech.id" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">BY NURATECH</a>
+              </div>
+            </div>
+          </div>
+        </footer>
+
+        <ChatbotWidget />
+      </div>
+    </>
   )
 }

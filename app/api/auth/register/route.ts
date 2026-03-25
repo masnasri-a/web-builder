@@ -7,6 +7,10 @@ const schema = z.object({
   name: z.string().min(1).max(100),
   email: z.string().email(),
   password: z.string().min(8).max(100),
+  role: z.enum(["INDIVIDUAL", "VENDOR"]).default("INDIVIDUAL"),
+  // Vendor-only
+  shopName: z.string().min(1).max(100).optional(),
+  description: z.string().max(300).optional(),
 })
 
 export async function POST(req: Request) {
@@ -21,7 +25,14 @@ export async function POST(req: Request) {
       )
     }
 
-    const { name, email, password } = parsed.data
+    const { name, email, password, role, shopName, description } = parsed.data
+
+    if (role === "VENDOR" && !shopName?.trim()) {
+      return NextResponse.json(
+        { error: "Shop name is required for vendor registration" },
+        { status: 400 }
+      )
+    }
 
     const existing = await db.user.findUnique({ where: { email } })
     if (existing) {
@@ -33,9 +44,20 @@ export async function POST(req: Request) {
 
     const passwordHash = await bcrypt.hash(password, 12)
 
-    await db.user.create({
-      data: { name, email, passwordHash },
+    const user = await db.user.create({
+      data: { name, email, passwordHash, role },
     })
+
+    if (role === "VENDOR") {
+      await db.vendorProfile.create({
+        data: {
+          userId: user.id,
+          shopName: shopName!.trim(),
+          description: description?.trim() ?? null,
+          discount: 5.0,
+        },
+      })
+    }
 
     return NextResponse.json({ success: true }, { status: 201 })
   } catch {

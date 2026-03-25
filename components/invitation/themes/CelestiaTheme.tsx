@@ -16,6 +16,7 @@ import type { Section } from "@/types"
 import type { ThemeTemplateProps } from "./index"
 import type { GuestInvitation } from "@/components/invitation/guest-sections"
 import { GiftSection } from "@/components/invitation/gift-section"
+import { UcapanWall } from "@/components/invitation/ucapan-wall"
 
 const Masonry = dynamic(
   () => import("@/components/ui/masonry").then((m) => ({ default: m.Masonry })),
@@ -126,6 +127,34 @@ function ConstellationDots({ width = 160, height = 80, opacity = 0.5 }: { width?
   )
 }
 
+// ─── Module-level sub-components ──────────────────────────────────────────────
+
+function CelestiaPersonCard({ photo, name, parents, bio, instagram }: { photo?: string; name: string; parents?: string; bio?: string; instagram?: string }) {
+  return (
+    <div className="space-y-3 text-center">
+      <div
+        className="mx-auto h-20 w-20 overflow-hidden rounded-full"
+        style={{ border: `2px solid ${GOLD}`, boxShadow: `0 0 0 4px ${GOLD}25` }}
+      >
+        {photo && (
+          <Image src={photo} alt={name} width={80} height={80} className="object-cover w-full h-full" />
+        )}
+      </div>
+      <h2 className="text-2xl font-bold" style={{ color: SILVER, fontFamily: "Cormorant Garamond, serif" }}>
+        {name}
+      </h2>
+      {parents && <p className="text-xs opacity-55" style={{ color: TXT }}>{parents}</p>}
+      {bio && <p className="mx-auto max-w-40 text-sm leading-relaxed opacity-65" style={{ color: TXT }}>{bio}</p>}
+      {instagram && (
+        <a href={`https://instagram.com/${instagram}`} target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 text-xs opacity-55" style={{ color: SILVER }}>
+          <Instagram className="h-3 w-3" />@{instagram}
+        </a>
+      )}
+    </div>
+  )
+}
+
 // ─── Section renderer ─────────────────────────────────────────────────────────
 
 function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitation }) {
@@ -198,30 +227,6 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
 
     // ── Couple ────────────────────────────────────────────────────────────────
     case "couple": {
-      const PersonCard = ({ photo, name, parents, bio, instagram }: { photo?: string; name: string; parents?: string; bio?: string; instagram?: string }) => (
-        <div className="space-y-3 text-center">
-          <div
-            className="mx-auto h-20 w-20 overflow-hidden rounded-full"
-            style={{ border: `2px solid ${GOLD}`, boxShadow: `0 0 0 4px ${GOLD}25` }}
-          >
-            {photo && (
-              <Image src={photo} alt={name} width={80} height={80} className="object-cover w-full h-full" />
-            )}
-          </div>
-          <h2 className="text-2xl font-bold" style={{ color: SILVER, fontFamily: "Cormorant Garamond, serif" }}>
-            {name}
-          </h2>
-          {parents && <p className="text-xs opacity-55" style={{ color: TXT }}>{parents}</p>}
-          {bio && <p className="mx-auto max-w-40 text-sm leading-relaxed opacity-65" style={{ color: TXT }}>{bio}</p>}
-          {instagram && (
-            <a href={`https://instagram.com/${instagram}`} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs opacity-55" style={{ color: SILVER }}>
-              <Instagram className="h-3 w-3" />@{instagram}
-            </a>
-          )}
-        </div>
-      )
-
       return (
         <section
           id={section.id}
@@ -238,13 +243,13 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
           </Anim>
           <div className="flex justify-center gap-8 items-center">
             <Anim variant="slideLeft" delay={150}>
-              <PersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} instagram={c.groomInstagram as string} />
+              <CelestiaPersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} instagram={c.groomInstagram as string} />
             </Anim>
             <Anim variant="scaleIn" delay={300}>
               <span className="text-3xl italic font-light" style={{ color: GOLD }}>&amp;</span>
             </Anim>
             <Anim variant="slideRight" delay={150}>
-              <PersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} instagram={c.brideInstagram as string} />
+              <CelestiaPersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} instagram={c.brideInstagram as string} />
             </Anim>
           </div>
         </section>
@@ -520,6 +525,27 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
       )
     }
 
+    // ── Ucapan ────────────────────────────────────────────────────────────────
+    case "ucapan":
+      return (
+        <section
+          id={section.id}
+          className="relative min-h-dvh flex flex-col items-center justify-center py-12"
+          style={{ backgroundColor: BG, color: TXT, ...snap }}
+        >
+          <div className="w-full max-w-sm px-8">
+            <Anim variant="fadeIn" delay={0}>
+              <p className="mb-6 text-center text-[10px] tracking-[0.4em] uppercase opacity-60">
+                {(c.title as string) || "Ucapan & Doa"}
+              </p>
+            </Anim>
+            <Anim variant="fadeUp" delay={120}>
+              <UcapanWall invitationId={inv.id} primaryColor={GOLD} />
+            </Anim>
+          </div>
+        </section>
+      )
+
     default:
       return null
   }
@@ -527,7 +553,7 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 
-export function CelestiaTheme({ inv, sections, themeConfig, activeSection, onSectionClick }: ThemeTemplateProps) {
+export function CelestiaTheme({ inv, sections, activeSection, onSectionClick }: ThemeTemplateProps) {
   const sorted = [...sections].sort((a, b) => a.order - b.order)
   return (
     <>

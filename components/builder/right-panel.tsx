@@ -465,6 +465,9 @@ function SectionConfig({
         {type === "closing" && (
           <>{field("Closing Message", "message", "We look forward to seeing you!", true)}</>
         )}
+        {type === "ucapan" && (
+          <>{field("Judul Section", "title", "Ucapan & Doa")}</>
+        )}
         {type === "countdown" && (
           <p className="text-xs text-muted-foreground">
             Countdown automatically uses the wedding date.

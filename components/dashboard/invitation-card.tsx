@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { formatDistanceToNow } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Users, ExternalLink, Pencil } from "lucide-react"

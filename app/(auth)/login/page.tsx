@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { signIn } from "next-auth/react"
+import { signIn, getSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -47,13 +47,19 @@ export default function LoginPage() {
       return
     }
 
-    router.push("/dashboard")
+    const session = await getSession()
+    const role = session?.user?.role
+    if (role === "SUPER_ADMIN") router.push("/super-admin")
+    else if (role === "VENDOR") router.push("/vendor")
+    else if (role === "INDIVIDUAL") router.push("/individual")
+    else if (role === "ADMIN") router.push("/admin")
+    else router.push("/dashboard")
     router.refresh()
   }
 
   async function handleGoogle() {
     setGoogleLoading(true)
-    await signIn("google", { callbackUrl: "/dashboard" })
+    await signIn("google", { callbackUrl: "/auth/callback" })
   }
 
   return (
