@@ -6,11 +6,12 @@
  * Palette : Rose (#E8A0B0) · Blush (#F5C8D0) · Peach (#F5D5C0) · Sage (#B8C8B8) · Warm BG (#FFF8F6) · Dark text (#4A2835)
  */
 
-import Image from "next/image"
 import dynamic from "next/dynamic"
 import { Anim } from "@/components/invitation/anim"
 import { CountdownTimer } from "@/components/invitation/countdown-timer"
 import { RsvpForm } from "@/components/invitation/rsvp-form"
+import { WatermarkedImage } from "@/components/invitation/watermarked-image"
+import { useShowWatermark } from "@/components/invitation/guest-context"
 import { Navigation, Instagram } from "lucide-react"
 import type { Section } from "@/types"
 import type { ThemeTemplateProps } from "./index"
@@ -152,7 +153,7 @@ function PastelRosePersonCard({ photo, name, parents, bio, instagram }: { photo?
         style={{ border: `2.5px solid ${ROSE}`, boxShadow: `0 0 0 4px ${BLUSH}60` }}
       >
         {photo && (
-          <Image src={photo} alt={name} width={80} height={80} className="object-cover w-full h-full" />
+          <WatermarkedImage src={photo} alt={name} width={80} height={80} className="object-cover w-full h-full" />
         )}
       </div>
       <h2 className="text-2xl font-bold" style={{ color: TXT, fontFamily: "Cormorant Garamond, serif" }}>
@@ -174,6 +175,7 @@ function PastelRosePersonCard({ photo, name, parents, bio, instagram }: { photo?
 
 function PastelRoseSection({ section, inv, index }: { section: Section; inv: GuestInvitation; index: number }) {
   const c = section.content as Record<string, unknown>
+  const showWatermark = useShowWatermark()
   // Alternating soft gradient backgrounds
   const altBg = index % 3 === 0
     ? `linear-gradient(160deg, ${BG} 0%, ${BLUSH}25 100%)`
@@ -367,7 +369,7 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
                 Belum ada foto
               </div>
             ) : (
-              <Masonry items={items} animateFrom="bottom" stagger={0.05} blurToFocus maxColumns={2} />
+              <Masonry items={items} animateFrom="bottom" stagger={0.05} blurToFocus maxColumns={2} showWatermark={showWatermark} />
             )}
           </div>
         </section>

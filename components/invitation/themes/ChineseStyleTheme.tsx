@@ -6,7 +6,7 @@
  * Use case: Traditional Chinese / Tionghoa wedding, Lunar New Year wedding
  */
 
-import Image from "next/image"
+import { WatermarkedImage } from "@/components/invitation/watermarked-image"
 import { Anim } from "@/components/invitation/anim"
 import { CountdownTimer } from "@/components/invitation/countdown-timer"
 import { RsvpForm } from "@/components/invitation/rsvp-form"
@@ -138,7 +138,7 @@ function ChinesePersonCard({ photo, name, parents, bio }: { photo?: string; name
         style={{ border: `2.5px solid ${G}` }}
       >
         {photo && (
-          <Image src={photo} alt={name} width={96} height={96} className="h-full w-full object-cover" />
+          <WatermarkedImage src={photo} alt={name} width={96} height={96} className="h-full w-full object-cover" />
         )}
       </div>
       <h2 className="text-2xl font-bold" style={{ color: P, fontFamily: "Cinzel, serif" }}>{name}</h2>
@@ -572,7 +572,7 @@ function ChineseSection({
                 className="mb-2 overflow-hidden rounded"
                 style={{ border: `1.5px solid ${G}50` }}
               >
-                <Image
+                <WatermarkedImage
                   src={url} alt={`Gallery ${i + 1}`}
                   width={200} height={200}
                   className="w-full h-auto object-cover"

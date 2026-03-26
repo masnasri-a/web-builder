@@ -6,8 +6,8 @@
  * Use case: Artistic / bohemian wedding, gallery aesthetic, earthy & handcrafted nuance
  */
 
-import Image from "next/image"
 import { Anim } from "@/components/invitation/anim"
+import { WatermarkedImage } from "@/components/invitation/watermarked-image"
 import { CountdownTimer } from "@/components/invitation/countdown-timer"
 import { RsvpForm } from "@/components/invitation/rsvp-form"
 import { Navigation } from "lucide-react"
@@ -122,7 +122,7 @@ function ChestnutPersonCard({ photo, name, parents, bio }: { photo?: string; nam
   return (
     <div className="space-y-3 text-center">
       <div className="mx-auto h-24 w-24 overflow-hidden rounded-full" style={{ border: `2.5px solid ${SAND}`, boxShadow: `0 0 0 4px ${TERRA}20` }}>
-        {photo && <Image src={photo} alt={name} width={96} height={96} className="h-full w-full object-cover" />}
+        {photo && <WatermarkedImage src={photo} alt={name} width={96} height={96} className="h-full w-full object-cover" />}
       </div>
       <h2 className="text-2xl font-bold" style={{ color: CHEST, fontFamily: "Cormorant Garamond, serif" }}>{name}</h2>
       {parents && <p className="text-sm opacity-60" style={{ color: TXT }}>{parents}</p>}
@@ -346,7 +346,7 @@ function ChestnutSection({
         <section id={section.id} className="min-h-dvh flex flex-col items-center justify-center py-12 text-center" style={{ backgroundColor: BG, ...snap }}>
           <Anim variant="fadeIn" delay={0}><p className="mb-6 text-[10px] tracking-[0.35em] uppercase" style={{ color: CHEST, opacity: 0.6 }}>Gallery</p></Anim>
           <div className="columns-2 gap-2 px-4 w-full max-w-sm mx-auto">
-            {images.map((url, i) => (<div key={i} className="mb-2 overflow-hidden rounded-xl" style={{ border: `1.5px solid ${SAND}60` }}><Image src={url} alt={`Gallery ${i + 1}`} width={200} height={200} className="w-full h-auto object-cover" /></div>))}
+            {images.map((url, i) => (<div key={i} className="mb-2 overflow-hidden rounded-xl" style={{ border: `1.5px solid ${SAND}60` }}><WatermarkedImage src={url} alt={`Gallery ${i + 1}`} width={200} height={200} className="w-full h-auto object-cover" /></div>))}
           </div>
         </section>
       )

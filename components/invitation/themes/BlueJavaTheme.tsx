@@ -6,7 +6,6 @@
  * Palette : Indigo (#1E3566) · Blue (#2B6CB0) · Gold (#C8A84B) · Cream BG (#F5F0E6) · Dark text (#1A2040)
  */
 
-import Image from "next/image"
 import dynamic from "next/dynamic"
 import { Anim } from "@/components/invitation/anim"
 import { CountdownTimer } from "@/components/invitation/countdown-timer"
@@ -17,6 +16,8 @@ import type { ThemeTemplateProps } from "./index"
 import type { GuestInvitation } from "@/components/invitation/guest-sections"
 import { GiftSection } from "@/components/invitation/gift-section"
 import { UcapanWall } from "@/components/invitation/ucapan-wall"
+import { WatermarkedImage } from "@/components/invitation/watermarked-image"
+import { useShowWatermark } from "@/components/invitation/guest-context"
 
 const Masonry = dynamic(
   () => import("@/components/ui/masonry").then((m) => ({ default: m.Masonry })),
@@ -110,7 +111,7 @@ function BlueJavaPersonCard({ photo, name, parents, bio, instagram }: { photo?: 
         style={{ border: `2.5px solid ${GOLD}`, boxShadow: `0 0 0 4px ${GOLD}30` }}
       >
         {photo && (
-          <Image src={photo} alt={name} width={80} height={80} className="object-cover w-full h-full" />
+          <WatermarkedImage src={photo} alt={name} width={80} height={80} className="object-cover w-full h-full" />
         )}
       </div>
       <h2 className="text-2xl font-bold" style={{ color: INDIGO, fontFamily: "Cormorant Garamond, serif" }}>
@@ -131,6 +132,7 @@ function BlueJavaPersonCard({ photo, name, parents, bio, instagram }: { photo?: 
 // ─── Section renderer ─────────────────────────────────────────────────────────
 
 function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitation }) {
+  const showWatermark = useShowWatermark()
   const c = section.content as Record<string, unknown>
 
   switch (section.type) {
@@ -333,7 +335,7 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
                 Belum ada foto
               </div>
             ) : (
-              <Masonry items={items} animateFrom="bottom" stagger={0.05} blurToFocus maxColumns={2} />
+              <Masonry items={items} animateFrom="bottom" stagger={0.05} blurToFocus maxColumns={2} showWatermark={showWatermark} />
             )}
           </div>
         </section>

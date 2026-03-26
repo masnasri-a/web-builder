@@ -6,8 +6,8 @@
  * Use case: Romantic / feminine wedding, garden party, outdoor ceremony
  */
 
-import Image from "next/image"
 import { Anim } from "@/components/invitation/anim"
+import { WatermarkedImage } from "@/components/invitation/watermarked-image"
 import { CountdownTimer } from "@/components/invitation/countdown-timer"
 import { RsvpForm } from "@/components/invitation/rsvp-form"
 import { Navigation } from "lucide-react"
@@ -120,7 +120,7 @@ function FloralPersonCard({ photo, name, parents, bio }: { photo?: string; name:
         style={{ border: `2.5px solid ${BLSH}`, boxShadow: `0 0 0 4px ${BLSH}30` }}
       >
         {photo && (
-          <Image src={photo} alt={name} width={96} height={96} className="h-full w-full object-cover" />
+          <WatermarkedImage src={photo} alt={name} width={96} height={96} className="h-full w-full object-cover" />
         )}
       </div>
       <h2
@@ -513,7 +513,7 @@ function FloralSection({
                 className="mb-2 overflow-hidden rounded-xl"
                 style={{ border: `1.5px solid ${BLSH}60` }}
               >
-                <Image
+                <WatermarkedImage
                   src={url} alt={`Gallery ${i + 1}`}
                   width={200} height={200}
                   className="w-full h-auto object-cover"

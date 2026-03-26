@@ -53,7 +53,9 @@ Kami berhak mengubah, menangguhkan, atau menghentikan fitur Layanan kapan saja d
 • Mengandung malware, virus, atau kode berbahaya.
 • Bersifat menipu, memfitnah, atau melecehkan.
 
-**4.3 Tanggung jawab konten**: Anda sepenuhnya bertanggung jawab atas konten yang Anda buat dan bagikan melalui platform kami.`,
+**4.3 Tanggung jawab konten**: Anda sepenuhnya bertanggung jawab atas konten yang Anda buat dan bagikan melalui platform kami.
+
+**4.4 Musik yang diunggah**: Fitur musik latar memungkinkan Anda mengunggah berkas audio ke dalam undangan digital. Selembar.id **tidak** menyediakan, memiliki, atau melisensikan musik apa pun — semua berkas audio adalah konten yang diunggah sepenuhnya oleh pengguna. Anda bertanggung jawab penuh untuk memastikan bahwa musik yang Anda unggah bebas dari hak cipta pihak lain atau telah mendapatkan izin yang sah dari pemegang hak cipta yang bersangkutan. Selembar.id tidak bertanggung jawab atas klaim, tuntutan, atau kerugian yang timbul akibat penggunaan musik tanpa izin yang diunggah oleh pengguna.`,
   },
   {
     id: "payment",
@@ -83,22 +85,33 @@ Kami berhak mengubah, menangguhkan, atau menghentikan fitur Layanan kapan saja d
   {
     id: "ip",
     title: "7. Kekayaan Intelektual",
-    content: `Semua elemen Layanan yang tidak dibuat oleh pengguna — termasuk desain tema, antarmuka, logo, nama merek, dan kode perangkat lunak — adalah milik PT Nuratech Karya Indonesia dan dilindungi oleh hukum kekayaan intelektual Indonesia.
+    content: `Semua elemen Layanan yang tidak dibuat oleh pengguna — termasuk desain tema, antarmuka, logo, nama merek, dan kode perangkat lunak — adalah milik PT Nuratech Digital Nusantara dan dilindungi oleh hukum kekayaan intelektual Indonesia.
 
 Anda tidak diperbolehkan menggunakan merek, logo, atau elemen desain kami tanpa izin tertulis sebelumnya.`,
   },
   {
+    id: "copyright",
+    title: "8. Hak Cipta & Status Selembar.id sebagai Penyedia Platform",
+    content: `**8.1 Selembar.id sebagai penyedia platform**: Selembar.id beroperasi semata-mata sebagai penyedia platform teknologi (technology platform provider). Kami bukan pencipta, penerbit, distributor, maupun pemegang hak cipta atas konten yang dibuat atau diunggah oleh pengguna — termasuk namun tidak terbatas pada foto, teks, video, dan berkas audio/musik.
+
+**8.2 Tanggung jawab hak cipta konten pengguna**: Seluruh tanggung jawab atas keabsahan hak cipta dan legalitas konten yang diunggah ke platform berada sepenuhnya pada pengguna yang mengunggah konten tersebut. Pengguna wajib memastikan bahwa mereka memiliki hak, lisensi, atau izin yang diperlukan sebelum mengunggah konten apa pun.
+
+**8.3 Musik**: Musik yang diputar dalam undangan digital adalah berkas audio yang **diunggah dan dipilih sendiri oleh pengguna**. Selembar.id tidak menyediakan perpustakaan musik berlisensi, tidak mengkurasi, dan tidak memverifikasi status hak cipta berkas audio yang diunggah. Pengguna bertanggung jawab penuh untuk memperoleh izin dari pemegang hak cipta musik yang bersangkutan sebelum menggunakannya.
+
+**8.4 Pelanggaran hak cipta (DMCA/Hak Cipta Indonesia)**: Jika Anda adalah pemegang hak cipta dan menemukan konten di platform kami yang melanggar hak Anda, silakan kirimkan pemberitahuan resmi ke **hello@selembar.id** dengan menyertakan identitas Anda, deskripsi karya yang dilanggar, dan tautan konten yang dimaksud. Kami akan menindaklanjuti laporan yang valid sesuai dengan Undang-Undang Hak Cipta Republik Indonesia (UU No. 28 Tahun 2014).`,
+  },
+  {
     id: "disclaimer",
-    title: "8. Penafian dan Batasan Tanggung Jawab",
+    title: "9. Penafian dan Batasan Tanggung Jawab",
     content: `**8.1 Layanan "sebagaimana adanya"**: Layanan disediakan tanpa jaminan apapun, tersurat maupun tersirat, termasuk namun tidak terbatas pada jaminan ketersediaan, akurasi, atau kesesuaian untuk tujuan tertentu.
 
-**8.2 Batasan tanggung jawab**: Sejauh diizinkan hukum, PT Nuratech Karya Indonesia tidak bertanggung jawab atas kerugian tidak langsung, insidental, atau konsekuensial yang timbul dari penggunaan atau ketidakmampuan menggunakan Layanan.
+**8.2 Batasan tanggung jawab**: Sejauh diizinkan hukum, PT Nuratech Digital Nusantara tidak bertanggung jawab atas kerugian tidak langsung, insidental, atau konsekuensial yang timbul dari penggunaan atau ketidakmampuan menggunakan Layanan.
 
 **8.3 Force majeure**: Kami tidak bertanggung jawab atas kegagalan layanan akibat bencana alam, pemadaman listrik, gangguan jaringan, atau kejadian di luar kendali kami.`,
   },
   {
     id: "termination",
-    title: "9. Penghentian Layanan",
+    title: "10. Penghentian Layanan",
     content: `**9.1 Oleh pengguna**: Anda dapat menghapus akun Anda kapan saja melalui pengaturan akun atau dengan menghubungi tim kami. Penghapusan akun bersifat permanen.
 
 **9.2 Oleh kami**: Kami berhak menangguhkan atau mengakhiri akun Anda dengan atau tanpa pemberitahuan jika Anda melanggar Syarat ini, melakukan penipuan, atau membahayakan pengguna lain.
@@ -107,20 +120,20 @@ Anda tidak diperbolehkan menggunakan merek, logo, atau elemen desain kami tanpa 
   },
   {
     id: "governing-law",
-    title: "10. Hukum yang Berlaku",
+    title: "11. Hukum yang Berlaku",
     content: `Syarat ini diatur oleh dan ditafsirkan sesuai dengan hukum Negara Kesatuan Republik Indonesia. Setiap sengketa yang timbul dari atau berkaitan dengan Syarat ini akan diselesaikan melalui musyawarah mufakat. Jika tidak tercapai kesepakatan, sengketa akan diselesaikan melalui pengadilan yang berwenang di Jakarta, Indonesia.`,
   },
   {
     id: "changes",
-    title: "11. Perubahan Syarat",
+    title: "12. Perubahan Syarat",
     content: `Kami berhak memperbarui Syarat ini kapan saja. Perubahan material akan diberitahukan melalui email atau notifikasi dalam aplikasi setidaknya 7 hari sebelum berlaku. Penggunaan Layanan secara berkelanjutan setelah berlakunya perubahan dianggap sebagai penerimaan Syarat yang diperbarui.`,
   },
   {
     id: "contact",
-    title: "12. Kontak",
+    title: "13. Kontak",
     content: `Pertanyaan atau masukan mengenai Syarat ini dapat disampaikan kepada:
 
-**PT Nuratech Karya Indonesia**
+**PT Nuratech Digital Nusantara**
 Email: hello@selembar.id
 Website: https://nuratech.id`,
   },
@@ -166,7 +179,7 @@ export default function TermsPage() {
             className="text-sm leading-relaxed"
             style={{ color: "rgba(27,58,45,0.75)", fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}
           >
-            Dokumen ini merupakan perjanjian hukum antara Anda dan <strong>PT Nuratech Karya Indonesia</strong>{" "}
+            Dokumen ini merupakan perjanjian hukum antara Anda dan <strong>PT Nuratech Digital Nusantara</strong>{" "}
             selaku pengelola platform <strong>Selembar.id</strong>. Harap baca dengan seksama sebelum
             menggunakan layanan kami.
           </p>

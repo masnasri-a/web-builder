@@ -19,6 +19,7 @@ const SECTIONS = [
 
 • **Data akun**: nama, alamat email, dan kata sandi (disimpan dalam bentuk hash terenkripsi).
 • **Data undangan**: nama pasangan, tanggal dan lokasi acara, foto, serta konten lain yang Anda masukkan ke dalam editor undangan.
+• **Data media & musik**: berkas gambar dan audio yang Anda unggah sebagai bagian dari undangan digital, termasuk musik latar. Berkas ini disimpan di infrastruktur cloud kami semata-mata untuk keperluan penyajian undangan.
 • **Data tamu (RSVP)**: nama tamu, nomor telepon, alamat email, dan konfirmasi kehadiran yang diisi oleh tamu undangan.
 • **Data pembayaran**: catatan transaksi berupa jumlah, tanggal, dan status pembayaran. Kami tidak menyimpan detail kartu kredit atau rekening bank.
 • **Data penggunaan**: log aktivitas, alamat IP, jenis perangkat, browser, serta halaman yang dikunjungi untuk keperluan analitik internal.`,
@@ -94,16 +95,27 @@ Untuk menggunakan hak-hak ini, hubungi kami di **hello@selembar.id**.`,
     content: `Layanan Selembar.id ditujukan untuk pengguna berusia 17 tahun ke atas. Kami tidak secara sengaja mengumpulkan data dari anak-anak di bawah usia 17 tahun. Jika Anda mengetahui bahwa seorang anak telah mendaftar tanpa izin orang tua, silakan hubungi kami untuk segera menghapus data tersebut.`,
   },
   {
+    id: "user-content-copyright",
+    title: "9. Konten yang Diunggah & Hak Cipta",
+    content: `**9.1 Status Selembar.id**: Selembar.id adalah penyedia platform teknologi (technology platform provider). Kami tidak memiliki, mengkurasi, maupun bertanggung jawab atas konten yang dibuat atau diunggah oleh pengguna, termasuk foto, teks, dan musik.
+
+**9.2 Musik yang diunggah pengguna**: Fitur musik latar pada undangan digital sepenuhnya diisi oleh berkas audio yang diunggah oleh pengguna itu sendiri. Selembar.id tidak menyediakan perpustakaan musik berlisensi dan tidak memverifikasi status hak cipta berkas audio yang diunggah. Tanggung jawab atas keabsahan penggunaan musik — termasuk perolehan izin dari pemegang hak cipta — berada sepenuhnya pada pengguna yang mengunggahnya.
+
+**9.3 Pemrosesan data konten**: Berkas audio dan media lainnya yang Anda unggah disimpan dan diproses semata-mata untuk keperluan penyajian undangan Anda kepada tamu. Kami tidak menggunakan konten tersebut untuk tujuan lain, tidak membagikannya kepada pihak ketiga selain yang diperlukan untuk operasional platform (misalnya penyedia layanan cloud storage), dan tidak mengklaim hak kepemilikan atas konten tersebut.
+
+**9.4 Pelaporan pelanggaran hak cipta**: Apabila Anda menemukan konten yang melanggar hak cipta Anda dalam platform kami, silakan laporkan ke **hello@selembar.id**. Kami akan menindaklanjuti laporan yang valid sesuai Undang-Undang Hak Cipta Republik Indonesia (UU No. 28 Tahun 2014).`,
+  },
+  {
     id: "changes",
-    title: "9. Perubahan Kebijakan",
+    title: "10. Perubahan Kebijakan",
     content: `Kami dapat memperbarui kebijakan privasi ini sewaktu-waktu. Perubahan signifikan akan kami beritahukan melalui email atau notifikasi dalam aplikasi setidaknya 7 hari sebelum berlaku. Penggunaan layanan secara berkelanjutan setelah tanggal berlaku perubahan dianggap sebagai penerimaan kebijakan yang diperbarui.`,
   },
   {
     id: "contact",
-    title: "10. Hubungi Kami",
+    title: "11. Hubungi Kami",
     content: `Jika Anda memiliki pertanyaan atau kekhawatiran mengenai kebijakan privasi ini, silakan hubungi:
 
-**PT Nuratech Karya Indonesia**
+**PT Nuratech Digital Nusantara**
 Email: hello@selembar.id
 Website: https://nuratech.id`,
   },
@@ -150,7 +162,7 @@ export default function PrivacyPage() {
             style={{ color: "rgba(27,58,45,0.75)", fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}
           >
             Selamat datang di <strong>Selembar.id</strong>, layanan undangan digital pernikahan premium yang
-            dioperasikan oleh PT Nuratech Karya Indonesia. Kebijakan Privasi ini menjelaskan bagaimana
+            dioperasikan oleh PT Nuratech Digital Nusantara. Kebijakan Privasi ini menjelaskan bagaimana
             kami mengumpulkan, menggunakan, menyimpan, dan melindungi informasi pribadi Anda ketika
             menggunakan layanan kami. Dengan menggunakan Selembar.id, Anda menyetujui praktik yang
             dijelaskan dalam kebijakan ini.

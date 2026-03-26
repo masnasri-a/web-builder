@@ -179,7 +179,8 @@ model TierConfig {
   ctaLabel          String   @default("Mulai Sekarang")
 
   // Pricing
-  price             Int      @default(0)        // IDR / period
+  price             Int      @default(0)        // IDR / period (final price)
+  originalPrice     Int      @default(0)        // IDR / period (strikethrough price, 0 = no strikethrough)
   durationDays      Int      @default(30)       // subscription duration (0 = lifetime / never expires)
 
   // Limits  (0 = unlimited)

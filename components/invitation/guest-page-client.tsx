@@ -4,6 +4,7 @@ import { useState } from "react"
 import { GuestSections, type GuestInvitation } from "@/components/invitation/guest-sections"
 import { SplashScreen } from "@/components/invitation/splash-screen"
 import { MusicPlayer } from "@/components/invitation/music-player"
+import { QrCheckinWidget } from "@/components/invitation/qr-checkin-widget"
 import { FontLoader } from "@/components/invitation/font-loader"
 import type { Section, ThemeConfig } from "@/types"
 import { getThemeBySlug } from "@/lib/themeRegistry"
@@ -19,6 +20,7 @@ interface GuestPageClientProps {
   guestId?: string
   musicUrl?: string | null
   themeSlug?: string
+  ownerTier?: string
 }
 
 export function GuestPageClient({
@@ -30,6 +32,7 @@ export function GuestPageClient({
   guestId,
   musicUrl,
   themeSlug,
+  ownerTier,
 }: GuestPageClientProps) {
   const [entered, setEntered] = useState(false)
 
@@ -45,7 +48,7 @@ export function GuestPageClient({
   }
 
   return (
-    <GuestContextProvider guestName={guestName}>
+    <GuestContextProvider guestName={guestName} guestId={guestId} ownerTier={ownerTier}>
     <div className="h-dvh overflow-y-scroll" style={style}>
       <FontLoader fontFamily={fonts} />
 
@@ -67,6 +70,9 @@ export function GuestPageClient({
           fullscreen
         />
       )}
+
+      {/* QR check-in widget — only shown after entering, only if guestId is known */}
+      {entered && <QrCheckinWidget />}
 
       {/* Music player — only shown after entering, only if musicUrl provided */}
       {musicUrl && <MusicPlayer musicUrl={musicUrl} autoPlay={entered} />}

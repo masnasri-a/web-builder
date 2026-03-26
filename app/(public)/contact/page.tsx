@@ -229,7 +229,7 @@ export default async function ContactPage() {
             className="lp-serif text-2xl font-light"
             style={{ color: "var(--lp-950)" }}
           >
-            PT Nuratech Karya Indonesia
+            PT Nuratech Digital Nusantara
           </p>
           <p
             className="mt-2 text-sm"

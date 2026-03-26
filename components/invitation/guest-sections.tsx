@@ -1,10 +1,11 @@
 "use client"
 
-import Image from "next/image"
 import dynamic from "next/dynamic"
 import { Anim } from "@/components/invitation/anim"
 import { CountdownTimer } from "@/components/invitation/countdown-timer"
 import { RsvpForm } from "@/components/invitation/rsvp-form"
+import { WatermarkedImage } from "@/components/invitation/watermarked-image"
+import { useShowWatermark } from "@/components/invitation/guest-context"
 import type { Section, ThemeConfig } from "@/types"
 import { Instagram, Navigation } from "lucide-react"
 import { GiftSection } from "@/components/invitation/gift-section"
@@ -56,6 +57,7 @@ function AnimatedSection({
   inv: GuestInvitation
   themeConfig: ThemeConfig
 }) {
+  const showWatermark = useShowWatermark()
   const c = section.content as Record<string, unknown>
   const primary = themeConfig.primaryColor
   const accent = themeConfig.accentColor
@@ -168,7 +170,7 @@ function AnimatedSection({
         <div className="space-y-3 text-center">
           <div className="mx-auto h-24 w-24 overflow-hidden rounded-full bg-gray-100">
             {(c.groomPhoto as string) && (
-              <Image src={c.groomPhoto as string} alt="Groom" width={96} height={96} className="h-full w-full object-cover" />
+              <WatermarkedImage src={c.groomPhoto as string} alt="Groom" width={96} height={96} className="h-full w-full object-cover" />
             )}
           </div>
           <h2 className="text-2xl font-semibold" style={{ color: primary }}>{inv.groomName}</h2>
@@ -196,7 +198,7 @@ function AnimatedSection({
         <div className="space-y-3 text-center">
           <div className="mx-auto h-24 w-24 overflow-hidden rounded-full bg-gray-100">
             {(c.bridePhoto as string) && (
-              <Image src={c.bridePhoto as string} alt="Bride" width={96} height={96} className="h-full w-full object-cover" />
+              <WatermarkedImage src={c.bridePhoto as string} alt="Bride" width={96} height={96} className="h-full w-full object-cover" />
             )}
           </div>
           <h2 className="text-2xl font-semibold" style={{ color: primary }}>{inv.brideName}</h2>
@@ -507,6 +509,7 @@ function AnimatedSection({
               stagger={0.05}
               blurToFocus={true}
               maxColumns={2}
+              showWatermark={showWatermark}
             />
           </div>
         </section>

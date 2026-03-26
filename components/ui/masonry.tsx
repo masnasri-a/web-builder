@@ -27,6 +27,8 @@ interface MasonryProps {
   colorShiftOnHover?: boolean
   /** Cap the responsive column count (e.g. 2 for gallery sections) */
   maxColumns?: number
+  /** Show "selembar.id" watermark overlay on each image (BASIC tier) */
+  showWatermark?: boolean
 }
 
 const useMedia = (
@@ -90,6 +92,7 @@ export function Masonry({
   blurToFocus = true,
   colorShiftOnHover = false,
   maxColumns,
+  showWatermark = false,
 }: MasonryProps) {
   const rawColumns = useMedia(
     [
@@ -312,6 +315,36 @@ export function Masonry({
                   borderRadius: "10px",
                 }}
               />
+            )}
+            {showWatermark && (
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  pointerEvents: "none",
+                  borderRadius: "10px",
+                  overflow: "hidden",
+                }}
+                aria-hidden="true"
+              >
+                <span
+                  style={{
+                    color: "rgba(255,255,255,0.45)",
+                    fontSize: "clamp(10px, 2.5vw, 14px)",
+                    fontWeight: 700,
+                    letterSpacing: "0.1em",
+                    textShadow: "0 1px 4px rgba(0,0,0,0.3)",
+                    transform: "rotate(-25deg)",
+                    whiteSpace: "nowrap",
+                    userSelect: "none",
+                  }}
+                >
+                  selembar.id
+                </span>
+              </div>
             )}
           </div>
         </div>

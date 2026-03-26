@@ -6,8 +6,8 @@
  * Use case: Formal black-tie wedding, gala dinner, mewah / luxury wedding
  */
 
-import Image from "next/image"
 import { Anim } from "@/components/invitation/anim"
+import { WatermarkedImage } from "@/components/invitation/watermarked-image"
 import { CountdownTimer } from "@/components/invitation/countdown-timer"
 import { RsvpForm } from "@/components/invitation/rsvp-form"
 import { Navigation } from "lucide-react"
@@ -145,7 +145,7 @@ function RoyalPersonCard({ photo, name, parents, bio }: { photo?: string; name: 
         style={{ border: `2.5px solid ${G}`, boxShadow: `0 0 0 4px ${G}25` }}
       >
         {photo && (
-          <Image src={photo} alt={name} width={96} height={96} className="h-full w-full object-cover" />
+          <WatermarkedImage src={photo} alt={name} width={96} height={96} className="h-full w-full object-cover" />
         )}
       </div>
       <h2 className="text-2xl font-bold" style={{ color: CHAMP, fontFamily: "Cinzel, serif" }}>{name}</h2>
@@ -554,7 +554,7 @@ function RoyalSection({
                   className="mb-2 overflow-hidden rounded-sm"
                   style={{ border: `1.5px solid ${G}50` }}
                 >
-                  <Image
+                  <WatermarkedImage
                     src={url} alt={`Gallery ${i + 1}`}
                     width={200} height={200}
                     className="w-full h-auto object-cover"

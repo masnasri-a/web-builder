@@ -20,6 +20,7 @@ import {
   PremiumBlueTheme,
   SerenityBlossomTheme,
   PastelRoseTheme,
+  FairytaleGardenTheme,
 } from "@/components/invitation/themes"
 
 export interface ThemeRegistryEntry {
@@ -204,6 +205,20 @@ export const themeRegistry: ThemeRegistryEntry[] = [
       accentColor: "#B8C8B8",
       fontFamily: "Cormorant Garamond",
       bgColor: "#FFF8F6",
+    },
+  },
+  {
+    id: "fairytale-garden",
+    name: "Fairytale Garden",
+    tags: ["fairytale", "romantis", "garden", "floral", "mewah", "elegant"],
+    previewColor: "#C4A0B0",
+    component: FairytaleGardenTheme,
+    defaultConfig: {
+      primaryColor: "#C4A0B0",
+      secondaryColor: "#FFF8F2",
+      accentColor: "#B48BA8",
+      fontFamily: "Cormorant Garamond",
+      bgColor: "#FFF8F2",
     },
   },
 ]

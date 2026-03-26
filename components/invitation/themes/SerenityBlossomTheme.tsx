@@ -6,11 +6,12 @@
  * Palette : Sakura (#E8849A) · Lavender (#9B8EC4) · Sage (#7BA898) · Ivory BG (#FAFAF5) · Deep purple-brown text (#3D2B4A) · Petal (#F4B8C8)
  */
 
-import Image from "next/image"
 import dynamic from "next/dynamic"
 import { Anim } from "@/components/invitation/anim"
 import { CountdownTimer } from "@/components/invitation/countdown-timer"
 import { RsvpForm } from "@/components/invitation/rsvp-form"
+import { WatermarkedImage } from "@/components/invitation/watermarked-image"
+import { useShowWatermark } from "@/components/invitation/guest-context"
 import { Navigation, Instagram } from "lucide-react"
 import type { Section } from "@/types"
 import type { ThemeTemplateProps } from "./index"
@@ -119,7 +120,7 @@ function SerenityPersonCard({ photo, name, parents, bio, instagram }: { photo?: 
         style={{ border: `2.5px solid ${SAKURA}`, boxShadow: `0 0 0 4px ${PETAL}60` }}
       >
         {photo && (
-          <Image src={photo} alt={name} width={80} height={80} className="object-cover w-full h-full" />
+          <WatermarkedImage src={photo} alt={name} width={80} height={80} className="object-cover w-full h-full" />
         )}
       </div>
       <h2 className="text-2xl font-bold" style={{ color: SAKURA, fontFamily: "Cormorant Garamond, serif" }}>
@@ -141,6 +142,7 @@ function SerenityPersonCard({ photo, name, parents, bio, instagram }: { photo?: 
 
 function SerenityBlossomSection({ section, inv }: { section: Section; inv: GuestInvitation }) {
   const c = section.content as Record<string, unknown>
+  const showWatermark = useShowWatermark()
 
   switch (section.type) {
 
@@ -326,7 +328,7 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
                 Belum ada foto
               </div>
             ) : (
-              <Masonry items={items} animateFrom="bottom" stagger={0.05} blurToFocus maxColumns={2} />
+              <Masonry items={items} animateFrom="bottom" stagger={0.05} blurToFocus maxColumns={2} showWatermark={showWatermark} />
             )}
           </div>
         </section>

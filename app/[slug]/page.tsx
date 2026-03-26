@@ -61,7 +61,7 @@ export default async function GuestPage({
 
   const inv = await db.invitation.findUnique({
     where: { slug, isPublished: true },
-    include: { theme: true },
+    include: { theme: true, user: { select: { tier: true } } },
   })
 
   if (!inv) notFound()
@@ -130,6 +130,7 @@ export default async function GuestPage({
         guestId={guestRecord?.id}
         musicUrl={inv.musicUrl}
         themeSlug={inv.theme?.slug}
+        ownerTier={inv.user.tier}
       />
     </>
   )

@@ -423,9 +423,21 @@ export default async function LandingPage() {
                     {tier.description && (
                       <p className="mb-3 text-xs" style={{ color: isFeatured ? "rgba(245,239,230,0.65)" : "rgba(43,87,64,0.65)" }}>{tier.description}</p>
                     )}
-                    <p className="font-serif-lp mb-0.5 text-3xl font-light" style={{ color: isFeatured ? "white" : "var(--lp-950)" }}>
-                      {tier.price === 0 ? "Gratis" : `Rp ${Math.floor(tier.price / 1000)}k`}
-                    </p>
+                    {tier.originalPrice > 0 && tier.originalPrice > tier.price && (
+                      <p className="mb-0.5 text-sm font-light line-through" style={{ color: isFeatured ? "rgba(245,239,230,0.45)" : "rgba(43,87,64,0.4)" }}>
+                        Rp {Math.floor(tier.originalPrice / 1000)}k
+                      </p>
+                    )}
+                    <div className="flex items-baseline gap-2">
+                      <p className="font-serif-lp mb-0.5 text-3xl font-light" style={{ color: isFeatured ? "white" : "var(--lp-950)" }}>
+                        {tier.price === 0 ? "Gratis" : `Rp ${Math.floor(tier.price / 1000)}k`}
+                      </p>
+                      {tier.originalPrice > 0 && tier.originalPrice > tier.price && tier.price > 0 && (
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-bold" style={{ background: isFeatured ? "var(--lp-gold)" : "var(--lp-600)", color: isFeatured ? "var(--lp-950)" : "white" }}>
+                          -{Math.round(((tier.originalPrice - tier.price) / tier.originalPrice) * 100)}%
+                        </span>
+                      )}
+                    </div>
                     <p className="mb-6 text-xs" style={{ color: isFeatured ? "rgba(245,239,230,0.55)" : "rgba(43,87,64,0.55)" }}>
                       {tier.price === 0 ? "selamanya" : "/ bulan"}
                     </p>

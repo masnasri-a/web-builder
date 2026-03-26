@@ -6,11 +6,12 @@
  * Palette : Royal (#1B3A7A) · Gold (#C9A84C) · Pearl (#F8F4EE) · Deep navy text (#0D2352) · Light blue tint (#EEF2FF)
  */
 
-import Image from "next/image"
 import dynamic from "next/dynamic"
 import { Anim } from "@/components/invitation/anim"
 import { CountdownTimer } from "@/components/invitation/countdown-timer"
 import { RsvpForm } from "@/components/invitation/rsvp-form"
+import { WatermarkedImage } from "@/components/invitation/watermarked-image"
+import { useShowWatermark } from "@/components/invitation/guest-context"
 import { Navigation, Instagram } from "lucide-react"
 import type { Section } from "@/types"
 import type { ThemeTemplateProps } from "./index"
@@ -115,7 +116,7 @@ function PremiumBluePersonCard({ photo, name, parents, bio, instagram }: { photo
         style={{ border: `2.5px solid ${GOLD}`, boxShadow: `0 0 0 4px ${ROYAL}18` }}
       >
         {photo && (
-          <Image src={photo} alt={name} width={80} height={80} className="object-cover w-full h-full" />
+          <WatermarkedImage src={photo} alt={name} width={80} height={80} className="object-cover w-full h-full" />
         )}
       </div>
       <h2 className="text-2xl font-bold" style={{ color: ROYAL, fontFamily: "Cormorant Garamond, serif" }}>
@@ -137,6 +138,7 @@ function PremiumBluePersonCard({ photo, name, parents, bio, instagram }: { photo
 
 function PremiumBlueSection({ section, inv, index }: { section: Section; inv: GuestInvitation; index: number }) {
   const c = section.content as Record<string, unknown>
+  const showWatermark = useShowWatermark()
   const sectionBg = index % 2 === 0 ? PEARL : LIGHT
 
   switch (section.type) {
@@ -315,7 +317,7 @@ function PremiumBlueSection({ section, inv, index }: { section: Section; inv: Gu
                 Belum ada foto
               </div>
             ) : (
-              <Masonry items={items} animateFrom="bottom" stagger={0.05} blurToFocus maxColumns={2} />
+              <Masonry items={items} animateFrom="bottom" stagger={0.05} blurToFocus maxColumns={2} showWatermark={showWatermark} />
             )}
           </div>
         </section>

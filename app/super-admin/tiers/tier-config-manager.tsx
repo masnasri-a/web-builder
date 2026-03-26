@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-type Theme = { id: string; name: string; slug: string; isActive: boolean }
+type Theme = { id: string; name: string; slug: string; isActive: boolean; previewImage: string | null; config: { primaryColor?: string; accentColor?: string } | null }
 type TierConfig = {
   id: string
   roleType: string
@@ -18,6 +18,7 @@ type TierConfig = {
   isVisible: boolean
   ctaLabel: string
   price: number
+  originalPrice: number
   maxInvitations: number
   maxRsvpGuests: number
   maxGalleryImages: number
@@ -144,7 +145,7 @@ export function TierConfigManager({
       </div>
 
       {/* Tier Cards */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-2">
         {TIERS.map(tier => {
           const cfg = getConfig(activeTab, tier)
           if (!cfg) return null
@@ -207,14 +208,31 @@ export function TierConfigManager({
                 <section className="space-y-2.5">
                   <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Harga & Batas</p>
                   <div className="space-y-2">
-                    <div className="space-y-1">
-                      <Label className="text-xs">Harga (IDR/bulan)</Label>
-                      <Input
-                        type="number" min="0" step="1000"
-                        value={cfg.price}
-                        onChange={e => updateLocal(activeTab, tier, { price: parseInt(e.target.value) || 0 })}
-                        className="h-8 text-sm"
-                      />
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1">
+                        <Label className="text-xs">Harga (IDR/bulan)</Label>
+                        <Input
+                          type="number" min="0" step="1000"
+                          value={cfg.price}
+                          onChange={e => updateLocal(activeTab, tier, { price: parseInt(e.target.value) || 0 })}
+                          className="h-8 text-sm"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Harga Coret (0 = tidak ada)</Label>
+                        <Input
+                          type="number" min="0" step="1000"
+                          value={cfg.originalPrice}
+                          onChange={e => updateLocal(activeTab, tier, { originalPrice: parseInt(e.target.value) || 0 })}
+                          className="h-8 text-sm"
+                          placeholder="e.g. 150000"
+                        />
+                        {cfg.originalPrice > 0 && cfg.originalPrice > cfg.price && (
+                          <p className="text-[10px] text-muted-foreground">
+                            Diskon {Math.round(((cfg.originalPrice - cfg.price) / cfg.originalPrice) * 100)}%
+                          </p>
+                        )}
+                      </div>
                     </div>
                     <div className="grid grid-cols-3 gap-2">
                       {[
@@ -277,25 +295,66 @@ export function TierConfigManager({
                     onChange={v => updateLocal(activeTab, tier, { allThemes: v })}
                   />
                   {!cfg.allThemes && (
-                    <div className="mt-2 space-y-1.5 rounded-xl border border-border bg-muted/30 p-3">
+                    <div className="mt-2 rounded-xl border border-border bg-muted/30 p-3">
                       <p className="text-[11px] text-muted-foreground mb-2">Pilih tema yang diizinkan:</p>
-                      {themes.map(theme => {
-                        const checked = (cfg.allowedThemeIds ?? []).includes(theme.id)
-                        return (
-                          <label key={theme.id} className="flex items-center gap-2 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={checked}
-                              onChange={() => toggleTheme(activeTab, tier, theme.id)}
-                              className="rounded"
-                            />
-                            <span className="text-sm">{theme.name}</span>
-                            {!theme.isActive && (
-                              <span className="text-[10px] text-muted-foreground">(nonaktif)</span>
-                            )}
-                          </label>
-                        )
-                      })}
+                      <div className="grid grid-cols-3 gap-2">
+                        {themes.map(theme => {
+                          const checked = (cfg.allowedThemeIds ?? []).includes(theme.id)
+                          const cfg2 = theme.config as { primaryColor?: string; accentColor?: string } | null
+                          return (
+                            <button
+                              key={theme.id}
+                              type="button"
+                              onClick={() => toggleTheme(activeTab, tier, theme.id)}
+                              className={`group relative flex flex-col items-center gap-1.5 rounded-xl border-2 p-2 transition-all text-center ${
+                                checked
+                                  ? "border-primary bg-primary/5"
+                                  : "border-transparent bg-card hover:border-border"
+                              }`}
+                            >
+                              {/* Thumbnail / color swatch */}
+                              <div className="relative h-14 w-full overflow-hidden rounded-lg bg-muted">
+                                {theme.previewImage ? (
+                                  <img
+                                    src={theme.previewImage}
+                                    alt={theme.name}
+                                    className="h-full w-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="flex h-full w-full items-center justify-center gap-1">
+                                    <div className="h-5 w-5 rounded" style={{ backgroundColor: cfg2?.primaryColor ?? "#888" }} />
+                                    <div className="h-5 w-5 rounded" style={{ backgroundColor: cfg2?.accentColor ?? "#aaa" }} />
+                                  </div>
+                                )}
+                                {/* Hover preview tooltip */}
+                                {theme.previewImage && (
+                                  <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 hidden -translate-x-1/2 group-hover:block">
+                                    <div className="overflow-hidden rounded-xl border border-border bg-card shadow-xl">
+                                      <img
+                                        src={theme.previewImage}
+                                        alt={theme.name}
+                                        className="h-48 w-32 object-cover"
+                                      />
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                              <span className="text-[11px] font-medium leading-tight">{theme.name}</span>
+                              {!theme.isActive && (
+                                <span className="text-[9px] text-muted-foreground">(nonaktif)</span>
+                              )}
+                              {/* Check indicator */}
+                              {checked && (
+                                <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                                  <svg className="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                  </svg>
+                                </div>
+                              )}
+                            </button>
+                          )
+                        })}
+                      </div>
                       {themes.length === 0 && (
                         <p className="text-xs text-muted-foreground">Belum ada tema</p>
                       )}

@@ -22,7 +22,7 @@ export default async function TiersPage() {
 
   const [rawConfigs, themes] = await Promise.all([
     db.tierConfig.findMany({ orderBy: [{ roleType: "asc" }, { tier: "asc" }] }),
-    db.theme.findMany({ select: { id: true, name: true, slug: true, isActive: true }, orderBy: { name: "asc" } }),
+    db.theme.findMany({ select: { id: true, name: true, slug: true, isActive: true, previewImage: true, config: true }, orderBy: { name: "asc" } }),
   ])
 
   const configs = rawConfigs.map(c => ({
@@ -38,7 +38,7 @@ export default async function TiersPage() {
           Kelola harga, batas fitur, dan akses tema per paket untuk setiap tipe pengguna
         </p>
       </div>
-      <TierConfigManager initialConfigs={configs} themes={themes} />
+      <TierConfigManager initialConfigs={configs} themes={themes.map(t => ({ ...t, config: t.config as Record<string, string> | null }))} />
     </div>
   )
 }

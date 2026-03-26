@@ -25,6 +25,7 @@ const NAV_CONFIGS: Record<string, NavItem[]> = {
   ],
   "super-admin": [
     { href: "/super-admin", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/super-admin/themes", label: "Themes", icon: Palette },
     { href: "/super-admin/vendors", label: "Vendors", icon: Users },
     { href: "/super-admin/vouchers", label: "Vouchers", icon: Tag },
     { href: "/super-admin/tiers", label: "Tier Config", icon: Settings2 },

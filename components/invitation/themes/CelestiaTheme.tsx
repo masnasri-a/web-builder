@@ -6,11 +6,12 @@
  * Palette : Midnight (#080E1C) · Navy (#0E1F42) · Silver (#C8D4E0) · Gold (#E8C547) · Light text (#E8F0F8)
  */
 
-import Image from "next/image"
 import dynamic from "next/dynamic"
 import { Anim } from "@/components/invitation/anim"
 import { CountdownTimer } from "@/components/invitation/countdown-timer"
 import { RsvpForm } from "@/components/invitation/rsvp-form"
+import { WatermarkedImage } from "@/components/invitation/watermarked-image"
+import { useShowWatermark } from "@/components/invitation/guest-context"
 import { Navigation, Instagram } from "lucide-react"
 import type { Section } from "@/types"
 import type { ThemeTemplateProps } from "./index"
@@ -137,7 +138,7 @@ function CelestiaPersonCard({ photo, name, parents, bio, instagram }: { photo?: 
         style={{ border: `2px solid ${GOLD}`, boxShadow: `0 0 0 4px ${GOLD}25` }}
       >
         {photo && (
-          <Image src={photo} alt={name} width={80} height={80} className="object-cover w-full h-full" />
+          <WatermarkedImage src={photo} alt={name} width={80} height={80} className="object-cover w-full h-full" />
         )}
       </div>
       <h2 className="text-2xl font-bold" style={{ color: SILVER, fontFamily: "Cormorant Garamond, serif" }}>
@@ -159,6 +160,7 @@ function CelestiaPersonCard({ photo, name, parents, bio, instagram }: { photo?: 
 
 function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitation }) {
   const c = section.content as Record<string, unknown>
+  const showWatermark = useShowWatermark()
 
   switch (section.type) {
 
@@ -339,7 +341,7 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
                 Belum ada foto
               </div>
             ) : (
-              <Masonry items={items} animateFrom="bottom" stagger={0.05} blurToFocus maxColumns={2} />
+              <Masonry items={items} animateFrom="bottom" stagger={0.05} blurToFocus maxColumns={2} showWatermark={showWatermark} />
             )}
           </div>
         </section>
