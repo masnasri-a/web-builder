@@ -64,6 +64,7 @@ export type GuestRecord = {
   attendance: "PENDING" | "ATTENDING" | "NOT_ATTENDING"
   guestCount: number
   message: string | null
+  checkedInAt: Date | null
   createdAt: Date
 }
 

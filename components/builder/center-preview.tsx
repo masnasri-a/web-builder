@@ -23,6 +23,7 @@ interface CenterPreviewProps {
   groomName: string
   brideName: string
   eventDate: string
+  eventTime?: string | null
   eventVenue: string
   eventAddress: string
   sections: Section[]
@@ -40,6 +41,7 @@ export function CenterPreview({
   groomName,
   brideName,
   eventDate,
+  eventTime,
   eventVenue,
   eventAddress,
   sections,
@@ -119,6 +121,7 @@ export function CenterPreview({
               groomName: groomName || "Groom",
               brideName: brideName || "Bride",
               eventDate,
+              eventTime: eventTime ?? null,
               eventVenue: eventVenue || "Venue",
               eventAddress: eventAddress || null,
             }

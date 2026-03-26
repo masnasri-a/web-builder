@@ -1,12 +1,15 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import QRCode from "react-qr-code"
 import type { ThemeConfig } from "@/types"
 
 interface SplashScreenProps {
   groomName: string
   brideName: string
   guestName?: string
+  /** Guest DB ID — when present, a scannable QR code is shown for check-in */
+  guestId?: string
   themeConfig: ThemeConfig
   onEnter: () => void
   /** true = fixed inset-0 (public page), false = absolute inset-0 (builder preview) */
@@ -17,6 +20,7 @@ export function SplashScreen({
   groomName,
   brideName,
   guestName,
+  guestId,
   themeConfig,
   onEnter,
   fullscreen = true,
@@ -117,6 +121,24 @@ export function SplashScreen({
           </div>
         ) : (
           <div className="mb-8" />
+        )}
+
+        {/* QR check-in code — only shown when guestId is known */}
+        {guestId && (
+          <div className="mb-8 flex flex-col items-center gap-2">
+            <div
+              className="rounded-2xl p-3"
+              style={{ background: "rgba(255,255,255,0.85)" }}
+            >
+              <QRCode value={guestId} size={100} />
+            </div>
+            <p
+              className="text-[9px] tracking-[0.25em] uppercase"
+              style={{ color: themeConfig.primaryColor, opacity: 0.45 }}
+            >
+              Tunjukkan ke panitia
+            </p>
+          </div>
         )}
 
         {/* CTA button */}

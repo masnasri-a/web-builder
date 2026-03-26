@@ -59,6 +59,7 @@ export default async function InvitationPreviewPage({
               groomName: inv.groomName,
               brideName: inv.brideName,
               eventDate: inv.eventDate.toISOString(),
+              eventTime: inv.eventTime,
               eventVenue: inv.eventVenue,
               eventAddress: inv.eventAddress,
             }}

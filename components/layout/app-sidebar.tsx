@@ -8,6 +8,7 @@ import {
   LayoutDashboard, Users, Palette, Heart,
   Tag, MessageCircle, Settings2, Mail,
   Gift, CreditCard, BarChart3, Settings,
+  QrCode,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -32,12 +33,16 @@ const NAV_CONFIGS: Record<string, NavItem[]> = {
   vendor: [
     { href: "/vendor", label: "Dashboard", icon: LayoutDashboard },
     { href: "/dashboard/invitations", label: "Undangan", icon: Mail },
+    { href: "/vendor/guests", label: "Tamu RSVP", icon: Users },
+    { href: "/vendor/scan", label: "Scan Kedatangan", icon: QrCode },
     { href: "/vendor/vouchers", label: "My Vouchers", icon: Tag },
     { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
   ],
   individual: [
     { href: "/individual", label: "Dashboard", icon: LayoutDashboard },
     { href: "/dashboard/invitations", label: "Undangan", icon: Mail },
+    { href: "/individual/guests", label: "Tamu RSVP", icon: Users },
+    { href: "/individual/scan", label: "Scan Kedatangan", icon: QrCode },
     { href: "/individual/claim", label: "Claim Voucher", icon: Gift },
     { href: "/individual/my-vouchers", label: "My Vouchers", icon: Tag },
     { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
@@ -105,9 +110,13 @@ export function AppSidebar({
           Menu
         </p>
         {navItems.map(({ href, label, icon: Icon }) => {
+          // Root section pages (e.g. /individual, /vendor) must be exact-matched
+          // to avoid highlighting them as active on every sub-page.
+          const hrefDepth = href.split("/").filter(Boolean).length
           const isActive =
             href === pathname ||
-            (href !== "/" &&
+            (hrefDepth > 1 &&
+              href !== "/" &&
               pathname.startsWith(href) &&
               (pathname[href.length] === "/" || pathname.length === href.length))
           return (

@@ -8,6 +8,7 @@ import { RsvpForm } from "@/components/invitation/rsvp-form"
 import type { Section, ThemeConfig } from "@/types"
 import { Instagram, Navigation } from "lucide-react"
 import { GiftSection } from "@/components/invitation/gift-section"
+import { CalendarButtons } from "@/components/invitation/calendar-buttons"
 
 const Masonry = dynamic(
   () => import("@/components/ui/masonry").then((m) => ({ default: m.Masonry })),
@@ -20,6 +21,7 @@ export interface GuestInvitation {
   brideName: string
   /** ISO string — serializable from server to client */
   eventDate: string
+  eventTime: string | null
   eventVenue: string
   eventAddress: string | null
 }
@@ -310,6 +312,17 @@ function AnimatedSection({
                 </div>
               </Anim>
             )}
+            <Anim variant="fadeUp" delay={480}>
+              <CalendarButtons
+                eventDate={inv.eventDate}
+                eventTime={inv.eventTime}
+                eventVenue={inv.eventVenue}
+                eventAddress={inv.eventAddress}
+                groomName={inv.groomName}
+                brideName={inv.brideName}
+                primaryColor={primary}
+              />
+            </Anim>
           </div>
         </section>
       )

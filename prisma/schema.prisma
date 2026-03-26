@@ -146,6 +146,7 @@ model Guest {
   attendance   Attendance @default(PENDING)
   guestCount   Int        @default(1)
   message      String?
+  checkedInAt  DateTime?
   createdAt    DateTime   @default(now())
 
   invitation Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)

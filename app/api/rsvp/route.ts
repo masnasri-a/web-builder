@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { z } from "zod"
 import { getTierConfig } from "@/lib/tier"
+import { auth } from "@/lib/auth"
 
 const schema = z.object({
   invitationId: z.string().min(1),
@@ -70,11 +71,26 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
+  const session = await auth()
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   const { searchParams } = new URL(req.url)
   const invitationId = searchParams.get("invitationId")
 
   if (!invitationId) {
     return NextResponse.json({ error: "invitationId required" }, { status: 400 })
+  }
+
+  // Verify the invitation belongs to the authenticated user
+  const invitation = await db.invitation.findUnique({
+    where: { id: invitationId, userId: session.user.id },
+    select: { id: true },
+  })
+
+  if (!invitation) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 })
   }
 
   const guests = await db.guest.findMany({

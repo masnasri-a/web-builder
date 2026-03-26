@@ -66,6 +66,14 @@ export default async function GuestPage({
 
   if (!inv) notFound()
 
+  // If the URL includes a guest name, look up their DB record to get the ID for QR check-in
+  const guestRecord = guestName
+    ? await db.guest.findFirst({
+        where: { invitationId: inv.id, name: guestName },
+        select: { id: true },
+      })
+    : null
+
   const sections = inv.sections as Section[]
   const themeConfig = inv.themeConfig as ThemeConfig
   const visible = [...sections]
@@ -111,6 +119,7 @@ export default async function GuestPage({
           groomName: inv.groomName,
           brideName: inv.brideName,
           eventDate: inv.eventDate.toISOString(),
+          eventTime: inv.eventTime,
           eventVenue: inv.eventVenue,
           eventAddress: inv.eventAddress,
         }}
@@ -118,6 +127,7 @@ export default async function GuestPage({
         themeConfig={themeConfig}
         fonts={fonts}
         guestName={guestName}
+        guestId={guestRecord?.id}
         musicUrl={inv.musicUrl}
         themeSlug={inv.theme?.slug}
       />

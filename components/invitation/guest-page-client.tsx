@@ -16,6 +16,7 @@ interface GuestPageClientProps {
   themeConfig: ThemeConfig
   fonts: string[]
   guestName?: string
+  guestId?: string
   musicUrl?: string | null
   themeSlug?: string
 }
@@ -26,6 +27,7 @@ export function GuestPageClient({
   themeConfig,
   fonts,
   guestName,
+  guestId,
   musicUrl,
   themeSlug,
 }: GuestPageClientProps) {
@@ -59,6 +61,7 @@ export function GuestPageClient({
           groomName={inv.groomName}
           brideName={inv.brideName}
           guestName={guestName}
+          guestId={guestId}
           themeConfig={themeConfig}
           onEnter={() => setEntered(true)}
           fullscreen

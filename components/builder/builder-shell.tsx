@@ -224,6 +224,7 @@ export function BuilderShell({ invitation }: BuilderShellProps) {
           groomName={state.groomName}
           brideName={state.brideName}
           eventDate={state.eventDate}
+          eventTime={state.eventTime}
           eventVenue={state.eventVenue}
           eventAddress={state.eventAddress}
           sections={state.sections}
