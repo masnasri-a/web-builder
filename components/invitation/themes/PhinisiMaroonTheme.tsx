@@ -10,11 +10,12 @@ import { Anim } from "@/components/invitation/anim"
 import { WatermarkedImage } from "@/components/invitation/watermarked-image"
 import { CountdownTimer } from "@/components/invitation/countdown-timer"
 import { RsvpForm } from "@/components/invitation/rsvp-form"
-import { Navigation } from "lucide-react"
+import { Navigation, Instagram } from "lucide-react"
 import type { Section } from "@/types"
 import type { ThemeTemplateProps } from "./index"
 import { GiftSection } from "@/components/invitation/gift-section"
 import { UcapanWall } from "@/components/invitation/ucapan-wall"
+import { resolveThemeColors, sectionStyle } from "./theme-utils"
 
 // ─── Palette ──────────────────────────────────────────────────────────────────
 const MAROON = "#7D1535"
@@ -22,11 +23,6 @@ const GOLD   = "#C49A45"
 const BG     = "#F9F1E8"  // parchment / aged paper
 const WOOD   = "#3B1F0A"  // dark wood for text
 const COPPER = "#A0522D"  // copper accent
-
-const snap: React.CSSProperties = {
-  scrollSnapAlign: "start",
-  scrollSnapStop: "always",
-}
 
 // ─── SVG Decorations ─────────────────────────────────────────────────────────
 
@@ -162,7 +158,7 @@ function Divider() {
 
 // ─── Module-level sub-components ──────────────────────────────────────────────
 
-function PhinisiPersonCard({ photo, name, parents, bio }: { photo?: string; name: string; parents?: string; bio?: string }) {
+function PhinisiPersonCard({ photo, name, parents, bio, instagram }: { photo?: string; name: string; parents?: string; bio?: string; instagram?: string }) {
   return (
     <div className="space-y-3 text-center">
       <div className="mx-auto h-24 w-24 overflow-hidden rounded-full" style={{ border: `2.5px solid ${GOLD}` }}>
@@ -171,6 +167,13 @@ function PhinisiPersonCard({ photo, name, parents, bio }: { photo?: string; name
       <h2 className="text-2xl font-bold" style={{ color: MAROON, fontFamily: "Cinzel, serif" }}>{name}</h2>
       {parents && <p className="text-sm opacity-60" style={{ color: WOOD }}>{parents}</p>}
       {bio && <p className="mx-auto max-w-[180px] text-sm leading-relaxed opacity-72" style={{ color: WOOD }}>{bio}</p>}
+      {instagram && (
+        <a href={`https://instagram.com/${instagram}`} target="_blank" rel="noopener noreferrer"
+           className="inline-flex items-center gap-1 text-xs opacity-60 hover:opacity-100 transition-opacity"
+           style={{ color: GOLD }}>
+          <Instagram className="h-3 w-3" />@{instagram}
+        </a>
+      )}
     </div>
   )
 }
@@ -180,9 +183,19 @@ function PhinisiPersonCard({ photo, name, parents, bio }: { photo?: string; name
 function PhinisiSection({
   section,
   inv,
+  _P = MAROON,
+  _ACC = GOLD,
+  _BG = BG,
+  _TXT = WOOD,
+  _BDR = COPPER,
 }: {
   section: Section
   inv: ThemeTemplateProps["inv"]
+  _P?: string
+  _ACC?: string
+  _BG?: string
+  _TXT?: string
+  _BDR?: string
 }) {
   const c = section.content as Record<string, unknown>
 
@@ -193,7 +206,7 @@ function PhinisiSection({
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center overflow-hidden text-center"
-          style={{ backgroundColor: BG, color: WOOD, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           {/* top maroon band + rope border */}
           <div className="absolute inset-x-0 top-0 pointer-events-none">
@@ -209,39 +222,39 @@ function PhinisiSection({
               <CompassRose size={64} />
             </Anim>
             <Anim variant="fadeIn" delay={160}>
-              <p className="mt-4 mb-3 text-[10px] tracking-[0.55em] uppercase" style={{ color: MAROON, opacity: 0.7 }}>
+              <p className="mt-4 mb-3 text-[10px] tracking-[0.55em] uppercase" style={{ color: _P, opacity: 0.7 }}>
                 — Undangan Pernikahan —
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={280}>
               <h1
                 className="text-5xl font-bold leading-tight"
-                style={{ color: MAROON, fontFamily: "Cinzel, Georgia, serif" }}
+                style={{ color: _P, fontFamily: "Cinzel, Georgia, serif" }}
               >
                 {inv.groomName}
               </h1>
             </Anim>
             <Anim variant="scaleIn" delay={400}>
-              <p className="my-3 text-xl" style={{ color: GOLD }}>&amp;</p>
+              <p className="my-3 text-xl" style={{ color: _ACC }}>&amp;</p>
             </Anim>
             <Anim variant="fadeUp" delay={460}>
               <h1
                 className="text-5xl font-bold leading-tight"
-                style={{ color: MAROON, fontFamily: "Cinzel, Georgia, serif" }}
+                style={{ color: _P, fontFamily: "Cinzel, Georgia, serif" }}
               >
                 {inv.brideName}
               </h1>
             </Anim>
             {(c.subtitle as string) && (
               <Anim variant="fadeUp" delay={560}>
-                <p className="mt-5 text-sm italic" style={{ color: WOOD, opacity: 0.6 }}>
+                <p className="mt-5 text-sm italic" style={{ color: _TXT, opacity: 0.6 }}>
                   {c.subtitle as string}
                 </p>
               </Anim>
             )}
             <Anim variant="fadeIn" delay={640}>
               <Divider />
-              <p className="text-sm tracking-widest" style={{ color: MAROON, opacity: 0.75 }}>
+              <p className="text-sm tracking-widest" style={{ color: _P, opacity: 0.75 }}>
                 {new Date(inv.eventDate).toLocaleDateString("id-ID", {
                   weekday: "long", day: "numeric", month: "long", year: "numeric",
                 })}
@@ -268,22 +281,22 @@ function PhinisiSection({
     case "couple": {
       const layout = (c.coupleLayout as string) ?? "side-by-side"
       return (
-        <section id={section.id} className="min-h-dvh flex flex-col items-center justify-center px-8 py-16 text-center" style={{ backgroundColor: BG, ...snap }}>
+        <section id={section.id} className="min-h-dvh flex flex-col items-center justify-center px-8 py-16 text-center" style={{ ...sectionStyle(section, _BG) }}>
           <Anim variant="scaleIn" delay={0}><CompassRose size={40} /></Anim>
           <Anim variant="fadeIn" delay={60}>
-            <p className="mt-4 mb-8 text-[10px] tracking-[0.45em] uppercase" style={{ color: MAROON, opacity: 0.6 }}>Mempelai</p>
+            <p className="mt-4 mb-8 text-[10px] tracking-[0.45em] uppercase" style={{ color: _P, opacity: 0.6 }}>Mempelai</p>
           </Anim>
           {layout === "side-by-side" ? (
             <div className="flex justify-center gap-10">
-              <Anim variant="slideLeft" delay={150}><PhinisiPersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} /></Anim>
-              <Anim variant="scaleIn" delay={300} className="self-center"><span className="text-3xl font-light" style={{ color: GOLD }}>&amp;</span></Anim>
-              <Anim variant="slideRight" delay={150}><PhinisiPersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} /></Anim>
+              <Anim variant="slideLeft" delay={150}><PhinisiPersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} instagram={c.groomInstagram as string} /></Anim>
+              <Anim variant="scaleIn" delay={300} className="self-center"><span className="text-3xl font-light" style={{ color: _ACC }}>&amp;</span></Anim>
+              <Anim variant="slideRight" delay={150}><PhinisiPersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} instagram={c.brideInstagram as string} /></Anim>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-8">
-              <Anim variant="fadeUp" delay={150}><PhinisiPersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} /></Anim>
-              <span className="text-3xl font-light" style={{ color: GOLD }}>&amp;</span>
-              <Anim variant="fadeUp" delay={300}><PhinisiPersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} /></Anim>
+              <Anim variant="fadeUp" delay={150}><PhinisiPersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} instagram={c.groomInstagram as string} /></Anim>
+              <span className="text-3xl font-light" style={{ color: _ACC }}>&amp;</span>
+              <Anim variant="fadeUp" delay={300}><PhinisiPersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} instagram={c.brideInstagram as string} /></Anim>
             </div>
           )}
         </section>
@@ -295,31 +308,31 @@ function PhinisiSection({
       type EventItem = { name: string; date: string; time: string }
       const events = (c.events as EventItem[]) ?? []
       return (
-        <section id={section.id} className="min-h-dvh flex flex-col items-center justify-center px-8 py-16 text-center" style={{ backgroundColor: `${MAROON}0e`, ...snap }}>
+        <section id={section.id} className="min-h-dvh flex flex-col items-center justify-center px-8 py-16 text-center" style={{ ...sectionStyle(section, `${_P}0e`) }}>
           <div className="max-w-lg mx-auto w-full">
             <Anim variant="scaleIn" delay={0}><PhinisiShip width={160} /></Anim>
             <Anim variant="fadeIn" delay={120}>
-              <p className="mt-3 mb-4 text-[10px] tracking-[0.45em] uppercase" style={{ color: MAROON, opacity: 0.65 }}>Save The Date</p>
+              <p className="mt-3 mb-4 text-[10px] tracking-[0.45em] uppercase" style={{ color: _P, opacity: 0.65 }}>Save The Date</p>
             </Anim>
             <Anim variant="fadeUp" delay={200}>
-              <p className="mb-2 text-3xl font-bold" style={{ color: MAROON, fontFamily: "Cinzel, serif" }}>
+              <p className="mb-2 text-3xl font-bold" style={{ color: _P, fontFamily: "Cinzel, serif" }}>
                 {new Date(inv.eventDate).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={300}>
               <div>
-                <p className="text-lg font-medium" style={{ color: WOOD }}>{inv.eventVenue}</p>
-                {inv.eventAddress && <p className="mt-1 text-sm opacity-60" style={{ color: WOOD }}>{inv.eventAddress}</p>}
+                <p className="text-lg font-medium" style={{ color: _TXT }}>{inv.eventVenue}</p>
+                {inv.eventAddress && <p className="mt-1 text-sm opacity-60" style={{ color: _TXT }}>{inv.eventAddress}</p>}
               </div>
             </Anim>
             {events.length > 0 && (
               <Anim variant="fadeUp" delay={400}>
                 <div className="mt-8 flex flex-wrap justify-center gap-3">
                   {events.map((ev, i) => (
-                    <div key={i} className="rounded px-5 py-4 text-center min-w-[120px]" style={{ border: `1.5px solid ${GOLD}60`, backgroundColor: `${MAROON}07` }}>
-                      <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: GOLD }}>{ev.name || `Acara ${i + 1}`}</p>
-                      {ev.date && <p className="mt-1.5 text-sm font-medium" style={{ color: WOOD }}>{new Date(ev.date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}</p>}
-                      {ev.time && <p className="text-sm opacity-65" style={{ color: WOOD }}>{ev.time}</p>}
+                    <div key={i} className="rounded px-5 py-4 text-center min-w-[120px]" style={{ border: `1.5px solid ${_ACC}60`, backgroundColor: `${_P}07` }}>
+                      <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: _ACC }}>{ev.name || `Acara ${i + 1}`}</p>
+                      {ev.date && <p className="mt-1.5 text-sm font-medium" style={{ color: _TXT }}>{new Date(ev.date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}</p>}
+                      {ev.time && <p className="text-sm opacity-65" style={{ color: _TXT }}>{ev.time}</p>}
                     </div>
                   ))}
                 </div>
@@ -332,31 +345,31 @@ function PhinisiSection({
 
     case "countdown":
       return (
-        <section id={section.id} className="min-h-dvh flex flex-col items-center justify-center px-8 py-12 text-center" style={{ backgroundColor: BG, ...snap }}>
-          <Anim variant="fadeIn" delay={0}><p className="mb-6 text-[10px] tracking-[0.45em] uppercase" style={{ color: MAROON, opacity: 0.6 }}>Menghitung Hari</p></Anim>
-          <Anim variant="scaleIn" delay={160}><CountdownTimer eventDate={inv.eventDate} primaryColor={MAROON} /></Anim>
+        <section id={section.id} className="min-h-dvh flex flex-col items-center justify-center px-8 py-12 text-center" style={{ ...sectionStyle(section, _BG) }}>
+          <Anim variant="fadeIn" delay={0}><p className="mb-6 text-[10px] tracking-[0.45em] uppercase" style={{ color: _P, opacity: 0.6 }}>Menghitung Hari</p></Anim>
+          <Anim variant="scaleIn" delay={160}><CountdownTimer eventDate={inv.eventDate} primaryColor={_P} /></Anim>
           <Anim variant="scaleIn" delay={340}><div className="mt-8 max-w-xs mx-auto"><Divider /></div></Anim>
         </section>
       )
 
     case "rsvp":
       return (
-        <section id={section.id} className="min-h-dvh flex flex-col items-center justify-center px-8 py-16" style={{ backgroundColor: `${MAROON}0e`, ...snap }}>
+        <section id={section.id} className="min-h-dvh flex flex-col items-center justify-center px-8 py-16" style={{ ...sectionStyle(section, `${_P}0e`) }}>
           <div className="max-w-lg mx-auto w-full">
             <Anim variant="scaleIn" delay={0}><div className="flex justify-center mb-4"><CompassRose size={38} /></div></Anim>
-            <Anim variant="fadeIn" delay={60}><p className="mb-2 text-center text-[10px] tracking-[0.35em] uppercase" style={{ color: MAROON, opacity: 0.65 }}>{(c.title as string) || "RSVP"}</p></Anim>
-            <Anim variant="fadeUp" delay={160}><p className="mb-6 text-center text-sm" style={{ color: WOOD, opacity: 0.65 }}>Konfirmasi Kehadiran Anda</p></Anim>
-            <Anim variant="fadeUp" delay={260}><RsvpForm invitationId={inv.id} primaryColor={MAROON} deadline={c.deadline as string | undefined} /></Anim>
+            <Anim variant="fadeIn" delay={60}><p className="mb-2 text-center text-[10px] tracking-[0.35em] uppercase" style={{ color: _P, opacity: 0.65 }}>{(c.title as string) || "RSVP"}</p></Anim>
+            <Anim variant="fadeUp" delay={160}><p className="mb-6 text-center text-sm" style={{ color: _TXT, opacity: 0.65 }}>Konfirmasi Kehadiran Anda</p></Anim>
+            <Anim variant="fadeUp" delay={260}><RsvpForm invitationId={inv.id} primaryColor={_P} deadline={c.deadline as string | undefined} /></Anim>
           </div>
         </section>
       )
 
     case "quote":
       return (
-        <section id={section.id} className="min-h-dvh flex flex-col items-center justify-center px-8 py-12 text-center" style={{ backgroundColor: BG, ...snap }}>
-          <Anim variant="scaleIn" delay={0}><p className="text-4xl leading-none" style={{ color: GOLD }}>&ldquo;</p></Anim>
-          <Anim variant="fadeUp" delay={160}><blockquote className="mx-auto max-w-sm text-base italic leading-relaxed mt-3" style={{ color: WOOD, opacity: 0.85 }}>{c.quote as string}</blockquote></Anim>
-          {!!c.source && <Anim variant="fadeIn" delay={360}><p className="mt-4 text-xs uppercase tracking-widest" style={{ color: MAROON, opacity: 0.6 }}>— {c.source as string}</p></Anim>}
+        <section id={section.id} className="min-h-dvh flex flex-col items-center justify-center px-8 py-12 text-center" style={{ ...sectionStyle(section, _BG) }}>
+          <Anim variant="scaleIn" delay={0}><p className="text-4xl leading-none" style={{ color: _ACC }}>&ldquo;</p></Anim>
+          <Anim variant="fadeUp" delay={160}><blockquote className="mx-auto max-w-sm text-base italic leading-relaxed mt-3" style={{ color: _TXT, opacity: 0.85 }}>{c.quote as string}</blockquote></Anim>
+          {!!c.source && <Anim variant="fadeIn" delay={360}><p className="mt-4 text-xs uppercase tracking-widest" style={{ color: _P, opacity: 0.6 }}>— {c.source as string}</p></Anim>}
         </section>
       )
 
@@ -366,12 +379,12 @@ function PhinisiSection({
       const gmapsUrl = hasCoords ? `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed` : null
       const dirUrl   = hasCoords ? `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}` : null
       return (
-        <section id={section.id} className="min-h-dvh flex flex-col items-center justify-center px-8 py-10 text-center" style={{ backgroundColor: BG, ...snap }}>
+        <section id={section.id} className="min-h-dvh flex flex-col items-center justify-center px-8 py-10 text-center" style={{ ...sectionStyle(section, _BG) }}>
           <div className="max-w-lg mx-auto w-full">
-            <Anim variant="fadeIn" delay={0}><p className="mb-4 text-[10px] uppercase tracking-widest" style={{ color: MAROON, opacity: 0.65 }}>{(c.label as string) || "Lokasi Acara"}</p></Anim>
-            {gmapsUrl && <Anim variant="fadeUp" delay={150}><div className="overflow-hidden rounded" style={{ border: `1.5px solid ${GOLD}60` }}><iframe src={gmapsUrl} width="100%" height="280" style={{ border: 0 }} loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div></Anim>}
-            {(c.address as string) && <Anim variant="fadeIn" delay={280}><p className="mt-3 text-sm opacity-65" style={{ color: WOOD }}>{c.address as string}</p></Anim>}
-            {dirUrl && <Anim variant="fadeUp" delay={380}><a href={dirUrl} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-2 rounded px-5 py-2 text-sm font-medium transition-opacity hover:opacity-80" style={{ border: `1.5px solid ${MAROON}`, color: MAROON }}><Navigation className="h-4 w-4" />Petunjuk Arah</a></Anim>}
+            <Anim variant="fadeIn" delay={0}><p className="mb-4 text-[10px] uppercase tracking-widest" style={{ color: _P, opacity: 0.65 }}>{(c.label as string) || "Lokasi Acara"}</p></Anim>
+            {gmapsUrl && <Anim variant="fadeUp" delay={150}><div className="overflow-hidden rounded" style={{ border: `1.5px solid ${_ACC}60` }}><iframe src={gmapsUrl} width="100%" height="280" style={{ border: 0 }} loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div></Anim>}
+            {(c.address as string) && <Anim variant="fadeIn" delay={280}><p className="mt-3 text-sm opacity-65" style={{ color: _TXT }}>{c.address as string}</p></Anim>}
+            {dirUrl && <Anim variant="fadeUp" delay={380}><a href={dirUrl} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-2 rounded px-5 py-2 text-sm font-medium transition-opacity hover:opacity-80" style={{ border: `1.5px solid ${_P}`, color: _P }}><Navigation className="h-4 w-4" />Petunjuk Arah</a></Anim>}
           </div>
         </section>
       )
@@ -379,11 +392,11 @@ function PhinisiSection({
 
     case "closing":
       return (
-        <section id={section.id} className="relative min-h-dvh flex flex-col items-center justify-center px-8 py-20 text-center overflow-hidden" style={{ backgroundColor: `${MAROON}0e`, ...snap }}>
+        <section id={section.id} className="relative min-h-dvh flex flex-col items-center justify-center px-8 py-20 text-center overflow-hidden" style={{ ...sectionStyle(section, `${_P}0e`) }}>
           <Anim variant="scaleIn" delay={0}><PhinisiShip width={180} /></Anim>
-          <Anim variant="fadeUp" delay={200}><p className="mx-auto max-w-xs text-base leading-relaxed mt-6" style={{ color: WOOD, opacity: 0.72 }}>{(c.message as string) || "Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan hadir."}</p></Anim>
+          <Anim variant="fadeUp" delay={200}><p className="mx-auto max-w-xs text-base leading-relaxed mt-6" style={{ color: _TXT, opacity: 0.72 }}>{(c.message as string) || "Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan hadir."}</p></Anim>
           <Anim variant="scaleIn" delay={380}><div className="mt-6 max-w-xs mx-auto"><Divider /></div></Anim>
-          <Anim variant="fadeIn" delay={480}><p className="text-xl font-bold" style={{ color: MAROON, fontFamily: "Cinzel, serif" }}>{inv.groomName} & {inv.brideName}</p></Anim>
+          <Anim variant="fadeIn" delay={480}><p className="text-xl font-bold" style={{ color: _P, fontFamily: "Cinzel, serif" }}>{inv.groomName} & {inv.brideName}</p></Anim>
         </section>
       )
 
@@ -391,10 +404,10 @@ function PhinisiSection({
       const images = (section.content as { images?: string[] }).images ?? []
       if (images.length === 0) return null
       return (
-        <section id={section.id} className="min-h-dvh flex flex-col items-center justify-center py-12 text-center" style={{ backgroundColor: BG, ...snap }}>
-          <Anim variant="fadeIn" delay={0}><p className="mb-6 text-[10px] tracking-[0.35em] uppercase" style={{ color: MAROON, opacity: 0.6 }}>Gallery</p></Anim>
+        <section id={section.id} className="min-h-dvh flex flex-col items-center justify-center py-12 text-center" style={{ ...sectionStyle(section, _BG) }}>
+          <Anim variant="fadeIn" delay={0}><p className="mb-6 text-[10px] tracking-[0.35em] uppercase" style={{ color: _P, opacity: 0.6 }}>Gallery</p></Anim>
           <div className="columns-2 gap-2 px-4 w-full max-w-sm mx-auto">
-            {images.map((url, i) => (<div key={i} className="mb-2 overflow-hidden rounded-sm" style={{ border: `1.5px solid ${GOLD}45` }}><WatermarkedImage src={url} alt={`Gallery ${i + 1}`} width={200} height={200} className="w-full h-auto object-cover" /></div>))}
+            {images.map((url, i) => (<div key={i} className="mb-2 overflow-hidden rounded-sm" style={{ border: `1.5px solid ${_ACC}45` }}><WatermarkedImage src={url} alt={`Gallery ${i + 1}`} width={200} height={200} className="w-full h-auto object-cover" /></div>))}
           </div>
         </section>
       )
@@ -407,7 +420,7 @@ function PhinisiSection({
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-16"
-          style={{ backgroundColor: BG, color: WOOD, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="max-w-sm mx-auto w-full">
             <Anim variant="fadeUp" delay={0}>
@@ -419,8 +432,8 @@ function PhinisiSection({
                 qrisImage={c.qrisImage as string | null | undefined}
                 banks={banks}
                 allowTransferProof={c.allowTransferProof as boolean | undefined}
-                primaryColor={MAROON}
-                accentColor={GOLD}
+                primaryColor={_P}
+                accentColor={_ACC}
               />
             </Anim>
           </div>
@@ -434,7 +447,7 @@ function PhinisiSection({
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center py-12"
-          style={{ backgroundColor: BG, color: WOOD, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="w-full max-w-sm px-8">
             <Anim variant="fadeIn" delay={0}>
@@ -443,7 +456,7 @@ function PhinisiSection({
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={120}>
-              <UcapanWall invitationId={inv.id} primaryColor={MAROON} />
+              <UcapanWall invitationId={inv.id} primaryColor={_P} />
             </Anim>
           </div>
         </section>
@@ -453,7 +466,8 @@ function PhinisiSection({
   }
 }
 
-export function PhinisiMaroonTheme({ inv, sections, activeSection, onSectionClick }: ThemeTemplateProps) {
+export function PhinisiMaroonTheme({ inv, sections, themeConfig, activeSection, onSectionClick }: ThemeTemplateProps) {
+  const tc = resolveThemeColors(themeConfig, { primary: MAROON, accent: GOLD, bg: BG, text: WOOD, border: COPPER })
   const sorted = [...sections].sort((a, b) => a.order - b.order)
   return (
     <>
@@ -464,7 +478,7 @@ export function PhinisiMaroonTheme({ inv, sections, activeSection, onSectionClic
           className={onSectionClick ? "cursor-pointer" : ""}
           style={activeSection === s.id ? { outline: "2px solid rgba(0,0,0,0.25)", outlineOffset: "-2px" } : undefined}
         >
-          <PhinisiSection section={s} inv={inv} />
+          <PhinisiSection section={s} inv={inv} _P={tc.primary} _ACC={tc.accent} _BG={tc.bg} _TXT={tc.text} _BDR={tc.border} />
         </div>
       ))}
     </>

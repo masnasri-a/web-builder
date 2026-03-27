@@ -11,13 +11,17 @@ interface GalleryManagerProps {
   invitationId: string
   images: string[]
   onUpdateImages: (images: string[]) => void
+  maxGalleryImages?: number
 }
 
 export function GalleryManager({
   invitationId,
   images,
   onUpdateImages,
+  maxGalleryImages = 0,
 }: GalleryManagerProps) {
+  // 0 means unlimited
+  const atLimit = maxGalleryImages > 0 && images.length >= maxGalleryImages
   const [uploading, setUploading] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -74,7 +78,9 @@ export function GalleryManager({
 
   return (
     <div className="space-y-3">
-      <Label className="text-xs">Gallery ({images.length} foto)</Label>
+      <Label className="text-xs">
+        Gallery ({images.length}{maxGalleryImages > 0 ? `/${maxGalleryImages}` : ""} foto)
+      </Label>
 
       {images.length > 0 && (
         <div className="grid grid-cols-3 gap-2">
@@ -114,7 +120,7 @@ export function GalleryManager({
         <Button
           size="sm"
           variant="default"
-          disabled={uploading}
+          disabled={uploading || atLimit}
           className="rounded-xl text-xs w-full"
           onClick={() => inputRef.current?.click()}
         >
@@ -123,7 +129,7 @@ export function GalleryManager({
           ) : (
             <ImagePlus className="h-3.5 w-3.5" />
           )}
-          {uploading ? "Mengupload..." : "Tambah Foto"}
+          {uploading ? "Mengupload..." : atLimit ? "Batas foto tercapai" : "Tambah Foto"}
         </Button>
       </div>
     </div>

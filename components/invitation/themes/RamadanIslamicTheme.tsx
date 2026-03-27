@@ -10,11 +10,12 @@ import { WatermarkedImage } from "@/components/invitation/watermarked-image"
 import { Anim } from "@/components/invitation/anim"
 import { CountdownTimer } from "@/components/invitation/countdown-timer"
 import { RsvpForm } from "@/components/invitation/rsvp-form"
-import { Navigation } from "lucide-react"
+import { Instagram, Navigation } from "lucide-react"
 import type { Section } from "@/types"
 import type { ThemeTemplateProps } from "./index"
 import { GiftSection } from "@/components/invitation/gift-section"
 import { UcapanWall } from "@/components/invitation/ucapan-wall"
+import { sectionStyle, resolveThemeColors } from "./theme-utils"
 
 // ─── Palette constants ────────────────────────────────────────────────────────
 const P   = "#1A5C38" // emerald — primary
@@ -138,13 +139,13 @@ function MandalaCorner({ rotate = 0 }: { rotate?: number }) {
 
 // ─── Module-level sub-components ──────────────────────────────────────────────
 
-function IslamicPersonCard({ photo, name, parents, bio }: { photo?: string; name: string; parents?: string; bio?: string }) {
+function IslamicPersonCard({ photo, name, parents, bio, instagram, _P, _G, _TXT }: { photo?: string; name: string; parents?: string; bio?: string; instagram?: string; _P: string; _G: string; _TXT: string }) {
   return (
     <div className="space-y-3 text-center">
       <div
         className="mx-auto h-24 w-24 overflow-hidden"
         style={{
-          border: `2px solid ${G}`,
+          border: `2px solid ${_G}`,
           clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
         }}
       >
@@ -152,14 +153,21 @@ function IslamicPersonCard({ photo, name, parents, bio }: { photo?: string; name
           <WatermarkedImage src={photo} alt={name} width={96} height={96} className="h-full w-full object-cover" />
         )}
       </div>
-      <h2 className="text-2xl font-bold" style={{ color: P, fontFamily: "Cormorant Garamond, serif" }}>
+      <h2 className="text-2xl font-bold" style={{ color: _P, fontFamily: "Cormorant Garamond, serif" }}>
         {name}
       </h2>
-      {parents && <p className="text-sm opacity-60" style={{ color: TXT }}>{parents}</p>}
+      {parents && <p className="text-sm opacity-60" style={{ color: _TXT }}>{parents}</p>}
       {bio && (
-        <p className="mx-auto max-w-[180px] text-sm leading-relaxed opacity-72" style={{ color: TXT }}>
+        <p className="mx-auto max-w-[180px] text-sm leading-relaxed opacity-72" style={{ color: _TXT }}>
           {bio}
         </p>
+      )}
+      {instagram && (
+        <a href={`https://instagram.com/${instagram}`} target="_blank" rel="noopener noreferrer"
+           className="inline-flex items-center gap-1 text-xs opacity-60 hover:opacity-100 transition-opacity"
+           style={{ color: _G }}>
+          <Instagram className="h-3 w-3" />@{instagram}
+        </a>
       )}
     </div>
   )
@@ -170,9 +178,19 @@ function IslamicPersonCard({ photo, name, parents, bio }: { photo?: string; name
 function IslamicSection({
   section,
   inv,
+  _P,
+  _G,
+  _BG,
+  _TXT,
+  _BORDER,
 }: {
   section: Section
   inv: ThemeTemplateProps["inv"]
+  _P: string
+  _G: string
+  _BG: string
+  _TXT: string
+  _BORDER: string
 }) {
   const c = section.content as Record<string, unknown>
 
@@ -183,15 +201,15 @@ function IslamicSection({
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center overflow-hidden text-center"
-          style={{ backgroundColor: BG, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           {/* Star background pattern */}
           <StarPattern />
 
           {/* Top arabesque band */}
           <div className="absolute inset-x-0 top-0 pointer-events-none z-10">
-            <div style={{ backgroundColor: P, height: 6 }} />
-            <div style={{ backgroundColor: BG, paddingTop: 2, paddingBottom: 2 }}>
+            <div style={{ backgroundColor: _P, height: 6 }} />
+            <div style={{ backgroundColor: _BG, paddingTop: 2, paddingBottom: 2 }}>
               <ArabesqueBorder />
             </div>
             <div className="absolute top-0 left-0"><MandalaCorner rotate={0} /></div>
@@ -205,10 +223,10 @@ function IslamicSection({
             </Anim>
 
             <Anim variant="fadeIn" delay={160}>
-              <p className="mt-4 mb-2 text-xs italic" style={{ color: P, opacity: 0.65 }}>
-                بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ
+              <p className="mt-4 mb-2 text-xs italic" style={{ color: _P, opacity: 0.65 }}>
+                بِسْمِ اللهِ الرَّحْمَٰنِ الرَّحِيْمِ
               </p>
-              <p className="mb-4 text-[10px] tracking-[0.45em] uppercase" style={{ color: G, opacity: 0.8 }}>
+              <p className="mb-4 text-[10px] tracking-[0.45em] uppercase" style={{ color: _G, opacity: 0.8 }}>
                 Undangan Pernikahan
               </p>
             </Anim>
@@ -216,20 +234,20 @@ function IslamicSection({
             <Anim variant="fadeUp" delay={280}>
               <h1
                 className="text-5xl font-bold leading-tight"
-                style={{ color: P, fontFamily: "Cormorant Garamond, Georgia, serif" }}
+                style={{ color: _P, fontFamily: "Cormorant Garamond, Georgia, serif" }}
               >
                 {inv.groomName}
               </h1>
             </Anim>
 
             <Anim variant="scaleIn" delay={400}>
-              <p className="my-3 text-xl font-light" style={{ color: G }}>&amp;</p>
+              <p className="my-3 text-xl font-light" style={{ color: _G }}>&amp;</p>
             </Anim>
 
             <Anim variant="fadeUp" delay={460}>
               <h1
                 className="text-5xl font-bold leading-tight"
-                style={{ color: P, fontFamily: "Cormorant Garamond, Georgia, serif" }}
+                style={{ color: _P, fontFamily: "Cormorant Garamond, Georgia, serif" }}
               >
                 {inv.brideName}
               </h1>
@@ -237,15 +255,15 @@ function IslamicSection({
 
             {(c.subtitle as string) && (
               <Anim variant="fadeUp" delay={560}>
-                <p className="mt-5 text-sm italic" style={{ color: TXT, opacity: 0.62 }}>
+                <p className="mt-5 text-sm italic" style={{ color: _TXT, opacity: 0.62 }}>
                   {c.subtitle as string}
                 </p>
               </Anim>
             )}
 
             <Anim variant="fadeIn" delay={640}>
-              <div className="mt-5 h-px w-24 mx-auto" style={{ backgroundColor: G, opacity: 0.4 }} />
-              <p className="mt-3 text-sm" style={{ color: P, opacity: 0.7 }}>
+              <div className="mt-5 h-px w-24 mx-auto" style={{ backgroundColor: _G, opacity: 0.4 }} />
+              <p className="mt-3 text-sm" style={{ color: _P, opacity: 0.7 }}>
                 {new Date(inv.eventDate).toLocaleDateString("id-ID", {
                   weekday: "long", day: "numeric", month: "long", year: "numeric",
                 })}
@@ -256,10 +274,10 @@ function IslamicSection({
           {/* Bottom: mosque silhouette + arabesque band */}
           <div className="absolute inset-x-0 bottom-0 pointer-events-none z-10">
             <MosqueSilhouette />
-            <div style={{ backgroundColor: BG, paddingTop: 2, paddingBottom: 2 }}>
+            <div style={{ backgroundColor: _BG, paddingTop: 2, paddingBottom: 2 }}>
               <ArabesqueBorder flip />
             </div>
-            <div style={{ backgroundColor: P, height: 6 }} />
+            <div style={{ backgroundColor: _P, height: 6 }} />
             <div className="absolute bottom-0 left-0"><MandallaCorner rotate={270} /></div>
             <div className="absolute bottom-0 right-0"><MandallaCorner rotate={180} /></div>
           </div>
@@ -274,13 +292,13 @@ function IslamicSection({
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center px-8 py-16 text-center overflow-hidden"
-          style={{ backgroundColor: BG, ...snap }}
+          style={{ ...sectionStyle(section, _BG) }}
         >
           <StarPattern />
           <div className="relative z-10 w-full">
             <Anim variant="fadeIn" delay={0}><CrescentStar size={38} /></Anim>
             <Anim variant="fadeIn" delay={60}>
-              <p className="mt-4 mb-8 text-[10px] tracking-[0.45em] uppercase" style={{ color: P, opacity: 0.6 }}>
+              <p className="mt-4 mb-8 text-[10px] tracking-[0.45em] uppercase" style={{ color: _P, opacity: 0.6 }}>
                 Mempelai
               </p>
             </Anim>
@@ -291,15 +309,19 @@ function IslamicSection({
                   <IslamicPersonCard
                     photo={c.groomPhoto as string} name={inv.groomName}
                     parents={c.groomParents as string} bio={c.groomBio as string}
+                    instagram={c.groomInstagram as string}
+                    _P={_P} _G={_G} _TXT={_TXT}
                   />
                 </Anim>
                 <Anim variant="scaleIn" delay={300} className="self-center">
-                  <span className="text-3xl font-light" style={{ color: G }}>&amp;</span>
+                  <span className="text-3xl font-light" style={{ color: _G }}>&amp;</span>
                 </Anim>
                 <Anim variant="slideRight" delay={150}>
                   <IslamicPersonCard
                     photo={c.bridePhoto as string} name={inv.brideName}
                     parents={c.brideParents as string} bio={c.brideBio as string}
+                    instagram={c.brideInstagram as string}
+                    _P={_P} _G={_G} _TXT={_TXT}
                   />
                 </Anim>
               </div>
@@ -309,13 +331,17 @@ function IslamicSection({
                   <IslamicPersonCard
                     photo={c.groomPhoto as string} name={inv.groomName}
                     parents={c.groomParents as string} bio={c.groomBio as string}
+                    instagram={c.groomInstagram as string}
+                    _P={_P} _G={_G} _TXT={_TXT}
                   />
                 </Anim>
-                <span className="text-3xl font-light" style={{ color: G }}>&amp;</span>
+                <span className="text-3xl font-light" style={{ color: _G }}>&amp;</span>
                 <Anim variant="fadeUp" delay={300}>
                   <IslamicPersonCard
                     photo={c.bridePhoto as string} name={inv.brideName}
                     parents={c.brideParents as string} bio={c.brideBio as string}
+                    instagram={c.brideInstagram as string}
+                    _P={_P} _G={_G} _TXT={_TXT}
                   />
                 </Anim>
               </div>
@@ -333,20 +359,20 @@ function IslamicSection({
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center px-8 py-16 text-center overflow-hidden"
-          style={{ backgroundColor: `${P}0c`, ...snap }}
+          style={{ ...sectionStyle(section, `${_P}0c`) }}
         >
           <StarPattern />
           <div className="relative z-10 max-w-lg mx-auto w-full">
             <Anim variant="scaleIn" delay={0}><CrescentStar size={48} /></Anim>
             <Anim variant="fadeIn" delay={120}>
-              <p className="mb-4 text-[10px] tracking-[0.45em] uppercase" style={{ color: P, opacity: 0.62 }}>
+              <p className="mb-4 text-[10px] tracking-[0.45em] uppercase" style={{ color: _P, opacity: 0.62 }}>
                 Save The Date
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={200}>
               <p
                 className="mb-2 text-3xl font-bold"
-                style={{ color: P, fontFamily: "Cormorant Garamond, serif" }}
+                style={{ color: _P, fontFamily: "Cormorant Garamond, serif" }}
               >
                 {new Date(inv.eventDate).toLocaleDateString("id-ID", {
                   weekday: "long", day: "numeric", month: "long", year: "numeric",
@@ -355,9 +381,9 @@ function IslamicSection({
             </Anim>
             <Anim variant="fadeUp" delay={300}>
               <div>
-                <p className="text-lg font-medium" style={{ color: TXT }}>{inv.eventVenue}</p>
+                <p className="text-lg font-medium" style={{ color: _TXT }}>{inv.eventVenue}</p>
                 {inv.eventAddress && (
-                  <p className="mt-1 text-sm opacity-60" style={{ color: TXT }}>{inv.eventAddress}</p>
+                  <p className="mt-1 text-sm opacity-60" style={{ color: _TXT }}>{inv.eventAddress}</p>
                 )}
               </div>
             </Anim>
@@ -368,19 +394,19 @@ function IslamicSection({
                     <div
                       key={i}
                       className="rounded-lg px-5 py-4 text-center min-w-[120px]"
-                      style={{ border: `1.5px solid ${G}60`, backgroundColor: `${P}08` }}
+                      style={{ border: `1.5px solid ${_G}60`, backgroundColor: `${_P}08` }}
                     >
-                      <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: G }}>
+                      <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: _G }}>
                         {ev.name || `Acara ${i + 1}`}
                       </p>
                       {ev.date && (
-                        <p className="mt-1.5 text-sm font-medium" style={{ color: TXT }}>
+                        <p className="mt-1.5 text-sm font-medium" style={{ color: _TXT }}>
                           {new Date(ev.date).toLocaleDateString("id-ID", {
                             day: "numeric", month: "long", year: "numeric",
                           })}
                         </p>
                       )}
-                      {ev.time && <p className="text-sm opacity-65" style={{ color: TXT }}>{ev.time}</p>}
+                      {ev.time && <p className="text-sm opacity-65" style={{ color: _TXT }}>{ev.time}</p>}
                     </div>
                   ))}
                 </div>
@@ -397,17 +423,17 @@ function IslamicSection({
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center px-8 py-12 text-center overflow-hidden"
-          style={{ backgroundColor: BG, ...snap }}
+          style={{ ...sectionStyle(section, _BG) }}
         >
           <StarPattern />
           <div className="relative z-10">
             <Anim variant="fadeIn" delay={0}>
-              <p className="mb-6 text-[10px] tracking-[0.45em] uppercase" style={{ color: P, opacity: 0.6 }}>
+              <p className="mb-6 text-[10px] tracking-[0.45em] uppercase" style={{ color: _P, opacity: 0.6 }}>
                 Menghitung Hari
               </p>
             </Anim>
             <Anim variant="scaleIn" delay={160}>
-              <CountdownTimer eventDate={inv.eventDate} primaryColor={P} />
+              <CountdownTimer eventDate={inv.eventDate} primaryColor={_P} />
             </Anim>
             <Anim variant="scaleIn" delay={340}>
               <div className="mt-8"><CrescentStar size={32} /></div>
@@ -422,7 +448,7 @@ function IslamicSection({
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center px-8 py-16 overflow-hidden"
-          style={{ backgroundColor: `${P}0c`, ...snap }}
+          style={{ ...sectionStyle(section, `${_P}0c`) }}
         >
           <StarPattern />
           <div className="relative z-10 max-w-lg mx-auto w-full">
@@ -430,19 +456,19 @@ function IslamicSection({
               <div className="flex justify-center mb-4"><CrescentStar size={36} /></div>
             </Anim>
             <Anim variant="fadeIn" delay={60}>
-              <p className="mb-2 text-center text-[10px] tracking-[0.35em] uppercase" style={{ color: P, opacity: 0.62 }}>
+              <p className="mb-2 text-center text-[10px] tracking-[0.35em] uppercase" style={{ color: _P, opacity: 0.62 }}>
                 {(c.title as string) || "RSVP"}
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={160}>
-              <p className="mb-6 text-center text-sm" style={{ color: TXT, opacity: 0.65 }}>
+              <p className="mb-6 text-center text-sm" style={{ color: _TXT, opacity: 0.65 }}>
                 Konfirmasi Kehadiran Anda
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={260}>
               <RsvpForm
                 invitationId={inv.id}
-                primaryColor={P}
+                primaryColor={_P}
                 deadline={c.deadline as string | undefined}
               />
             </Anim>
@@ -456,7 +482,7 @@ function IslamicSection({
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center px-8 py-12 text-center overflow-hidden"
-          style={{ backgroundColor: BG, ...snap }}
+          style={{ ...sectionStyle(section, _BG) }}
         >
           <StarPattern />
           <div className="relative z-10">
@@ -464,14 +490,14 @@ function IslamicSection({
             <Anim variant="fadeUp" delay={160}>
               <blockquote
                 className="mx-auto max-w-sm text-base italic leading-relaxed mt-6"
-                style={{ color: TXT, opacity: 0.85 }}
+              style={{ color: _TXT, opacity: 0.85 }}
               >
                 &ldquo;{c.quote as string}&rdquo;
               </blockquote>
             </Anim>
             {!!c.source && (
               <Anim variant="fadeIn" delay={360}>
-                <p className="mt-4 text-xs uppercase tracking-widest" style={{ color: P, opacity: 0.6 }}>
+              <p className="mt-4 text-xs uppercase tracking-widest" style={{ color: _P, opacity: 0.6 }}>
                   — {c.source as string}
                 </p>
               </Anim>
@@ -491,18 +517,18 @@ function IslamicSection({
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center px-8 py-10 text-center overflow-hidden"
-          style={{ backgroundColor: BG, ...snap }}
+          style={{ ...sectionStyle(section, _BG) }}
         >
           <StarPattern />
           <div className="relative z-10 max-w-lg mx-auto w-full">
             <Anim variant="fadeIn" delay={0}>
-              <p className="mb-4 text-[10px] uppercase tracking-widest" style={{ color: P, opacity: 0.6 }}>
+              <p className="mb-4 text-[10px] uppercase tracking-widest" style={{ color: _P, opacity: 0.6 }}>
                 {(c.label as string) || "Lokasi Acara"}
               </p>
             </Anim>
             {gmapsUrl && (
               <Anim variant="fadeUp" delay={150}>
-                <div className="overflow-hidden rounded-lg" style={{ border: `1.5px solid ${G}60` }}>
+                <div className="overflow-hidden rounded-lg" style={{ border: `1.5px solid ${_G}60` }}>
                   <iframe
                     src={gmapsUrl} width="100%" height="280"
                     style={{ border: 0 }} loading="lazy"
@@ -513,7 +539,7 @@ function IslamicSection({
             )}
             {(c.address as string) && (
               <Anim variant="fadeIn" delay={280}>
-                <p className="mt-3 text-sm opacity-65" style={{ color: TXT }}>{c.address as string}</p>
+                <p className="mt-3 text-sm opacity-65" style={{ color: _TXT }}>{c.address as string}</p>
               </Anim>
             )}
             {dirUrl && (
@@ -521,7 +547,7 @@ function IslamicSection({
                 <a
                   href={dirUrl} target="_blank" rel="noopener noreferrer"
                   className="mt-4 inline-flex items-center gap-2 rounded-lg px-5 py-2 text-sm font-medium transition-opacity hover:opacity-80"
-                  style={{ border: `1.5px solid ${P}`, color: P }}
+                  style={{ border: `1.5px solid ${_P}`, color: _P }}
                 >
                   <Navigation className="h-4 w-4" />
                   Petunjuk Arah
@@ -539,27 +565,27 @@ function IslamicSection({
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center px-8 py-20 text-center overflow-hidden"
-          style={{ backgroundColor: `${P}0c`, ...snap }}
+          style={{ ...sectionStyle(section, `${_P}0c`) }}
         >
           <StarPattern />
           <div className="relative z-10">
             <Anim variant="scaleIn" delay={0}><CrescentStar size={60} /></Anim>
             <Anim variant="fadeUp" delay={200}>
-              <p className="mx-auto max-w-xs text-base leading-relaxed mt-6" style={{ color: TXT, opacity: 0.72 }}>
+              <p className="mx-auto max-w-xs text-base leading-relaxed mt-6" style={{ color: _TXT, opacity: 0.72 }}>
                 {(c.message as string) ||
                   "Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan hadir."}
               </p>
             </Anim>
             <Anim variant="scaleIn" delay={380}>
-              <div className="mt-6 h-px w-24 mx-auto" style={{ backgroundColor: G, opacity: 0.45 }} />
+              <div className="mt-6 h-px w-24 mx-auto" style={{ backgroundColor: _G, opacity: 0.45 }} />
             </Anim>
             <Anim variant="fadeIn" delay={460}>
-              <p className="mt-4 text-xl font-bold" style={{ color: P, fontFamily: "Cormorant Garamond, serif" }}>
+              <p className="mt-4 text-xl font-bold" style={{ color: _P, fontFamily: "Cormorant Garamond, serif" }}>
                 {inv.groomName} & {inv.brideName}
               </p>
             </Anim>
             <Anim variant="fadeIn" delay={580}>
-              <p className="mt-3 text-sm italic" style={{ color: P, opacity: 0.55 }}>
+              <p className="mt-3 text-sm italic" style={{ color: _P, opacity: 0.55 }}>
                 Wassalamu&apos;alaikum Warahmatullahi Wabarakatuh
               </p>
             </Anim>
@@ -575,12 +601,12 @@ function IslamicSection({
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center py-12 text-center overflow-hidden"
-          style={{ backgroundColor: BG, ...snap }}
+          style={{ ...sectionStyle(section, _BG) }}
         >
           <StarPattern />
           <div className="relative z-10 w-full">
             <Anim variant="fadeIn" delay={0}>
-              <p className="mb-6 text-[10px] tracking-[0.35em] uppercase" style={{ color: P, opacity: 0.6 }}>
+              <p className="mb-6 text-[10px] tracking-[0.35em] uppercase" style={{ color: _P, opacity: 0.6 }}>
                 Gallery
               </p>
             </Anim>
@@ -589,7 +615,7 @@ function IslamicSection({
                 <div
                   key={i}
                   className="mb-2 overflow-hidden rounded"
-                  style={{ border: `1.5px solid ${G}45` }}
+                  style={{ border: `1.5px solid ${_G}45` }}
                 >
                   <WatermarkedImage
                     src={url} alt={`Gallery ${i + 1}`}
@@ -611,7 +637,7 @@ function IslamicSection({
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-16"
-          style={{ backgroundColor: BG, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="max-w-sm mx-auto w-full">
             <Anim variant="fadeUp" delay={0}>
@@ -623,8 +649,8 @@ function IslamicSection({
                 qrisImage={c.qrisImage as string | null | undefined}
                 banks={banks}
                 allowTransferProof={c.allowTransferProof as boolean | undefined}
-                primaryColor={P}
-                accentColor={G}
+                primaryColor={_P}
+                accentColor={_G}
               />
             </Anim>
           </div>
@@ -638,7 +664,7 @@ function IslamicSection({
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center py-12"
-          style={{ backgroundColor: BG, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="w-full max-w-sm px-8">
             <Anim variant="fadeIn" delay={0}>
@@ -647,7 +673,7 @@ function IslamicSection({
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={120}>
-              <UcapanWall invitationId={inv.id} primaryColor={P} />
+              <UcapanWall invitationId={inv.id} primaryColor={_P} />
             </Anim>
           </div>
         </section>
@@ -663,7 +689,9 @@ const MandallaCorner = MandalaCorner
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export function RamadanIslamicTheme({ inv, sections, activeSection, onSectionClick }: ThemeTemplateProps) {
+export function RamadanIslamicTheme({ inv, sections, themeConfig, activeSection, onSectionClick }: ThemeTemplateProps) {
+  const tc = resolveThemeColors(themeConfig, { primary: P, accent: G, bg: BG, text: TXT })
+
   const sorted = [...sections].sort((a, b) => a.order - b.order)
 
   return (
@@ -675,7 +703,7 @@ export function RamadanIslamicTheme({ inv, sections, activeSection, onSectionCli
           className={onSectionClick ? "cursor-pointer" : ""}
           style={activeSection === section.id ? { outline: "2px solid rgba(0,0,0,0.25)", outlineOffset: "-2px" } : undefined}
         >
-          <IslamicSection section={section} inv={inv} />
+          <IslamicSection section={section} inv={inv} _P={tc.primary} _G={tc.accent} _BG={tc.bg} _TXT={tc.text} _BORDER={tc.border} />
         </div>
       ))}
     </>

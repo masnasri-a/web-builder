@@ -88,6 +88,7 @@ model User {
   paymentOrders PaymentOrder[]
   subscriptions Subscription[]
   tierHistory   TierHistory[]
+  backgrounds   BackgroundImage[]
 }
 
 // Theme — managed by admin, applied by users
@@ -134,6 +135,26 @@ model Invitation {
   guests     Guest[]
   wishes     Wish[]
   giftProofs GiftProof[]
+  backgrounds BackgroundImage[]
+}
+
+// Background images — preset (super admin) or user-private (per invitation)
+model BackgroundImage {
+  id           String   @id @default(cuid())
+  url          String
+  key          String
+  name         String?
+  isPreset     Boolean  @default(false)
+  userId       String?
+  invitationId String?
+  createdAt    DateTime @default(now())
+
+  user       User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invitation Invitation? @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+
+  @@index([isPreset])
+  @@index([userId])
+  @@index([invitationId])
 }
 
 // Guest / RSVP

@@ -166,6 +166,10 @@ function buildWaUrl(phone: string, message: string): string {
   return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`
 }
 
+function buildWaUrlClean(phone: string): string {
+  return `https://wa.me/${phone}`
+}
+
 function downloadTemplate() {
   const csv =
     "Name,Phone\nBudi Santoso,081234567890\nSiti Rahayu,082345678901\nAhmad Fauzi,085678901234"
@@ -229,6 +233,7 @@ export function BroadcastPanel({
   const [templateId, setTemplateId] = useState("islami")
   const [customBody, setCustomBody] = useState("")
   const [hasCopied, setHasCopied] = useState(false)
+  const [hasCopiedMsg, setHasCopiedMsg] = useState(false)
   const [broadcastOpen, setBroadcastOpen] = useState(false)
   const [broadcastIndex, setBroadcastIndex] = useState(0)
   const [broadcastQueue, setBroadcastQueue] = useState<Contact[]>([])
@@ -338,10 +343,16 @@ export function BroadcastPanel({
     setTimeout(() => setHasCopied(false), 2000)
   }
 
-  function sendSingle(contact: Contact) {
+  async function sendSingle(contact: Contact) {
     const link = guestUrl(contact.name)
     const msg = buildMessage(activeTemplate, contact.name, groomName, brideName, link, formattedDate, venue, address, maps)
-    window.open(buildWaUrl(contact.phone, msg), "_blank")
+    try {
+      await navigator.clipboard.writeText(msg)
+      toast.success("Pesan berhasil di-copy! Tinggal paste di WhatsApp.")
+    } catch {
+      toast.error("Gagal meng-copy pesan.")
+    }
+    window.open(buildWaUrlClean(contact.phone), "_blank")
     setContacts((prev) =>
       prev.map((c) => (c.id === contact.id ? { ...c, status: "sent" } : c))
     )
@@ -369,12 +380,29 @@ export function BroadcastPanel({
     }
   }
 
-  function openCurrentWa() {
+  async function openCurrentWa() {
     const current = broadcastQueue[broadcastIndex]
     if (!current) return
     const link = guestUrl(current.name)
     const msg = buildMessage(activeTemplate, current.name, groomName, brideName, link, formattedDate, venue, address, maps)
-    window.open(buildWaUrl(current.phone, msg), "_blank")
+    try {
+      await navigator.clipboard.writeText(msg)
+      toast.success("Pesan di-copy! Tinggal paste di WhatsApp.")
+    } catch {
+      toast.error("Gagal meng-copy pesan.")
+    }
+    window.open(buildWaUrlClean(current.phone), "_blank")
+  }
+
+  async function handleCopyMessage() {
+    try {
+      await navigator.clipboard.writeText(previewMsg)
+      setHasCopiedMsg(true)
+      toast.success("Pesan berhasil di-copy!")
+      setTimeout(() => setHasCopiedMsg(false), 2000)
+    } catch {
+      toast.error("Gagal meng-copy pesan.")
+    }
   }
 
   const currentBroadcastContact = broadcastQueue[broadcastIndex]
@@ -622,9 +650,24 @@ export function BroadcastPanel({
                 {previewMsg}
               </pre>
             </div>
-            <p className="mt-2 text-xs text-muted-foreground">
-              Setiap tamu mendapat link unik dengan namanya (contoh: <code className="bg-muted px-1 rounded">{previewLink}</code>)
-            </p>
+            <div className="mt-3 flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-xl gap-2 text-xs"
+                onClick={handleCopyMessage}
+              >
+                {hasCopiedMsg ? (
+                  <Check className="h-3.5 w-3.5 text-green-500" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" />
+                )}
+                {hasCopiedMsg ? "Tersalin!" : "Copy Pesan"}
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                Setiap tamu mendapat link unik (contoh: <code className="bg-muted px-1 rounded">{previewLink}</code>)
+              </p>
+            </div>
           </div>
 
           {/* Broadcast Bar */}
@@ -729,7 +772,7 @@ export function BroadcastPanel({
               </div>
 
               <p className="text-center text-xs text-muted-foreground">
-                Klik &ldquo;Buka WhatsApp&rdquo; → kirim pesan → kembali ke sini
+                Klik &ldquo;Buka WhatsApp&rdquo; → pesan otomatis tercopy → paste di chat → kembali ke sini
               </p>
             </div>
           ) : (

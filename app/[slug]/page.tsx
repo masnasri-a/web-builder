@@ -1,4 +1,5 @@
 import { db } from "@/lib/db"
+import { cached } from "@/lib/redis"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import { GuestPageClient } from "@/components/invitation/guest-page-client"
@@ -59,10 +60,12 @@ export default async function GuestPage({
 }) {
   const [{ slug }, { to: guestName }] = await Promise.all([params, searchParams])
 
-  const inv = await db.invitation.findUnique({
-    where: { slug, isPublished: true },
-    include: { theme: true, user: { select: { tier: true } } },
-  })
+  const inv = await cached(`inv:${slug}`, 60, () =>
+    db.invitation.findUnique({
+      where: { slug, isPublished: true },
+      include: { theme: true, user: { select: { tier: true } } },
+    }),
+  )
 
   if (!inv) notFound()
 

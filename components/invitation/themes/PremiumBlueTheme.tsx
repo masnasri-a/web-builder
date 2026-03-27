@@ -16,6 +16,7 @@ import { Navigation, Instagram } from "lucide-react"
 import type { Section } from "@/types"
 import type { ThemeTemplateProps } from "./index"
 import type { GuestInvitation } from "@/components/invitation/guest-sections"
+import { sectionStyle, resolveThemeColors } from "./theme-utils"
 import { GiftSection } from "@/components/invitation/gift-section"
 import { UcapanWall } from "@/components/invitation/ucapan-wall"
 
@@ -108,25 +109,25 @@ function DiamondDivider({ width = 240, opacity = 0.65 }: { width?: number; opaci
 
 // ─── Module-level sub-components ──────────────────────────────────────────────
 
-function PremiumBluePersonCard({ photo, name, parents, bio, instagram }: { photo?: string; name: string; parents?: string; bio?: string; instagram?: string }) {
+function PremiumBluePersonCard({ photo, name, parents, bio, instagram, _PRIMARY, _ACCENT, _TXT }: { photo?: string; name: string; parents?: string; bio?: string; instagram?: string; _PRIMARY: string; _ACCENT: string; _TXT: string }) {
   return (
     <div className="space-y-3 text-center">
       <div
         className="mx-auto h-20 w-20 overflow-hidden rounded-full"
-        style={{ border: `2.5px solid ${GOLD}`, boxShadow: `0 0 0 4px ${ROYAL}18` }}
+        style={{ border: `2.5px solid ${_ACCENT}`, boxShadow: `0 0 0 4px ${_PRIMARY}18` }}
       >
         {photo && (
           <WatermarkedImage src={photo} alt={name} width={80} height={80} className="object-cover w-full h-full" />
         )}
       </div>
-      <h2 className="text-2xl font-bold" style={{ color: ROYAL, fontFamily: "Cormorant Garamond, serif" }}>
+      <h2 className="text-2xl font-bold" style={{ color: _PRIMARY, fontFamily: "Cormorant Garamond, serif" }}>
         {name}
       </h2>
-      {parents && <p className="text-xs opacity-60" style={{ color: TXT }}>{parents}</p>}
-      {bio && <p className="mx-auto max-w-40 text-sm leading-relaxed opacity-70" style={{ color: TXT }}>{bio}</p>}
+      {parents && <p className="text-xs opacity-60" style={{ color: _TXT }}>{parents}</p>}
+      {bio && <p className="mx-auto max-w-40 text-sm leading-relaxed opacity-70" style={{ color: _TXT }}>{bio}</p>}
       {instagram && (
         <a href={`https://instagram.com/${instagram}`} target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-xs opacity-60" style={{ color: ROYAL }}>
+          className="inline-flex items-center gap-1 text-xs opacity-60" style={{ color: _PRIMARY }}>
           <Instagram className="h-3 w-3" />@{instagram}
         </a>
       )}
@@ -136,10 +137,10 @@ function PremiumBluePersonCard({ photo, name, parents, bio, instagram }: { photo
 
 // ─── Section renderer ─────────────────────────────────────────────────────────
 
-function PremiumBlueSection({ section, inv, index }: { section: Section; inv: GuestInvitation; index: number }) {
+function PremiumBlueSection({ section, inv, index, _PRIMARY, _BG, _TXT, _ACCENT, _BORDER }: { section: Section; inv: GuestInvitation; index: number; _PRIMARY: string; _BG: string; _TXT: string; _ACCENT: string; _BORDER: string }) {
   const c = section.content as Record<string, unknown>
   const showWatermark = useShowWatermark()
-  const sectionBg = index % 2 === 0 ? PEARL : LIGHT
+  const sectionBg = index % 2 === 0 ? _BG : LIGHT
 
   switch (section.type) {
 
@@ -149,7 +150,7 @@ function PremiumBlueSection({ section, inv, index }: { section: Section; inv: Gu
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center overflow-hidden text-center"
-          style={{ backgroundColor: PEARL, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           {/* BlueFrame overlay corners */}
           <div className="absolute inset-6 pointer-events-none flex items-stretch">
@@ -161,20 +162,20 @@ function PremiumBlueSection({ section, inv, index }: { section: Section; inv: Gu
               <div className="flex justify-center mb-4"><GoldOrnament size={56} /></div>
             </Anim>
             <Anim variant="fadeIn" delay={120}>
-              <p className="mb-3 text-[10px] tracking-[0.5em] uppercase" style={{ color: ROYAL, opacity: 0.65 }}>
+              <p className="mb-3 text-[10px] tracking-[0.5em] uppercase" style={{ color: _PRIMARY, opacity: 0.65 }}>
                 The Wedding of
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={240}>
-              <h1 className="text-5xl font-bold leading-tight" style={{ color: ROYAL, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+              <h1 className="text-5xl font-bold leading-tight" style={{ color: _PRIMARY, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
                 {inv.groomName}
               </h1>
             </Anim>
             <Anim variant="scaleIn" delay={360}>
-              <p className="my-3 text-3xl font-light italic" style={{ color: GOLD }}>&amp;</p>
+              <p className="my-3 text-3xl font-light italic" style={{ color: _ACCENT }}>&amp;</p>
             </Anim>
             <Anim variant="fadeUp" delay={420}>
-              <h1 className="text-5xl font-bold leading-tight" style={{ color: ROYAL, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+              <h1 className="text-5xl font-bold leading-tight" style={{ color: _PRIMARY, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
                 {inv.brideName}
               </h1>
             </Anim>
@@ -183,13 +184,13 @@ function PremiumBlueSection({ section, inv, index }: { section: Section; inv: Gu
             </Anim>
             {(c.subtitle as string) && (
               <Anim variant="fadeUp" delay={580}>
-                <p className="mt-4 text-sm italic" style={{ color: TXT, opacity: 0.6 }}>
+                <p className="mt-4 text-sm italic" style={{ color: _TXT, opacity: 0.6 }}>
                   {c.subtitle as string}
                 </p>
               </Anim>
             )}
             <Anim variant="fadeIn" delay={640}>
-              <p className="mt-4 text-sm" style={{ color: ROYAL, opacity: 0.7 }}>
+              <p className="mt-4 text-sm" style={{ color: _PRIMARY, opacity: 0.7 }}>
                 {inv.eventDate
                   ? new Date(inv.eventDate).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
                   : "Wedding Date TBD"}
@@ -208,23 +209,23 @@ function PremiumBlueSection({ section, inv, index }: { section: Section; inv: Gu
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-16 text-center"
-          style={{ backgroundColor: sectionBg, ...snap }}
+          style={{ ...sectionStyle(section, sectionBg) }}
         >
           <Anim variant="fadeIn" delay={0}><GoldOrnament size={44} /></Anim>
           <Anim variant="fadeIn" delay={60}>
-            <p className="mt-3 mb-8 text-[10px] tracking-[0.45em] uppercase" style={{ color: ROYAL, opacity: 0.65 }}>
+            <p className="mt-3 mb-8 text-[10px] tracking-[0.45em] uppercase" style={{ color: _PRIMARY, opacity: 0.65 }}>
               The Couple
             </p>
           </Anim>
           <div className="flex justify-center gap-10 items-center">
             <Anim variant="slideLeft" delay={150}>
-              <PremiumBluePersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} instagram={c.groomInstagram as string} />
+              <PremiumBluePersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} instagram={c.groomInstagram as string} _PRIMARY={_PRIMARY} _ACCENT={_ACCENT} _TXT={_TXT} />
             </Anim>
             <Anim variant="scaleIn" delay={300}>
-              <span className="text-3xl italic font-light" style={{ color: GOLD }}>&amp;</span>
+              <span className="text-3xl italic font-light" style={{ color: _ACCENT }}>&amp;</span>
             </Anim>
             <Anim variant="slideRight" delay={150}>
-              <PremiumBluePersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} instagram={c.brideInstagram as string} />
+              <PremiumBluePersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} instagram={c.brideInstagram as string} _PRIMARY={_PRIMARY} _ACCENT={_ACCENT} _TXT={_TXT} />
             </Anim>
           </div>
         </section>
@@ -239,19 +240,19 @@ function PremiumBlueSection({ section, inv, index }: { section: Section; inv: Gu
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-16 text-center"
-          style={{ backgroundColor: sectionBg, ...snap }}
+          style={{ ...sectionStyle(section, sectionBg) }}
         >
           <div className="max-w-lg mx-auto w-full">
             <Anim variant="fadeIn" delay={0}>
               <div className="flex justify-center mb-4"><DiamondDivider width={200} /></div>
             </Anim>
             <Anim variant="fadeIn" delay={100}>
-              <p className="mb-4 text-[10px] tracking-[0.45em] uppercase" style={{ color: ROYAL, opacity: 0.65 }}>
+              <p className="mb-4 text-[10px] tracking-[0.45em] uppercase" style={{ color: _PRIMARY, opacity: 0.65 }}>
                 Save The Date
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={200}>
-              <p className="text-2xl font-bold" style={{ color: ROYAL, fontFamily: "Cormorant Garamond, serif" }}>
+              <p className="text-2xl font-bold" style={{ color: _PRIMARY, fontFamily: "Cormorant Garamond, serif" }}>
                 {inv.eventDate
                   ? new Date(inv.eventDate).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
                   : "Wedding Date TBD"}
@@ -259,9 +260,9 @@ function PremiumBlueSection({ section, inv, index }: { section: Section; inv: Gu
             </Anim>
             <Anim variant="fadeUp" delay={300}>
               <div className="mt-4">
-                <p className="text-lg font-medium" style={{ color: TXT }}>{inv.eventVenue}</p>
+                <p className="text-lg font-medium" style={{ color: _TXT }}>{inv.eventVenue}</p>
                 {inv.eventAddress && (
-                  <p className="mt-1 text-sm opacity-60" style={{ color: TXT }}>{inv.eventAddress}</p>
+                  <p className="mt-1 text-sm opacity-60" style={{ color: _TXT }}>{inv.eventAddress}</p>
                 )}
               </div>
             </Anim>
@@ -272,17 +273,17 @@ function PremiumBlueSection({ section, inv, index }: { section: Section; inv: Gu
                     <div
                       key={i}
                       className="rounded px-5 py-4 text-center min-w-32.5"
-                      style={{ border: `1.5px solid ${ROYAL}50`, backgroundColor: `${ROYAL}08` }}
+                      style={{ border: `1.5px solid ${_PRIMARY}50`, backgroundColor: `${_PRIMARY}08` }}
                     >
-                      <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: ROYAL }}>
+                      <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: _PRIMARY }}>
                         {ev.name || `Acara ${i + 1}`}
                       </p>
                       {ev.date && (
-                        <p className="mt-1.5 text-sm font-medium" style={{ color: TXT }}>
+                        <p className="mt-1.5 text-sm font-medium" style={{ color: _TXT }}>
                           {new Date(ev.date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
                         </p>
                       )}
-                      {ev.time && <p className="text-sm opacity-65" style={{ color: TXT }}>{ev.time}</p>}
+                      {ev.time && <p className="text-sm opacity-65" style={{ color: _TXT }}>{ev.time}</p>}
                     </div>
                   ))}
                 </div>
@@ -304,16 +305,16 @@ function PremiumBlueSection({ section, inv, index }: { section: Section; inv: Gu
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col"
-          style={{ backgroundColor: sectionBg, ...snap }}
+          style={{ ...sectionStyle(section, sectionBg) }}
         >
           <div className="px-4 py-12">
             <Anim variant="fadeIn" delay={0}>
-              <p className="mb-6 text-center text-xs font-semibold uppercase tracking-widest opacity-60" style={{ color: ROYAL }}>
+              <p className="mb-6 text-center text-xs font-semibold uppercase tracking-widest opacity-60" style={{ color: _PRIMARY }}>
                 Gallery
               </p>
             </Anim>
             {images.length === 0 ? (
-              <div className="mx-4 flex h-32 items-center justify-center rounded text-sm opacity-40" style={{ backgroundColor: `${ROYAL}15` }}>
+              <div className="mx-4 flex h-32 items-center justify-center rounded text-sm opacity-40" style={{ backgroundColor: `${_PRIMARY}15` }}>
                 Belum ada foto
               </div>
             ) : (
@@ -330,15 +331,15 @@ function PremiumBlueSection({ section, inv, index }: { section: Section; inv: Gu
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-12 text-center"
-          style={{ backgroundColor: sectionBg, ...snap }}
+          style={{ ...sectionStyle(section, sectionBg) }}
         >
           <Anim variant="fadeIn" delay={0}>
-            <p className="mb-6 text-[10px] tracking-[0.45em] uppercase" style={{ color: ROYAL, opacity: 0.65 }}>
+            <p className="mb-6 text-[10px] tracking-[0.45em] uppercase" style={{ color: _PRIMARY, opacity: 0.65 }}>
               Menghitung Hari
             </p>
           </Anim>
           <Anim variant="scaleIn" delay={160}>
-            <CountdownTimer eventDate={inv.eventDate} primaryColor={ROYAL} />
+            <CountdownTimer eventDate={inv.eventDate} primaryColor={_PRIMARY} />
           </Anim>
           <Anim variant="fadeIn" delay={340}>
             <div className="mt-8 flex justify-center"><DiamondDivider width={180} /></div>
@@ -352,18 +353,18 @@ function PremiumBlueSection({ section, inv, index }: { section: Section; inv: Gu
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center"
-          style={{ backgroundColor: sectionBg, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, sectionBg), color: _TXT }}
         >
           <div className="w-full max-w-sm px-8">
             <Anim variant="fadeIn" delay={0}>
               <div className="flex justify-center mb-4"><GoldOrnament size={40} /></div>
             </Anim>
             <Anim variant="fadeIn" delay={80}>
-              <p className="mb-6 text-center text-[10px] tracking-[0.4em] uppercase" style={{ color: ROYAL, opacity: 0.65 }}>
+              <p className="mb-6 text-center text-[10px] tracking-[0.4em] uppercase" style={{ color: _PRIMARY, opacity: 0.65 }}>
                 {(c.title as string) || "RSVP"}
               </p>
             </Anim>
-            <RsvpForm invitationId={inv.id} primaryColor={ROYAL} />
+            <RsvpForm invitationId={inv.id} primaryColor={_PRIMARY} />
           </div>
         </section>
       )
@@ -374,7 +375,7 @@ function PremiumBlueSection({ section, inv, index }: { section: Section; inv: Gu
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center px-8 py-20 text-center overflow-hidden"
-          style={{ backgroundColor: PEARL, ...snap }}
+          style={{ ...sectionStyle(section, _BG) }}
         >
           <div className="absolute inset-6 pointer-events-none">
             <BlueFrame width={320} height={460} opacity={0.25} />
@@ -384,7 +385,7 @@ function PremiumBlueSection({ section, inv, index }: { section: Section; inv: Gu
               <div className="flex justify-center mb-4"><GoldOrnament size={52} /></div>
             </Anim>
             <Anim variant="fadeUp" delay={200}>
-              <p className="text-3xl font-bold" style={{ color: ROYAL, fontFamily: "Cormorant Garamond, serif" }}>
+              <p className="text-3xl font-bold" style={{ color: _PRIMARY, fontFamily: "Cormorant Garamond, serif" }}>
                 {inv.groomName} &amp; {inv.brideName}
               </p>
             </Anim>
@@ -392,7 +393,7 @@ function PremiumBlueSection({ section, inv, index }: { section: Section; inv: Gu
               <div className="flex justify-center mt-4"><DiamondDivider width={200} /></div>
             </Anim>
             <Anim variant="fadeUp" delay={400}>
-              <p className="mx-auto max-w-xs text-sm leading-relaxed mt-5" style={{ color: TXT, opacity: 0.7 }}>
+              <p className="mx-auto max-w-xs text-sm leading-relaxed mt-5" style={{ color: _TXT, opacity: 0.7 }}>
                 {(c.message as string) || "Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan hadir."}
               </p>
             </Anim>
@@ -410,7 +411,7 @@ function PremiumBlueSection({ section, inv, index }: { section: Section; inv: Gu
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center"
-          style={{ backgroundColor: sectionBg, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, sectionBg), color: _TXT }}
         >
           <div className="w-full max-w-lg px-8">
             <Anim variant="fadeIn" delay={0}>
@@ -420,12 +421,12 @@ function PremiumBlueSection({ section, inv, index }: { section: Section; inv: Gu
             </Anim>
             {gmapsUrl ? (
               <Anim variant="fadeUp" delay={150}>
-                <div className="overflow-hidden rounded-xl" style={{ border: `1.5px solid ${ROYAL}40` }}>
+                <div className="overflow-hidden rounded-xl" style={{ border: `1.5px solid ${_PRIMARY}40` }}>
                   <iframe src={gmapsUrl} width="100%" height="240" style={{ border: 0 }} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
                 </div>
               </Anim>
             ) : (
-              <div className="flex h-40 items-center justify-center rounded-xl text-sm opacity-40" style={{ backgroundColor: `${ROYAL}20` }}>
+              <div className="flex h-40 items-center justify-center rounded-xl text-sm opacity-40" style={{ backgroundColor: `${_PRIMARY}20` }}>
                 Pilih lokasi di panel kanan
               </div>
             )}
@@ -452,20 +453,20 @@ function PremiumBlueSection({ section, inv, index }: { section: Section; inv: Gu
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-12 text-center"
-          style={{ backgroundColor: sectionBg, ...snap }}
+          style={{ ...sectionStyle(section, sectionBg) }}
         >
           <Anim variant="scaleIn" delay={0}><GoldOrnament size={40} opacity={0.7} /></Anim>
           <Anim variant="fadeUp" delay={160}>
             <blockquote
               className="mx-auto max-w-sm text-base italic leading-relaxed mt-6"
-              style={{ color: TXT, opacity: 0.85 }}
+              style={{ color: _TXT, opacity: 0.85 }}
             >
               &ldquo;{c.quote as string}&rdquo;
             </blockquote>
           </Anim>
           {!!c.source && (
             <Anim variant="fadeIn" delay={360}>
-              <p className="mt-4 text-xs uppercase tracking-widest" style={{ color: GOLD, opacity: 0.8 }}>
+              <p className="mt-4 text-xs uppercase tracking-widest" style={{ color: _ACCENT, opacity: 0.8 }}>
                 — {c.source as string}
               </p>
             </Anim>
@@ -480,7 +481,7 @@ function PremiumBlueSection({ section, inv, index }: { section: Section; inv: Gu
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-16"
-          style={{ backgroundColor: PEARL, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="max-w-sm mx-auto w-full">
             <Anim variant="fadeUp" delay={0}>
@@ -492,8 +493,8 @@ function PremiumBlueSection({ section, inv, index }: { section: Section; inv: Gu
                 qrisImage={c.qrisImage as string | null | undefined}
                 banks={banks}
                 allowTransferProof={c.allowTransferProof as boolean | undefined}
-                primaryColor={ROYAL}
-                accentColor={GOLD}
+                primaryColor={_PRIMARY}
+                accentColor={_ACCENT}
               />
             </Anim>
           </div>
@@ -507,7 +508,7 @@ function PremiumBlueSection({ section, inv, index }: { section: Section; inv: Gu
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center py-12"
-          style={{ backgroundColor: PEARL, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="w-full max-w-sm px-8">
             <Anim variant="fadeIn" delay={0}>
@@ -516,7 +517,7 @@ function PremiumBlueSection({ section, inv, index }: { section: Section; inv: Gu
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={120}>
-              <UcapanWall invitationId={inv.id} primaryColor={ROYAL} />
+              <UcapanWall invitationId={inv.id} primaryColor={_PRIMARY} />
             </Anim>
           </div>
         </section>
@@ -529,7 +530,9 @@ function PremiumBlueSection({ section, inv, index }: { section: Section; inv: Gu
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 
-export function PremiumBlueTheme({ inv, sections, activeSection, onSectionClick }: ThemeTemplateProps) {
+export function PremiumBlueTheme({ inv, sections, themeConfig, activeSection, onSectionClick }: ThemeTemplateProps) {
+  const tc = resolveThemeColors(themeConfig, { primary: ROYAL, accent: GOLD, bg: PEARL, text: TXT, border: LIGHT })
+
   const sorted = [...sections].sort((a, b) => a.order - b.order)
   return (
     <>
@@ -540,7 +543,7 @@ export function PremiumBlueTheme({ inv, sections, activeSection, onSectionClick 
           className={onSectionClick ? "cursor-pointer" : ""}
           style={activeSection === s.id ? { outline: "2px solid rgba(0,0,0,0.25)", outlineOffset: "-2px" } : undefined}
         >
-          <PremiumBlueSection section={s} inv={inv} index={i} />
+          <PremiumBlueSection section={s} inv={inv} index={i} _PRIMARY={tc.primary} _BG={tc.bg} _TXT={tc.text} _ACCENT={tc.accent} _BORDER={tc.border} />
         </div>
       ))}
     </>

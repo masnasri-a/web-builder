@@ -25,8 +25,8 @@ export function ImageUploader({
     const file = e.target.files?.[0]
     if (!file) return
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("File terlalu besar. Maksimum 5 MB.")
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File terlalu besar. Maksimum 10 MB.")
       return
     }
 

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { z } from "zod"
+import { invalidate } from "@/lib/redis"
 
 const patchSchema = z.object({
   id: z.string(),
@@ -70,6 +71,8 @@ export async function PATCH(req: Request) {
       data,
       include: { _count: { select: { invitations: true } } },
     })
+
+    await invalidate("themes")
 
     return NextResponse.json(updated)
   } catch (err) {

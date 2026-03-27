@@ -20,6 +20,7 @@ import type { ThemeTemplateProps } from "./index"
 import type { GuestInvitation } from "@/components/invitation/guest-sections"
 import { GiftSection } from "@/components/invitation/gift-section"
 import { UcapanWall } from "@/components/invitation/ucapan-wall"
+import { resolveThemeColors, sectionStyle } from "./theme-utils"
 
 const Masonry = dynamic(
     () => import("@/components/ui/masonry").then((m) => ({ default: m.Masonry })),
@@ -37,11 +38,6 @@ const PINK_BG = "#D4AAB4" // section background pink
 const BG_HERO = "/themes/fairytale-garden/bg-hero.png"
 const BG_GALLERY = "/themes/fairytale-garden/bg-gallery.png"
 
-const snap: React.CSSProperties = {
-    scrollSnapAlign: "start",
-    scrollSnapStop: "always",
-}
-
 // ─── Reusable decorative divider ─────────────────────────────────────────────
 function Divider({ color = DUSTY, width = 200 }: { color?: string; width?: number }) {
     return (
@@ -55,7 +51,7 @@ function Divider({ color = DUSTY, width = 200 }: { color?: string; width?: numbe
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function PersonCard({ photo, name, parents, bio, instagram }: { photo?: string; name: string; parents?: string; bio?: string; instagram?: string }) {
+function PersonCard({ photo, name, parents, bio, instagram, fallbackBg = BLUSH, fallbackColor = DUSTY }: { photo?: string; name: string; parents?: string; bio?: string; instagram?: string; fallbackBg?: string; fallbackColor?: string }) {
     return (
         <div className="space-y-3 text-center">
             {/* Oval photo frame */}
@@ -72,7 +68,7 @@ function PersonCard({ photo, name, parents, bio, instagram }: { photo?: string; 
                 {photo ? (
                     <WatermarkedImage src={photo} alt={name} width={100} height={130} className="object-cover w-full h-full" />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-3xl" style={{ backgroundColor: `${BLUSH}60`, color: DUSTY }}>
+                    <div className="w-full h-full flex items-center justify-center text-3xl" style={{ backgroundColor: `${fallbackBg}60`, color: fallbackColor }}>
                         {name.charAt(0)}
                     </div>
                 )}
@@ -94,7 +90,23 @@ function PersonCard({ photo, name, parents, bio, instagram }: { photo?: string; 
 
 // ─── Section renderer ─────────────────────────────────────────────────────────
 
-function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvitation }) {
+function FairytaleSection({
+    section,
+    inv,
+    _P = DUSTY,
+    _ACC = MAUVE,
+    _BG = PINK_BG,
+    _TXT = TXT,
+    _BORDER = BLUSH,
+}: {
+    section: Section
+    inv: GuestInvitation
+    _P?: string
+    _ACC?: string
+    _BG?: string
+    _TXT?: string
+    _BORDER?: string
+}) {
     const c = section.content as Record<string, unknown>
     const showWatermark = useShowWatermark()
 
@@ -106,7 +118,7 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
                 <section
                     id={section.id}
                     className="relative min-h-dvh flex flex-col items-center justify-center overflow-hidden text-center"
-                    style={{ ...snap }}
+                    style={{ ...sectionStyle(section), color: _TXT }}
                 >
                     {/* Full background image */}
                     <div className="absolute inset-0">
@@ -121,7 +133,7 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
 
                     <div className="relative z-10 px-8 py-16 flex flex-col items-center">
                         <Anim variant="fadeIn" delay={0}>
-                            <p className="mb-4 text-sm tracking-[0.3em]" style={{ color: TXT, fontFamily: "Cormorant Garamond, serif" }}>
+                            <p className="mb-4 text-sm tracking-[0.3em]" style={{ color: _TXT, fontFamily: "Cormorant Garamond, serif" }}>
                                 The Wedding Of
                             </p>
                         </Anim>
@@ -141,7 +153,7 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
                                 {(c.heroPhoto as string) ? (
                                     <WatermarkedImage src={c.heroPhoto as string} alt="" width={220} height={300} className="object-cover w-full h-full" />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-4xl" style={{ backgroundColor: `${BLUSH}40`, color: DUSTY }}>
+                                    <div className="w-full h-full flex items-center justify-center text-4xl" style={{ backgroundColor: `${_BORDER}40`, color: _P }}>
                                         {inv.groomName.charAt(0)}&{inv.brideName.charAt(0)}
                                     </div>
                                 )}
@@ -149,13 +161,13 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
                         </Anim>
 
                         <Anim variant="fadeUp" delay={300}>
-                            <h1 className="text-4xl font-bold leading-tight" style={{ color: TXT, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+                            <h1 className="text-4xl font-bold leading-tight" style={{ color: _TXT, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
                                 {inv.groomName} <span className="italic font-light">&amp;</span> {inv.brideName}
                             </h1>
                         </Anim>
 
                         <Anim variant="fadeIn" delay={450}>
-                            <p className="mt-4 text-sm" style={{ color: TXT, fontFamily: "Cormorant Garamond, serif" }}>
+                            <p className="mt-4 text-sm" style={{ color: _TXT, fontFamily: "Cormorant Garamond, serif" }}>
                                 {inv.eventDate
                                     ? new Date(inv.eventDate).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
                                     : "Wedding Date TBD"}
@@ -163,7 +175,7 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
                         </Anim>
 
                         <Anim variant="fadeIn" delay={550}>
-                            <p className="mt-4 text-sm font-semibold" style={{ color: TXT }}>
+                            <p className="mt-4 text-sm font-semibold" style={{ color: _TXT }}>
                                 Nama Tamu
                             </p>
                         </Anim>
@@ -177,7 +189,7 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
                 <section
                     id={section.id}
                     className="min-h-dvh flex flex-col items-center justify-center px-8 py-16 text-center"
-                    style={{ backgroundColor: PINK_BG, ...snap }}
+                    style={{ ...sectionStyle(section, _BG), color: _TXT }}
                 >
                     <Anim variant="fadeIn" delay={0}>
                         <p className="mb-3 text-lg italic" style={{ color: "white", fontFamily: "Great Vibes, Cormorant Garamond, cursive" }}>
@@ -197,6 +209,8 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
                                 parents={c.groomParents as string}
                                 bio={c.groomBio as string}
                                 instagram={c.groomInstagram as string}
+                                fallbackBg={_BORDER}
+                                fallbackColor={_P}
                             />
                         </Anim>
                         <Anim variant="scaleIn" delay={350}>
@@ -209,6 +223,8 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
                                 parents={c.brideParents as string}
                                 bio={c.brideBio as string}
                                 instagram={c.brideInstagram as string}
+                                fallbackBg={_BORDER}
+                                fallbackColor={_P}
                             />
                         </Anim>
                     </div>
@@ -224,7 +240,7 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
                 <section
                     id={section.id}
                     className="relative min-h-dvh flex flex-col items-center justify-center overflow-hidden"
-                    style={{ backgroundColor: PINK_BG, ...snap }}
+                    style={{ ...sectionStyle(section, _BG), color: _TXT }}
                 >
                     {/* Background image layer */}
                     <div className="absolute inset-0 opacity-30">
@@ -244,7 +260,7 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
 
                             <div className="relative z-10">
                                 <Anim variant="fadeIn" delay={0}>
-                                    <p className="text-2xl italic mb-6" style={{ color: TXT, fontFamily: "Great Vibes, Cormorant Garamond, cursive" }}>
+                                    <p className="text-2xl italic mb-6" style={{ color: _TXT, fontFamily: "Great Vibes, Cormorant Garamond, cursive" }}>
                                         Wedding Event
                                     </p>
                                 </Anim>
@@ -252,32 +268,32 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
                                 {events.map((ev, i) => (
                                     <div key={i} className="mb-8 last:mb-0">
                                         <Anim variant="fadeUp" delay={100 + i * 150}>
-                                            <h3 className="text-lg font-bold mb-2" style={{ color: TXT, fontFamily: "Cormorant Garamond, serif" }}>
+                                            <h3 className="text-lg font-bold mb-2" style={{ color: _TXT, fontFamily: "Cormorant Garamond, serif" }}>
                                                 {ev.name || `Acara ${i + 1}`}
                                             </h3>
-                                            <Divider color={TXT} width={200} />
+                                            <Divider color={_TXT} width={200} />
                                             {ev.date && (
-                                                <p className="text-sm font-semibold mt-2" style={{ color: TXT }}>
+                                                <p className="text-sm font-semibold mt-2" style={{ color: _TXT }}>
                                                     {new Date(ev.date).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
                                                 </p>
                                             )}
-                                            {ev.time && <p className="text-sm mt-1" style={{ color: TXT, opacity: 0.7 }}>{ev.time}</p>}
+                                            {ev.time && <p className="text-sm mt-1" style={{ color: _TXT, opacity: 0.7 }}>{ev.time}</p>}
 
                                             <div className="flex items-center justify-center gap-3 mt-3">
-                                                <div className="flex-1 h-px" style={{ backgroundColor: TXT, opacity: 0.2 }} />
-                                                <MapPin className="h-5 w-5" style={{ color: TXT, opacity: 0.5 }} />
-                                                <div className="flex-1 h-px" style={{ backgroundColor: TXT, opacity: 0.2 }} />
+                                                <div className="flex-1 h-px" style={{ backgroundColor: _TXT, opacity: 0.2 }} />
+                                                <MapPin className="h-5 w-5" style={{ color: _TXT, opacity: 0.5 }} />
+                                                <div className="flex-1 h-px" style={{ backgroundColor: _TXT, opacity: 0.2 }} />
                                             </div>
 
-                                            <p className="text-sm font-medium mt-2" style={{ color: TXT }}>{inv.eventVenue}</p>
+                                            <p className="text-sm font-medium mt-2" style={{ color: _TXT }}>{inv.eventVenue}</p>
                                             {inv.eventAddress && (
-                                                <p className="text-xs mt-1 opacity-60" style={{ color: TXT }}>{inv.eventAddress}</p>
+                                                <p className="text-xs mt-1 opacity-60" style={{ color: _TXT }}>{inv.eventAddress}</p>
                                             )}
 
                                             {i === 0 && (
                                                 <button
                                                     className="mt-4 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-white"
-                                                    style={{ background: `linear-gradient(135deg, ${DUSTY}, ${MAUVE})` }}
+                                                    style={{ background: `linear-gradient(135deg, ${_P}, ${_ACC})` }}
                                                 >
                                                     <MapPin className="h-4 w-4" />
                                                     Kunjungi Lokasi
@@ -301,7 +317,7 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
                 <section
                     id={section.id}
                     className="relative min-h-dvh flex flex-col overflow-hidden"
-                    style={{ backgroundColor: PINK_BG, ...snap }}
+                    style={{ ...sectionStyle(section, _BG), color: _TXT }}
                 >
                     {/* Background image */}
                     <div className="absolute inset-0 opacity-30">
@@ -321,15 +337,15 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
 
                             <div className="relative z-10">
                                 <Anim variant="fadeIn" delay={0}>
-                                    <p className="mb-2 text-center text-2xl italic" style={{ color: TXT, fontFamily: "Great Vibes, Cormorant Garamond, cursive" }}>
+                                    <p className="mb-2 text-center text-2xl italic" style={{ color: _TXT, fontFamily: "Great Vibes, Cormorant Garamond, cursive" }}>
                                         Our Gallery
                                     </p>
-                                    <p className="mb-6 text-center text-sm italic max-w-xs mx-auto" style={{ color: TXT, opacity: 0.6 }}>
+                                    <p className="mb-6 text-center text-sm italic max-w-xs mx-auto" style={{ color: _TXT, opacity: 0.6 }}>
                                         Kami bersyukur, dipertemukan Allah di waktu terbaik, kami menanti hari istimewa kami
                                     </p>
                                 </Anim>
                                 {images.length === 0 ? (
-                                    <div className="flex h-32 items-center justify-center rounded-xl text-sm opacity-40" style={{ backgroundColor: `${BLUSH}40` }}>
+                                    <div className="flex h-32 items-center justify-center rounded-xl text-sm opacity-40" style={{ backgroundColor: `${_BORDER}40` }}>
                                         Belum ada foto
                                     </div>
                                 ) : (
@@ -350,7 +366,7 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
                 <section
                     id={section.id}
                     className="relative min-h-dvh flex flex-col items-center justify-center px-8 py-12 text-center overflow-hidden"
-                    style={{ ...snap }}
+                    style={{ ...sectionStyle(section), color: _TXT }}
                 >
                     {/* Background image */}
                     <div className="absolute inset-0">
@@ -361,17 +377,17 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
 
                     <div className="relative z-10">
                         <Anim variant="fadeIn" delay={0}>
-                            <p className="text-2xl italic mb-2" style={{ color: TXT, fontFamily: "Great Vibes, Cormorant Garamond, cursive" }}>
+                            <p className="text-2xl italic mb-2" style={{ color: _TXT, fontFamily: "Great Vibes, Cormorant Garamond, cursive" }}>
                                 Menghitung Hari
                             </p>
-                            <p className="mb-8 text-sm" style={{ color: TXT, opacity: 0.7 }}>
+                            <p className="mb-8 text-sm" style={{ color: _TXT, opacity: 0.7 }}>
                                 {inv.eventDate
                                     ? new Date(inv.eventDate).toLocaleDateString("id-ID", { month: "long", year: "numeric" })
                                     : ""}
                             </p>
                         </Anim>
                         <Anim variant="scaleIn" delay={200}>
-                            <CountdownTimer eventDate={inv.eventDate} primaryColor={DUSTY} />
+                            <CountdownTimer eventDate={inv.eventDate} primaryColor={_P} />
                         </Anim>
                     </div>
                 </section>
@@ -383,7 +399,7 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
                 <section
                     id={section.id}
                     className="relative min-h-dvh flex flex-col items-center justify-center overflow-hidden"
-                    style={{ backgroundColor: PINK_BG, ...snap }}
+                    style={{ ...sectionStyle(section, _BG), color: _TXT }}
                 >
                     <div className="absolute inset-0 opacity-20">
                         <Image src={BG_HERO} alt="" fill className="object-cover" />
@@ -394,7 +410,7 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
                                 {(c.title as string) || "RSVP"}
                             </p>
                         </Anim>
-                        <RsvpForm invitationId={inv.id} primaryColor={DUSTY} />
+                        <RsvpForm invitationId={inv.id} primaryColor={_P} />
                     </div>
                 </section>
             )
@@ -405,7 +421,7 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
                 <section
                     id={section.id}
                     className="relative min-h-dvh flex flex-col items-center justify-center px-8 py-20 text-center overflow-hidden"
-                    style={{ ...snap }}
+                    style={{ ...sectionStyle(section), color: _TXT }}
                 >
                     {/* Full background image */}
                     <div className="absolute inset-0">
@@ -425,19 +441,19 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
                                     boxShadow: "0 8px 30px rgba(0,0,0,0.15)",
                                 }}
                             >
-                                <div className="w-full h-full flex items-center justify-center text-3xl" style={{ backgroundColor: `${BLUSH}40`, color: DUSTY }}>
+                                <div className="w-full h-full flex items-center justify-center text-3xl" style={{ backgroundColor: `${_BORDER}40`, color: _P }}>
                                     {inv.groomName.charAt(0)}&{inv.brideName.charAt(0)}
                                 </div>
                             </div>
                         </Anim>
 
                         <Anim variant="fadeUp" delay={180}>
-                            <p className="text-3xl font-bold" style={{ color: TXT, fontFamily: "Cormorant Garamond, serif" }}>
+                            <p className="text-3xl font-bold" style={{ color: _TXT, fontFamily: "Cormorant Garamond, serif" }}>
                                 {inv.groomName} &amp; {inv.brideName}
                             </p>
                         </Anim>
                         <Anim variant="fadeUp" delay={300}>
-                            <p className="mx-auto max-w-xs text-sm leading-relaxed mt-5" style={{ color: TXT, opacity: 0.8 }}>
+                            <p className="mx-auto max-w-xs text-sm leading-relaxed mt-5" style={{ color: _TXT, opacity: 0.8 }}>
                                 {(c.message as string) || "Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu."}
                             </p>
                         </Anim>
@@ -455,7 +471,7 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
                 <section
                     id={section.id}
                     className="relative min-h-dvh flex flex-col items-center justify-center overflow-hidden"
-                    style={{ backgroundColor: PINK_BG, ...snap }}
+                    style={{ ...sectionStyle(section, _BG), color: _TXT }}
                 >
                     <div className="absolute inset-0 opacity-20">
                         <Image src={BG_HERO} alt="" fill className="object-cover" />
@@ -501,7 +517,7 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
                 <section
                     id={section.id}
                     className="relative min-h-dvh flex flex-col items-center justify-center px-8 py-12 text-center overflow-hidden"
-                    style={{ ...snap }}
+                    style={{ ...sectionStyle(section), color: _TXT }}
                 >
                     {/* Background */}
                     <div className="absolute inset-0">
@@ -513,14 +529,14 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
                         <Anim variant="fadeUp" delay={100}>
                             <blockquote
                                 className="mx-auto max-w-sm text-base italic leading-relaxed"
-                                style={{ color: TXT, fontFamily: "Cormorant Garamond, serif" }}
+                                style={{ color: _TXT, fontFamily: "Cormorant Garamond, serif" }}
                             >
                                 &ldquo;{c.quote as string}&rdquo;
                             </blockquote>
                         </Anim>
                         {!!c.source && (
                             <Anim variant="fadeIn" delay={300}>
-                                <p className="mt-4 text-xs uppercase tracking-widest" style={{ color: DUSTY }}>
+                                <p className="mt-4 text-xs uppercase tracking-widest" style={{ color: _P }}>
                                     — {c.source as string}
                                 </p>
                             </Anim>
@@ -536,7 +552,7 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
                 <section
                     id={section.id}
                     className="relative min-h-dvh flex flex-col items-center justify-center px-8 py-16 overflow-hidden"
-                    style={{ backgroundColor: PINK_BG, ...snap }}
+                    style={{ ...sectionStyle(section, _BG), color: _TXT }}
                 >
                     <div className="absolute inset-0 opacity-20">
                         <Image src={BG_HERO} alt="" fill className="object-cover" />
@@ -551,8 +567,8 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
                                 qrisImage={c.qrisImage as string | null | undefined}
                                 banks={banks}
                                 allowTransferProof={c.allowTransferProof as boolean | undefined}
-                                primaryColor={DUSTY}
-                                accentColor={BLUSH}
+                                primaryColor={_P}
+                                accentColor={_BORDER}
                             />
                         </Anim>
                     </div>
@@ -566,7 +582,7 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
                 <section
                     id={section.id}
                     className="relative min-h-dvh flex flex-col items-center justify-center py-12 overflow-hidden"
-                    style={{ ...snap }}
+                    style={{ ...sectionStyle(section), color: _TXT }}
                 >
                     <div className="absolute inset-0">
                         <Image src={BG_GALLERY} alt="" fill className="object-cover" />
@@ -575,12 +591,12 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
 
                     <div className="relative z-10 w-full max-w-sm px-8">
                         <Anim variant="fadeIn" delay={0}>
-                            <p className="mb-6 text-center text-2xl italic" style={{ color: TXT, fontFamily: "Great Vibes, Cormorant Garamond, cursive" }}>
+                            <p className="mb-6 text-center text-2xl italic" style={{ color: _TXT, fontFamily: "Great Vibes, Cormorant Garamond, cursive" }}>
                                 {(c.title as string) || "Ucapan & Doa"}
                             </p>
                         </Anim>
                         <Anim variant="fadeUp" delay={120}>
-                            <UcapanWall invitationId={inv.id} primaryColor={DUSTY} />
+                            <UcapanWall invitationId={inv.id} primaryColor={_P} />
                         </Anim>
                     </div>
                 </section>
@@ -593,7 +609,8 @@ function FairytaleSection({ section, inv }: { section: Section; inv: GuestInvita
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 
-export function FairytaleGardenTheme({ inv, sections, activeSection, onSectionClick }: ThemeTemplateProps) {
+export function FairytaleGardenTheme({ inv, sections, themeConfig, activeSection, onSectionClick }: ThemeTemplateProps) {
+    const tc = resolveThemeColors(themeConfig, { primary: DUSTY, accent: MAUVE, bg: "#FFF0F5", text: TXT, border: BLUSH })
     const sorted = [...sections].sort((a, b) => a.order - b.order)
     return (
         <>
@@ -604,7 +621,7 @@ export function FairytaleGardenTheme({ inv, sections, activeSection, onSectionCl
                     className={onSectionClick ? "cursor-pointer" : ""}
                     style={activeSection === s.id ? { outline: "2px solid rgba(0,0,0,0.25)", outlineOffset: "-2px" } : undefined}
                 >
-                    <FairytaleSection section={s} inv={inv} />
+                    <FairytaleSection section={s} inv={inv} _P={tc.primary} _ACC={tc.accent} _BG={tc.bg} _TXT={tc.text} _BORDER={tc.border} />
                 </div>
             ))}
         </>

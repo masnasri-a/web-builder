@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { getTierConfig } from "@/lib/tier"
+import sharp from "sharp"
 import {
   uploadFile,
   BG_IMAGE_BUCKET,
@@ -14,7 +16,7 @@ const BUCKET_MAP: Record<string, string> = {
   gallery: GALLERY_BUCKET,
 }
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5 MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 MB
 
 /**
  * POST /api/s3/image-upload
@@ -57,18 +59,40 @@ export async function POST(req: Request) {
         { status: 404 }
       )
 
+    // Enforce gallery image limit
+    if (type === "gallery") {
+      const tierCfg = await getTierConfig(session.user.id)
+      if (tierCfg && tierCfg.maxGalleryImages > 0) {
+        const sections = invitation.sections as { type: string; content: Record<string, unknown> }[]
+        const gallerySec = sections.find((s) => s.type === "gallery")
+        const currentImages = (gallerySec?.content?.images as string[]) ?? []
+        if (currentImages.length >= tierCfg.maxGalleryImages) {
+          return NextResponse.json(
+            { error: `Batas galeri tercapai (maks ${tierCfg.maxGalleryImages} foto). Upgrade untuk menambah lebih banyak.` },
+            { status: 403 },
+          )
+        }
+      }
+    }
+
     const buffer = Buffer.from(await file.arrayBuffer())
 
     if (buffer.length > MAX_FILE_SIZE)
       return NextResponse.json(
-        { error: "File too large (max 5 MB)" },
+        { error: "File terlalu besar (maks 10 MB)" },
         { status: 413 }
       )
 
+    // Compress to Full HD max using sharp
+    const compressed = await sharp(buffer)
+      .resize(1920, 1080, { fit: "inside", withoutEnlargement: true })
+      .jpeg({ quality: 85, mozjpeg: true })
+      .toBuffer()
+
     const bucket = BUCKET_MAP[type]
-    const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_")
+    const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_").replace(/\.[^.]+$/, ".jpg")
     const key = `${invitationId}/${Date.now()}-${safeName}`
-    const url = await uploadFile(bucket, key, buffer, file.type || "image/jpeg")
+    const url = await uploadFile(bucket, key, compressed, "image/jpeg")
 
     return NextResponse.json({ url, key, bucket })
   } catch (err) {

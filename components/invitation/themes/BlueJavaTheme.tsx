@@ -14,6 +14,7 @@ import { Navigation, Instagram } from "lucide-react"
 import type { Section } from "@/types"
 import type { ThemeTemplateProps } from "./index"
 import type { GuestInvitation } from "@/components/invitation/guest-sections"
+import { resolveThemeColors, sectionStyle } from "./theme-utils"
 import { GiftSection } from "@/components/invitation/gift-section"
 import { UcapanWall } from "@/components/invitation/ucapan-wall"
 import { WatermarkedImage } from "@/components/invitation/watermarked-image"
@@ -30,11 +31,6 @@ const BLUE    = "#2B6CB0"
 const GOLD    = "#C8A84B"
 const BG      = "#F5F0E6"
 const TXT     = "#1A2040"
-
-const snap: React.CSSProperties = {
-  scrollSnapAlign: "start",
-  scrollSnapStop: "always",
-}
 
 // ─── SVG Decorations ──────────────────────────────────────────────────────────
 
@@ -131,7 +127,23 @@ function BlueJavaPersonCard({ photo, name, parents, bio, instagram }: { photo?: 
 
 // ─── Section renderer ─────────────────────────────────────────────────────────
 
-function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitation }) {
+function BlueJavaSection({
+  section,
+  inv,
+  _P = INDIGO,
+  _ACC = GOLD,
+  _BG = BG,
+  _TXT = TXT,
+  _BORDER = BLUE,
+}: {
+  section: Section
+  inv: GuestInvitation
+  _P?: string
+  _ACC?: string
+  _BG?: string
+  _TXT?: string
+  _BORDER?: string
+}) {
   const showWatermark = useShowWatermark()
   const c = section.content as Record<string, unknown>
 
@@ -143,7 +155,7 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center overflow-hidden text-center"
-          style={{ backgroundColor: BG, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           {/* Diagonal parang background */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -161,7 +173,7 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
               <KawungMotif size={64} opacity={0.75} />
             </Anim>
             <Anim variant="fadeIn" delay={100}>
-              <p className="mt-4 mb-2 text-[10px] tracking-[0.5em] uppercase" style={{ color: BLUE, opacity: 0.7 }}>
+              <p className="mt-4 mb-2 text-[10px] tracking-[0.5em] uppercase" style={{ color: _BORDER, opacity: 0.7 }}>
                 The Wedding of
               </p>
             </Anim>
@@ -169,15 +181,15 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
               <div className="my-3"><BatikBorder width={240} opacity={0.6} /></div>
             </Anim>
             <Anim variant="fadeUp" delay={220}>
-              <h1 className="text-5xl font-bold leading-tight" style={{ color: INDIGO, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+              <h1 className="text-5xl font-bold leading-tight" style={{ color: _P, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
                 {inv.groomName}
               </h1>
             </Anim>
             <Anim variant="scaleIn" delay={340}>
-              <p className="my-3 text-3xl font-light italic" style={{ color: GOLD }}>&amp;</p>
+              <p className="my-3 text-3xl font-light italic" style={{ color: _ACC }}>&amp;</p>
             </Anim>
             <Anim variant="fadeUp" delay={400}>
-              <h1 className="text-5xl font-bold leading-tight" style={{ color: INDIGO, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+              <h1 className="text-5xl font-bold leading-tight" style={{ color: _P, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
                 {inv.brideName}
               </h1>
             </Anim>
@@ -186,13 +198,13 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
             </Anim>
             {(c.subtitle as string) && (
               <Anim variant="fadeUp" delay={560}>
-                <p className="mt-4 text-sm italic" style={{ color: TXT, opacity: 0.6 }}>
+                <p className="mt-4 text-sm italic" style={{ color: _TXT, opacity: 0.6 }}>
                   {c.subtitle as string}
                 </p>
               </Anim>
             )}
             <Anim variant="fadeIn" delay={640}>
-              <p className="mt-4 text-sm" style={{ color: BLUE, opacity: 0.75 }}>
+              <p className="mt-4 text-sm" style={{ color: _BORDER, opacity: 0.75 }}>
                 {inv.eventDate
                   ? new Date(inv.eventDate).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
                   : "Wedding Date TBD"}
@@ -208,11 +220,11 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-16 text-center"
-          style={{ backgroundColor: BG, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <Anim variant="fadeIn" delay={0}><KawungMotif size={44} /></Anim>
           <Anim variant="fadeIn" delay={60}>
-            <p className="mt-3 mb-8 text-[10px] tracking-[0.45em] uppercase" style={{ color: BLUE, opacity: 0.65 }}>
+            <p className="mt-3 mb-8 text-[10px] tracking-[0.45em] uppercase" style={{ color: _BORDER, opacity: 0.65 }}>
               The Couple
             </p>
           </Anim>
@@ -251,21 +263,21 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-16 text-center"
-          style={{ backgroundColor: BG, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="max-w-lg mx-auto w-full">
             <Anim variant="fadeIn" delay={0}><BatikBorder width={260} opacity={0.55} /></Anim>
             <Anim variant="fadeIn" delay={80}>
-              <p className="mt-4 mb-3 text-[10px] tracking-[0.45em] uppercase" style={{ color: BLUE, opacity: 0.65 }}>
+              <p className="mt-4 mb-3 text-[10px] tracking-[0.45em] uppercase" style={{ color: _BORDER, opacity: 0.65 }}>
                 Save The Date
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={180}>
               <div
                 className="inline-block px-8 py-5 rounded-sm"
-                style={{ border: `2px solid ${INDIGO}`, backgroundColor: `${INDIGO}08` }}
+                style={{ border: `2px solid ${_P}`, backgroundColor: `${_P}08` }}
               >
-                <p className="text-2xl font-bold" style={{ color: INDIGO, fontFamily: "Cormorant Garamond, serif" }}>
+                <p className="text-2xl font-bold" style={{ color: _P, fontFamily: "Cormorant Garamond, serif" }}>
                   {inv.eventDate
                     ? new Date(inv.eventDate).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
                     : "Wedding Date TBD"}
@@ -274,9 +286,9 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
             </Anim>
             <Anim variant="fadeUp" delay={280}>
               <div className="mt-5">
-                <p className="text-lg font-medium" style={{ color: TXT }}>{inv.eventVenue}</p>
+                <p className="text-lg font-medium" style={{ color: _TXT }}>{inv.eventVenue}</p>
                 {inv.eventAddress && (
-                  <p className="mt-1 text-sm opacity-60" style={{ color: TXT }}>{inv.eventAddress}</p>
+                  <p className="mt-1 text-sm opacity-60" style={{ color: _TXT }}>{inv.eventAddress}</p>
                 )}
               </div>
             </Anim>
@@ -287,17 +299,17 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
                     <div
                       key={i}
                       className="rounded px-5 py-4 text-center min-w-32.5"
-                      style={{ border: `1.5px solid ${GOLD}80`, backgroundColor: `${GOLD}10` }}
+                      style={{ border: `1.5px solid ${_ACC}80`, backgroundColor: `${_ACC}10` }}
                     >
-                      <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: INDIGO }}>
+                      <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: _P }}>
                         {ev.name || `Acara ${i + 1}`}
                       </p>
                       {ev.date && (
-                        <p className="mt-1.5 text-sm font-medium" style={{ color: TXT }}>
+                        <p className="mt-1.5 text-sm font-medium" style={{ color: _TXT }}>
                           {new Date(ev.date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
                         </p>
                       )}
-                      {ev.time && <p className="text-sm opacity-65" style={{ color: TXT }}>{ev.time}</p>}
+                      {ev.time && <p className="text-sm opacity-65" style={{ color: _TXT }}>{ev.time}</p>}
                     </div>
                   ))}
                 </div>
@@ -319,18 +331,18 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col"
-          style={{ backgroundColor: BG, ...snap }}
+          style={{ ...sectionStyle(section, _BG) }}
         >
           <div className="px-4 py-12">
             <Anim variant="fadeIn" delay={0}>
-              <p className="mb-6 text-center text-xs font-semibold uppercase tracking-widest opacity-60" style={{ color: BLUE }}>
+              <p className="mb-6 text-center text-xs font-semibold uppercase tracking-widest opacity-60" style={{ color: _BORDER }}>
                 Gallery
               </p>
             </Anim>
             {images.length === 0 ? (
               <div
                 className="mx-4 flex h-32 items-center justify-center rounded text-sm opacity-40"
-                style={{ backgroundColor: `${INDIGO}15` }}
+                style={{ backgroundColor: `${_P}15` }}
               >
                 Belum ada foto
               </div>
@@ -348,15 +360,15 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-12 text-center"
-          style={{ backgroundColor: BG, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <Anim variant="fadeIn" delay={0}>
-            <p className="mb-6 text-[10px] tracking-[0.45em] uppercase" style={{ color: BLUE, opacity: 0.65 }}>
+            <p className="mb-6 text-[10px] tracking-[0.45em] uppercase" style={{ color: _BORDER, opacity: 0.65 }}>
               Menghitung Hari
             </p>
           </Anim>
           <Anim variant="scaleIn" delay={160}>
-            <CountdownTimer eventDate={inv.eventDate} primaryColor={INDIGO} />
+            <CountdownTimer eventDate={inv.eventDate} primaryColor={_P} />
           </Anim>
           <Anim variant="fadeIn" delay={340}>
             <div className="mt-8"><BatikBorder width={200} opacity={0.5} /></div>
@@ -370,18 +382,18 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center"
-          style={{ backgroundColor: BG, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="w-full max-w-sm px-8">
             <Anim variant="fadeIn" delay={0}>
               <div className="flex justify-center mb-4"><KawungMotif size={40} /></div>
             </Anim>
             <Anim variant="fadeIn" delay={80}>
-              <p className="mb-6 text-center text-[10px] tracking-[0.4em] uppercase" style={{ color: BLUE, opacity: 0.65 }}>
+              <p className="mb-6 text-center text-[10px] tracking-[0.4em] uppercase" style={{ color: _BORDER, opacity: 0.65 }}>
                 {(c.title as string) || "RSVP"}
               </p>
             </Anim>
-            <RsvpForm invitationId={inv.id} primaryColor={INDIGO} />
+            <RsvpForm invitationId={inv.id} primaryColor={_P} />
           </div>
         </section>
       )
@@ -392,7 +404,7 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center px-8 py-20 text-center overflow-hidden"
-          style={{ backgroundColor: BG, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="absolute top-0 left-0 right-0 pointer-events-none">
             <BatikBorder width={400} opacity={0.4} />
@@ -402,15 +414,15 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
           </div>
           <div className="relative z-10">
             <Anim variant="scaleIn" delay={0}>
-              <p className="text-6xl font-light italic" style={{ color: GOLD }}>&amp;</p>
+              <p className="text-6xl font-light italic" style={{ color: _ACC }}>&amp;</p>
             </Anim>
             <Anim variant="fadeUp" delay={180}>
-              <p className="text-3xl font-bold mt-2" style={{ color: INDIGO, fontFamily: "Cormorant Garamond, serif" }}>
+              <p className="text-3xl font-bold mt-2" style={{ color: _P, fontFamily: "Cormorant Garamond, serif" }}>
                 {inv.groomName} &amp; {inv.brideName}
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={300}>
-              <p className="mx-auto max-w-xs text-sm leading-relaxed mt-6" style={{ color: TXT, opacity: 0.7 }}>
+              <p className="mx-auto max-w-xs text-sm leading-relaxed mt-6" style={{ color: _TXT, opacity: 0.7 }}>
                 {(c.message as string) || "Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan hadir."}
               </p>
             </Anim>
@@ -431,7 +443,7 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center"
-          style={{ backgroundColor: BG, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="w-full max-w-lg px-8">
             <Anim variant="fadeIn" delay={0}>
@@ -441,12 +453,12 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
             </Anim>
             {gmapsUrl ? (
               <Anim variant="fadeUp" delay={150}>
-                <div className="overflow-hidden rounded-xl" style={{ border: `2px solid ${INDIGO}40` }}>
+                <div className="overflow-hidden rounded-xl" style={{ border: `2px solid ${_P}40` }}>
                   <iframe src={gmapsUrl} width="100%" height="240" style={{ border: 0 }} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
                 </div>
               </Anim>
             ) : (
-              <div className="flex h-40 items-center justify-center rounded-xl text-sm opacity-40" style={{ backgroundColor: `${INDIGO}20` }}>
+              <div className="flex h-40 items-center justify-center rounded-xl text-sm opacity-40" style={{ backgroundColor: `${_P}20` }}>
                 Pilih lokasi di panel kanan
               </div>
             )}
@@ -473,20 +485,20 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-12 text-center"
-          style={{ backgroundColor: BG, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <Anim variant="fadeIn" delay={0}><KawungMotif size={44} opacity={0.6} /></Anim>
           <Anim variant="fadeUp" delay={160}>
             <blockquote
               className="mx-auto max-w-sm text-base italic leading-relaxed mt-6"
-              style={{ color: TXT, opacity: 0.85 }}
+              style={{ color: _TXT, opacity: 0.85 }}
             >
               &ldquo;{c.quote as string}&rdquo;
             </blockquote>
           </Anim>
           {!!c.source && (
             <Anim variant="fadeIn" delay={360}>
-              <p className="mt-4 text-xs uppercase tracking-widest" style={{ color: GOLD, opacity: 0.8 }}>
+              <p className="mt-4 text-xs uppercase tracking-widest" style={{ color: _ACC, opacity: 0.8 }}>
                 — {c.source as string}
               </p>
             </Anim>
@@ -501,7 +513,7 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-16"
-          style={{ backgroundColor: BG, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="max-w-sm mx-auto w-full">
             <Anim variant="fadeUp" delay={0}>
@@ -513,8 +525,8 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
                 qrisImage={c.qrisImage as string | null | undefined}
                 banks={banks}
                 allowTransferProof={c.allowTransferProof as boolean | undefined}
-                primaryColor={INDIGO}
-                accentColor={GOLD}
+                primaryColor={_P}
+                accentColor={_ACC}
               />
             </Anim>
           </div>
@@ -528,19 +540,19 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center py-12"
-          style={{ backgroundColor: BG, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="w-full max-w-sm px-8">
             <Anim variant="fadeIn" delay={0}>
               <div className="flex justify-center mb-4"><KawungMotif size={36} opacity={0.55} /></div>
             </Anim>
             <Anim variant="fadeIn" delay={80}>
-              <p className="mb-6 text-center text-[10px] tracking-[0.4em] uppercase" style={{ color: BLUE, opacity: 0.65 }}>
+              <p className="mb-6 text-center text-[10px] tracking-[0.4em] uppercase" style={{ color: _BORDER, opacity: 0.65 }}>
                 {(c.title as string) || "Ucapan & Doa"}
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={160}>
-              <UcapanWall invitationId={inv.id} primaryColor={INDIGO} />
+              <UcapanWall invitationId={inv.id} primaryColor={_P} />
             </Anim>
           </div>
         </section>
@@ -553,7 +565,8 @@ function BlueJavaSection({ section, inv }: { section: Section; inv: GuestInvitat
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 
-export function BlueJavaTheme({ inv, sections, activeSection, onSectionClick }: ThemeTemplateProps) {
+export function BlueJavaTheme({ inv, sections, themeConfig, activeSection, onSectionClick }: ThemeTemplateProps) {
+  const tc = resolveThemeColors(themeConfig, { primary: INDIGO, accent: GOLD, bg: BG, text: TXT, border: BLUE })
   const sorted = [...sections].sort((a, b) => a.order - b.order)
   return (
     <>
@@ -564,7 +577,7 @@ export function BlueJavaTheme({ inv, sections, activeSection, onSectionClick }: 
           className={onSectionClick ? "cursor-pointer" : ""}
           style={activeSection === s.id ? { outline: "2px solid rgba(0,0,0,0.25)", outlineOffset: "-2px" } : undefined}
         >
-          <BlueJavaSection section={s} inv={inv} />
+          <BlueJavaSection section={s} inv={inv} _P={tc.primary} _ACC={tc.accent} _BG={tc.bg} _TXT={tc.text} _BORDER={tc.border} />
         </div>
       ))}
     </>

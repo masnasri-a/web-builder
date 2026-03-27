@@ -28,6 +28,8 @@ export type ThemeConfig = {
   fontFamily: string
   bgColor: string
   bgImage?: string
+  textColor?: string
+  borderColor?: string
 }
 
 export type InvitationWithRelations = {
@@ -199,6 +201,8 @@ export const DEFAULT_THEME_CONFIG: ThemeConfig = {
   accentColor: "#D4A853",
   fontFamily: "Playfair Display",
   bgColor: "#FFF9F0",
+  textColor: "#1a1a1a",
+  borderColor: "#d4d4d4",
 }
 
 export const FONT_OPTIONS = [

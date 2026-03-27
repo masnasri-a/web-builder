@@ -18,6 +18,7 @@ import type { ThemeTemplateProps } from "./index"
 import type { GuestInvitation } from "@/components/invitation/guest-sections"
 import { GiftSection } from "@/components/invitation/gift-section"
 import { UcapanWall } from "@/components/invitation/ucapan-wall"
+import { resolveThemeColors, sectionStyle } from "./theme-utils"
 
 const Masonry = dynamic(
   () => import("@/components/ui/masonry").then((m) => ({ default: m.Masonry })),
@@ -173,15 +174,27 @@ function PastelRosePersonCard({ photo, name, parents, bio, instagram }: { photo?
 
 // ─── Section renderer ─────────────────────────────────────────────────────────
 
-function PastelRoseSection({ section, inv, index }: { section: Section; inv: GuestInvitation; index: number }) {
+function PastelRoseSection({
+  section,
+  inv,
+  index,
+  _P = ROSE,
+  _ACC = PEACH,
+  _BG = BG,
+  _TXT = TXT,
+  _BORDER = SAGE,
+}: {
+  section: Section
+  inv: GuestInvitation
+  index: number
+  _P?: string
+  _ACC?: string
+  _BG?: string
+  _TXT?: string
+  _BORDER?: string
+}) {
   const c = section.content as Record<string, unknown>
   const showWatermark = useShowWatermark()
-  // Alternating soft gradient backgrounds
-  const altBg = index % 3 === 0
-    ? `linear-gradient(160deg, ${BG} 0%, ${BLUSH}25 100%)`
-    : index % 3 === 1
-      ? `linear-gradient(160deg, ${BG} 0%, ${PEACH}25 100%)`
-      : `linear-gradient(160deg, ${BG} 0%, ${SAGE}20 100%)`
 
   switch (section.type) {
 
@@ -191,7 +204,7 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center overflow-hidden text-center"
-          style={{ backgroundColor: BG, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           {/* Background dot grid texture */}
           <div className="absolute top-4 left-4 pointer-events-none"><DotGrid size={80} opacity={0.18} /></div>
@@ -218,12 +231,12 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
               <div className="flex justify-center mb-4"><PastelRose size={64} /></div>
             </Anim>
             <Anim variant="fadeIn" delay={120}>
-              <p className="mb-3 text-[10px] tracking-[0.5em] uppercase" style={{ color: ROSE, opacity: 0.75 }}>
+              <p className="mb-3 text-[10px] tracking-[0.5em] uppercase" style={{ color: _P, opacity: 0.75 }}>
                 The Wedding of
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={240}>
-              <h1 className="text-5xl font-bold leading-tight" style={{ color: TXT, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+              <h1 className="text-5xl font-bold leading-tight" style={{ color: _TXT, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
                 {inv.groomName}
               </h1>
             </Anim>
@@ -231,19 +244,19 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
               <div className="my-3 flex justify-center"><SoftRibbon width={100} height={44} opacity={0.8} /></div>
             </Anim>
             <Anim variant="fadeUp" delay={420}>
-              <h1 className="text-5xl font-bold leading-tight" style={{ color: TXT, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+              <h1 className="text-5xl font-bold leading-tight" style={{ color: _TXT, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
                 {inv.brideName}
               </h1>
             </Anim>
             {(c.subtitle as string) && (
               <Anim variant="fadeUp" delay={520}>
-                <p className="mt-5 text-sm italic" style={{ color: TXT, opacity: 0.6 }}>
+                <p className="mt-5 text-sm italic" style={{ color: _TXT, opacity: 0.6 }}>
                   {c.subtitle as string}
                 </p>
               </Anim>
             )}
             <Anim variant="fadeIn" delay={600}>
-              <p className="mt-5 text-sm" style={{ color: TXT, opacity: 0.55 }}>
+              <p className="mt-5 text-sm" style={{ color: _TXT, opacity: 0.55 }}>
                 {inv.eventDate
                   ? new Date(inv.eventDate).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
                   : "Wedding Date TBD"}
@@ -259,13 +272,13 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-16 text-center"
-          style={{ background: altBg, ...snap }}
+          style={{ ...sectionStyle(section, _BG) }}
         >
           <Anim variant="fadeIn" delay={0}>
             <div className="flex justify-center mb-4"><PastelRose size={48} /></div>
           </Anim>
           <Anim variant="fadeIn" delay={60}>
-            <p className="mb-8 text-[10px] tracking-[0.45em] uppercase" style={{ color: ROSE, opacity: 0.75 }}>
+            <p className="mb-8 text-[10px] tracking-[0.45em] uppercase" style={{ color: _P, opacity: 0.75 }}>
               The Couple
             </p>
           </Anim>
@@ -274,7 +287,7 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
               <PastelRosePersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} instagram={c.groomInstagram as string} />
             </Anim>
             <Anim variant="scaleIn" delay={300}>
-              <span className="text-3xl italic font-light" style={{ color: ROSE }}>&amp;</span>
+              <span className="text-3xl italic font-light" style={{ color: _P }}>&amp;</span>
             </Anim>
             <Anim variant="slideRight" delay={150}>
               <PastelRosePersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} instagram={c.brideInstagram as string} />
@@ -292,7 +305,7 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-16 text-center"
-          style={{ background: altBg, ...snap }}
+          style={{ ...sectionStyle(section, _BG) }}
         >
           <div className="max-w-lg mx-auto w-full">
             <Anim variant="fadeIn" delay={0}>
@@ -301,12 +314,12 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
               </div>
             </Anim>
             <Anim variant="fadeIn" delay={100}>
-              <p className="mb-4 text-[10px] tracking-[0.45em] uppercase" style={{ color: ROSE, opacity: 0.75 }}>
+              <p className="mb-4 text-[10px] tracking-[0.45em] uppercase" style={{ color: _P, opacity: 0.75 }}>
                 Save The Date
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={200}>
-              <p className="text-2xl font-bold" style={{ color: TXT, fontFamily: "Cormorant Garamond, serif" }}>
+              <p className="text-2xl font-bold" style={{ color: _TXT, fontFamily: "Cormorant Garamond, serif" }}>
                 {inv.eventDate
                   ? new Date(inv.eventDate).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
                   : "Wedding Date TBD"}
@@ -314,9 +327,9 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
             </Anim>
             <Anim variant="fadeUp" delay={300}>
               <div className="mt-4">
-                <p className="text-lg font-medium" style={{ color: TXT }}>{inv.eventVenue}</p>
+                <p className="text-lg font-medium" style={{ color: _TXT }}>{inv.eventVenue}</p>
                 {inv.eventAddress && (
-                  <p className="mt-1 text-sm opacity-60" style={{ color: TXT }}>{inv.eventAddress}</p>
+                  <p className="mt-1 text-sm opacity-60" style={{ color: _TXT }}>{inv.eventAddress}</p>
                 )}
               </div>
             </Anim>
@@ -327,17 +340,17 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
                     <div
                       key={i}
                       className="rounded-2xl px-5 py-4 text-center min-w-32.5"
-                      style={{ border: `1.5px solid ${ROSE}50`, backgroundColor: `${BLUSH}35` }}
+                      style={{ border: `1.5px solid ${_P}50`, backgroundColor: `${BLUSH}35` }}
                     >
-                      <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: ROSE }}>
+                      <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: _P }}>
                         {ev.name || `Acara ${i + 1}`}
                       </p>
                       {ev.date && (
-                        <p className="mt-1.5 text-sm font-medium" style={{ color: TXT }}>
+                        <p className="mt-1.5 text-sm font-medium" style={{ color: _TXT }}>
                           {new Date(ev.date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
                         </p>
                       )}
-                      {ev.time && <p className="text-sm opacity-65" style={{ color: TXT }}>{ev.time}</p>}
+                      {ev.time && <p className="text-sm opacity-65" style={{ color: _TXT }}>{ev.time}</p>}
                     </div>
                   ))}
                 </div>
@@ -356,11 +369,11 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col"
-          style={{ backgroundColor: BG, ...snap }}
+          style={{ ...sectionStyle(section, _BG) }}
         >
           <div className="px-4 py-12">
             <Anim variant="fadeIn" delay={0}>
-              <p className="mb-6 text-center text-xs font-semibold uppercase tracking-widest opacity-60" style={{ color: ROSE }}>
+              <p className="mb-6 text-center text-xs font-semibold uppercase tracking-widest opacity-60" style={{ color: _P }}>
                 Gallery
               </p>
             </Anim>
@@ -382,15 +395,15 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-12 text-center"
-          style={{ background: altBg, ...snap }}
+          style={{ ...sectionStyle(section, _BG) }}
         >
           <Anim variant="fadeIn" delay={0}>
-            <p className="mb-6 text-[10px] tracking-[0.45em] uppercase" style={{ color: ROSE, opacity: 0.75 }}>
+            <p className="mb-6 text-[10px] tracking-[0.45em] uppercase" style={{ color: _P, opacity: 0.75 }}>
               Menghitung Hari
             </p>
           </Anim>
           <Anim variant="scaleIn" delay={160}>
-            <CountdownTimer eventDate={inv.eventDate} primaryColor={ROSE} />
+            <CountdownTimer eventDate={inv.eventDate} primaryColor={_P} />
           </Anim>
           <Anim variant="fadeIn" delay={340}>
             <div className="mt-8 flex justify-center">
@@ -406,18 +419,18 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center"
-          style={{ background: altBg, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="w-full max-w-sm px-8">
             <Anim variant="fadeIn" delay={0}>
               <div className="flex justify-center mb-4"><PastelRose size={48} /></div>
             </Anim>
             <Anim variant="fadeIn" delay={80}>
-              <p className="mb-6 text-center text-[10px] tracking-[0.4em] uppercase" style={{ color: ROSE, opacity: 0.75 }}>
+              <p className="mb-6 text-center text-[10px] tracking-[0.4em] uppercase" style={{ color: _P, opacity: 0.75 }}>
                 {(c.title as string) || "RSVP"}
               </p>
             </Anim>
-            <RsvpForm invitationId={inv.id} primaryColor={ROSE} />
+            <RsvpForm invitationId={inv.id} primaryColor={_P} />
           </div>
         </section>
       )
@@ -428,7 +441,7 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center px-8 py-20 text-center overflow-hidden"
-          style={{ background: `linear-gradient(160deg, ${BG} 0%, ${BLUSH}30 60%, ${PEACH}25 100%)`, ...snap }}
+          style={{ ...sectionStyle(section, _BG) }}
         >
           {/* Background dot grids */}
           <div className="absolute top-6 left-6 pointer-events-none"><DotGrid size={64} opacity={0.15} /></div>
@@ -444,12 +457,12 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
               </div>
             </Anim>
             <Anim variant="fadeUp" delay={280}>
-              <p className="text-3xl font-bold" style={{ color: TXT, fontFamily: "Cormorant Garamond, serif" }}>
+              <p className="text-3xl font-bold" style={{ color: _TXT, fontFamily: "Cormorant Garamond, serif" }}>
                 {inv.groomName} &amp; {inv.brideName}
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={400}>
-              <p className="mx-auto max-w-xs text-sm leading-relaxed mt-5" style={{ color: TXT, opacity: 0.7 }}>
+              <p className="mx-auto max-w-xs text-sm leading-relaxed mt-5" style={{ color: _TXT, opacity: 0.7 }}>
                 {(c.message as string) || "Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan hadir."}
               </p>
             </Anim>
@@ -467,7 +480,7 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center"
-          style={{ backgroundColor: BG, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="w-full max-w-lg px-8">
             <Anim variant="fadeIn" delay={0}>
@@ -477,7 +490,7 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
             </Anim>
             {gmapsUrl ? (
               <Anim variant="fadeUp" delay={150}>
-                <div className="overflow-hidden rounded-xl" style={{ border: `1.5px solid ${ROSE}50` }}>
+                  <div className="overflow-hidden rounded-xl" style={{ border: `1.5px solid ${_P}50` }}>
                   <iframe src={gmapsUrl} width="100%" height="240" style={{ border: 0 }} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
                 </div>
               </Anim>
@@ -509,7 +522,7 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-12 text-center"
-          style={{ background: altBg, ...snap }}
+          style={{ ...sectionStyle(section, _BG) }}
         >
           <Anim variant="scaleIn" delay={0}>
             <div className="flex justify-center mb-2"><PastelRose size={44} opacity={0.75} /></div>
@@ -517,14 +530,14 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
           <Anim variant="fadeUp" delay={160}>
             <blockquote
               className="mx-auto max-w-sm text-base italic leading-relaxed mt-4"
-              style={{ color: TXT, opacity: 0.85 }}
+              style={{ color: _TXT, opacity: 0.85 }}
             >
               &ldquo;{c.quote as string}&rdquo;
             </blockquote>
           </Anim>
           {!!c.source && (
             <Anim variant="fadeIn" delay={360}>
-              <p className="mt-4 text-xs uppercase tracking-widest" style={{ color: ROSE, opacity: 0.7 }}>
+              <p className="mt-4 text-xs uppercase tracking-widest" style={{ color: _P, opacity: 0.7 }}>
                 — {c.source as string}
               </p>
             </Anim>
@@ -539,7 +552,7 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-16"
-          style={{ background: `linear-gradient(160deg, ${BG} 0%, ${BLUSH}25 100%)`, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="max-w-sm mx-auto w-full">
             <Anim variant="fadeUp" delay={0}>
@@ -551,8 +564,8 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
                 qrisImage={c.qrisImage as string | null | undefined}
                 banks={banks}
                 allowTransferProof={c.allowTransferProof as boolean | undefined}
-                primaryColor={ROSE}
-                accentColor={BLUSH}
+                primaryColor={_P}
+                accentColor={_ACC}
               />
             </Anim>
           </div>
@@ -566,7 +579,7 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center py-12"
-          style={{ backgroundColor: BG, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="w-full max-w-sm px-8">
             <Anim variant="fadeIn" delay={0}>
@@ -575,7 +588,7 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={120}>
-              <UcapanWall invitationId={inv.id} primaryColor={ROSE} />
+              <UcapanWall invitationId={inv.id} primaryColor={_P} />
             </Anim>
           </div>
         </section>
@@ -588,7 +601,8 @@ function PastelRoseSection({ section, inv, index }: { section: Section; inv: Gue
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 
-export function PastelRoseTheme({ inv, sections, activeSection, onSectionClick }: ThemeTemplateProps) {
+export function PastelRoseTheme({ inv, sections, themeConfig, activeSection, onSectionClick }: ThemeTemplateProps) {
+  const tc = resolveThemeColors(themeConfig, { primary: ROSE, accent: PEACH, bg: BG, text: TXT, border: SAGE })
   const sorted = [...sections].sort((a, b) => a.order - b.order)
   return (
     <>
@@ -599,7 +613,7 @@ export function PastelRoseTheme({ inv, sections, activeSection, onSectionClick }
           className={onSectionClick ? "cursor-pointer" : ""}
           style={activeSection === s.id ? { outline: "2px solid rgba(0,0,0,0.25)", outlineOffset: "-2px" } : undefined}
         >
-          <PastelRoseSection section={s} inv={inv} index={i} />
+          <PastelRoseSection section={s} inv={inv} index={i} _P={tc.primary} _ACC={tc.accent} _BG={tc.bg} _TXT={tc.text} _BORDER={tc.border} />
         </div>
       ))}
     </>

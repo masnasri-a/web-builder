@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Users, Palette, Heart,
   Tag, MessageCircle, Settings2, Mail,
   Gift, CreditCard, BarChart3, Settings,
-  QrCode,
+  QrCode, ImageIcon,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -26,6 +26,7 @@ const NAV_CONFIGS: Record<string, NavItem[]> = {
   "super-admin": [
     { href: "/super-admin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/super-admin/themes", label: "Themes", icon: Palette },
+    { href: "/super-admin/backgrounds", label: "Backgrounds", icon: ImageIcon },
     { href: "/super-admin/vendors", label: "Vendors", icon: Users },
     { href: "/super-admin/vouchers", label: "Vouchers", icon: Tag },
     { href: "/super-admin/tiers", label: "Tier Config", icon: Settings2 },
@@ -151,7 +152,7 @@ export function AppSidebar({
           </div>
         </div>
         <button
-          onClick={() => signOut({ callbackUrl: "/login" })}
+          onClick={() => signOut({ callbackUrl: "/" })}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           <LogOut className="h-4 w-4 shrink-0" />

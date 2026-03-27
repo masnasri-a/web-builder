@@ -10,11 +10,12 @@ import { Anim } from "@/components/invitation/anim"
 import { WatermarkedImage } from "@/components/invitation/watermarked-image"
 import { CountdownTimer } from "@/components/invitation/countdown-timer"
 import { RsvpForm } from "@/components/invitation/rsvp-form"
-import { Navigation } from "lucide-react"
+import { Instagram, Navigation } from "lucide-react"
 import type { Section } from "@/types"
 import type { ThemeTemplateProps } from "./index"
 import { GiftSection } from "@/components/invitation/gift-section"
 import { UcapanWall } from "@/components/invitation/ucapan-wall"
+import { sectionStyle, resolveThemeColors } from "./theme-utils"
 
 // ─── Palette constants ────────────────────────────────────────────────────────
 const P    = "#C47C8A" // dusty rose — primary / text headings
@@ -112,7 +113,7 @@ function FloralDivider() {
 
 // ─── Module-level sub-components ──────────────────────────────────────────────
 
-function FloralPersonCard({ photo, name, parents, bio }: { photo?: string; name: string; parents?: string; bio?: string }) {
+function FloralPersonCard({ photo, name, parents, bio, instagram, _P = P, _TXT = TXT }: { photo?: string; name: string; parents?: string; bio?: string; instagram?: string; _P?: string; _TXT?: string }) {
   return (
     <div className="space-y-3 text-center">
       <div
@@ -125,12 +126,19 @@ function FloralPersonCard({ photo, name, parents, bio }: { photo?: string; name:
       </div>
       <h2
         className="text-2xl font-bold"
-        style={{ color: P, fontFamily: "Cormorant Garamond, serif" }}
+        style={{ color: _P, fontFamily: "Cormorant Garamond, serif" }}
       >
         {name}
       </h2>
-      {parents && <p className="text-sm opacity-60" style={{ color: TXT }}>{parents}</p>}
-      {bio && <p className="mx-auto max-w-[180px] text-sm leading-relaxed opacity-72" style={{ color: TXT }}>{bio}</p>}
+      {parents && <p className="text-sm opacity-60" style={{ color: _TXT }}>{parents}</p>}
+      {bio && <p className="mx-auto max-w-[180px] text-sm leading-relaxed opacity-72" style={{ color: _TXT }}>{bio}</p>}
+      {instagram && (
+        <a href={`https://instagram.com/${instagram}`} target="_blank" rel="noopener noreferrer"
+           className="inline-flex items-center gap-1 text-xs opacity-60 hover:opacity-100 transition-opacity"
+           style={{ color: _P }}>
+          <Instagram className="h-3 w-3" />@{instagram}
+        </a>
+      )}
     </div>
   )
 }
@@ -140,9 +148,15 @@ function FloralPersonCard({ photo, name, parents, bio }: { photo?: string; name:
 function FloralSection({
   section,
   inv,
+  _P = P,
+  _BG = BG,
+  _TXT = TXT,
 }: {
   section: Section
   inv: ThemeTemplateProps["inv"]
+  _P?: string
+  _BG?: string
+  _TXT?: string
 }) {
   const c = section.content as Record<string, unknown>
 
@@ -154,8 +168,8 @@ function FloralSection({
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center overflow-hidden text-center"
           style={{
-            background: `linear-gradient(160deg, #FFF0F3 0%, ${BG} 50%, #F0F7EE 100%)`,
-            color: TXT,
+            background: `linear-gradient(160deg, #FFF0F3 0%, ${_BG} 50%, #F0F7EE 100%)`,
+            color: _TXT,
             ...snap,
           }}
         >
@@ -172,7 +186,7 @@ function FloralSection({
             </Anim>
 
             <Anim variant="fadeIn" delay={140}>
-              <p className="mb-4 mt-3 text-[10px] tracking-[0.5em] uppercase" style={{ color: P, opacity: 0.65 }}>
+              <p className="mb-4 mt-3 text-[10px] tracking-[0.5em] uppercase" style={{ color: _P, opacity: 0.65 }}>
                 The Wedding of
               </p>
             </Anim>
@@ -180,7 +194,7 @@ function FloralSection({
             <Anim variant="fadeUp" delay={260}>
               <h1
                 className="text-5xl font-bold leading-tight"
-                style={{ color: P, fontFamily: "Cormorant Garamond, Georgia, serif" }}
+                style={{ color: _P, fontFamily: "Cormorant Garamond, Georgia, serif" }}
               >
                 {inv.groomName}
               </h1>
@@ -193,7 +207,7 @@ function FloralSection({
             <Anim variant="fadeUp" delay={440}>
               <h1
                 className="text-5xl font-bold leading-tight"
-                style={{ color: P, fontFamily: "Cormorant Garamond, Georgia, serif" }}
+                style={{ color: _P, fontFamily: "Cormorant Garamond, Georgia, serif" }}
               >
                 {inv.brideName}
               </h1>
@@ -201,7 +215,7 @@ function FloralSection({
 
             {(c.subtitle as string) && (
               <Anim variant="fadeUp" delay={560}>
-                <p className="mt-5 text-sm italic" style={{ color: TXT, opacity: 0.6 }}>
+                <p className="mt-5 text-sm italic" style={{ color: _TXT, opacity: 0.6 }}>
                   {c.subtitle as string}
                 </p>
               </Anim>
@@ -209,7 +223,7 @@ function FloralSection({
 
             <Anim variant="fadeIn" delay={640}>
               <FloralDivider />
-              <p className="text-sm" style={{ color: P, opacity: 0.7 }}>
+              <p className="text-sm" style={{ color: _P, opacity: 0.7 }}>
                 {new Date(inv.eventDate).toLocaleDateString("id-ID", {
                   weekday: "long", day: "numeric", month: "long", year: "numeric",
                 })}
@@ -227,11 +241,11 @@ function FloralSection({
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-16 text-center"
-          style={{ background: `linear-gradient(180deg, ${BG} 0%, #FFF0F3 100%)`, ...snap }}
+          style={{ background: `linear-gradient(180deg, ${_BG} 0%, #FFF0F3 100%)`, ...snap }}
         >
           <Anim variant="fadeIn" delay={0}><Rose size={40} /></Anim>
           <Anim variant="fadeIn" delay={60}>
-            <p className="mt-4 mb-8 text-[10px] tracking-[0.45em] uppercase" style={{ color: P, opacity: 0.6 }}>
+            <p className="mt-4 mb-8 text-[10px] tracking-[0.45em] uppercase" style={{ color: _P, opacity: 0.6 }}>
               The Couple
             </p>
           </Anim>
@@ -239,23 +253,23 @@ function FloralSection({
           {layout === "side-by-side" ? (
             <div className="flex justify-center gap-10">
               <Anim variant="slideLeft" delay={150}>
-                <FloralPersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} />
+                <FloralPersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} instagram={c.groomInstagram as string} _P={_P} _TXT={_TXT} />
               </Anim>
               <Anim variant="scaleIn" delay={300} className="self-center">
                 <span className="text-3xl italic font-light" style={{ color: BLSH }}>&amp;</span>
               </Anim>
               <Anim variant="slideRight" delay={150}>
-                <FloralPersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} />
+                <FloralPersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} instagram={c.brideInstagram as string} _P={_P} _TXT={_TXT} />
               </Anim>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-8">
               <Anim variant="fadeUp" delay={150}>
-                <FloralPersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} />
+                <FloralPersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} instagram={c.groomInstagram as string} _P={_P} _TXT={_TXT} />
               </Anim>
               <span className="text-3xl italic font-light" style={{ color: BLSH }}>&amp;</span>
               <Anim variant="fadeUp" delay={300}>
-                <FloralPersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} />
+                <FloralPersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} instagram={c.brideInstagram as string} _P={_P} _TXT={_TXT} />
               </Anim>
             </div>
           )}
@@ -271,17 +285,17 @@ function FloralSection({
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-16 text-center"
-          style={{ background: `linear-gradient(160deg, #FFF0F3 0%, ${BG} 100%)`, ...snap }}
+          style={{ background: `linear-gradient(160deg, #FFF0F3 0%, ${_BG} 100%)`, ...snap }}
         >
           <div className="max-w-lg mx-auto w-full">
             <Anim variant="scaleIn" delay={0}><Rose size={44} /></Anim>
             <Anim variant="fadeIn" delay={120}>
-              <p className="mt-3 mb-4 text-[10px] tracking-[0.45em] uppercase" style={{ color: P, opacity: 0.62 }}>
+              <p className="mt-3 mb-4 text-[10px] tracking-[0.45em] uppercase" style={{ color: _P, opacity: 0.62 }}>
                 Save The Date
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={200}>
-              <p className="mb-2 text-3xl font-bold" style={{ color: P, fontFamily: "Cormorant Garamond, serif" }}>
+              <p className="mb-2 text-3xl font-bold" style={{ color: _P, fontFamily: "Cormorant Garamond, serif" }}>
                 {new Date(inv.eventDate).toLocaleDateString("id-ID", {
                   weekday: "long", day: "numeric", month: "long", year: "numeric",
                 })}
@@ -289,9 +303,9 @@ function FloralSection({
             </Anim>
             <Anim variant="fadeUp" delay={300}>
               <div>
-                <p className="text-lg font-medium" style={{ color: TXT }}>{inv.eventVenue}</p>
+                <p className="text-lg font-medium" style={{ color: _TXT }}>{inv.eventVenue}</p>
                 {inv.eventAddress && (
-                  <p className="mt-1 text-sm opacity-60" style={{ color: TXT }}>{inv.eventAddress}</p>
+                  <p className="mt-1 text-sm opacity-60" style={{ color: _TXT }}>{inv.eventAddress}</p>
                 )}
               </div>
             </Anim>
@@ -304,17 +318,17 @@ function FloralSection({
                       className="rounded-2xl px-5 py-4 text-center min-w-[120px]"
                       style={{ border: `1.5px solid ${BLSH}80`, backgroundColor: `${BLSH}14` }}
                     >
-                      <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: P }}>
+                      <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: _P }}>
                         {ev.name || `Acara ${i + 1}`}
                       </p>
                       {ev.date && (
-                        <p className="mt-1.5 text-sm font-medium" style={{ color: TXT }}>
+                        <p className="mt-1.5 text-sm font-medium" style={{ color: _TXT }}>
                           {new Date(ev.date).toLocaleDateString("id-ID", {
                             day: "numeric", month: "long", year: "numeric",
                           })}
                         </p>
                       )}
-                      {ev.time && <p className="text-sm opacity-65" style={{ color: TXT }}>{ev.time}</p>}
+                      {ev.time && <p className="text-sm opacity-65" style={{ color: _TXT }}>{ev.time}</p>}
                     </div>
                   ))}
                 </div>
@@ -331,15 +345,15 @@ function FloralSection({
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-12 text-center"
-          style={{ background: `linear-gradient(180deg, ${BG} 0%, #F0F7EE 100%)`, ...snap }}
+          style={{ background: `linear-gradient(180deg, ${_BG} 0%, #F0F7EE 100%)`, ...snap }}
         >
           <Anim variant="fadeIn" delay={0}>
-            <p className="mb-6 text-[10px] tracking-[0.45em] uppercase" style={{ color: P, opacity: 0.6 }}>
+            <p className="mb-6 text-[10px] tracking-[0.45em] uppercase" style={{ color: _P, opacity: 0.6 }}>
               Menghitung Hari
             </p>
           </Anim>
           <Anim variant="scaleIn" delay={160}>
-            <CountdownTimer eventDate={inv.eventDate} primaryColor={P} />
+            <CountdownTimer eventDate={inv.eventDate} primaryColor={_P} />
           </Anim>
           <Anim variant="scaleIn" delay={340}>
             <div className="mt-8"><FloralDivider /></div>
@@ -353,26 +367,26 @@ function FloralSection({
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-16"
-          style={{ background: `linear-gradient(160deg, #FFF0F3 0%, ${BG} 100%)`, ...snap }}
+          style={{ background: `linear-gradient(160deg, #FFF0F3 0%, ${_BG} 100%)`, ...snap }}
         >
           <div className="max-w-lg mx-auto w-full">
             <Anim variant="scaleIn" delay={0}>
               <div className="flex justify-center mb-4"><Rose size={36} /></div>
             </Anim>
             <Anim variant="fadeIn" delay={60}>
-              <p className="mb-2 text-center text-[10px] tracking-[0.35em] uppercase" style={{ color: P, opacity: 0.62 }}>
+              <p className="mb-2 text-center text-[10px] tracking-[0.35em] uppercase" style={{ color: _P, opacity: 0.62 }}>
                 {(c.title as string) || "RSVP"}
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={160}>
-              <p className="mb-6 text-center text-sm" style={{ color: TXT, opacity: 0.65 }}>
+              <p className="mb-6 text-center text-sm" style={{ color: _TXT, opacity: 0.65 }}>
                 Konfirmasi Kehadiran Anda
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={260}>
               <RsvpForm
                 invitationId={inv.id}
-                primaryColor={P}
+                primaryColor={_P}
                 deadline={c.deadline as string | undefined}
               />
             </Anim>
@@ -386,20 +400,20 @@ function FloralSection({
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-12 text-center"
-          style={{ background: `linear-gradient(180deg, #FFF0F3 0%, ${BG} 100%)`, ...snap }}
+          style={{ background: `linear-gradient(180deg, #FFF0F3 0%, ${_BG} 100%)`, ...snap }}
         >
           <Anim variant="scaleIn" delay={0}><Rose size={40} /></Anim>
           <Anim variant="fadeUp" delay={160}>
             <blockquote
               className="mx-auto max-w-sm text-base italic leading-relaxed mt-5"
-              style={{ color: TXT, opacity: 0.85 }}
+              style={{ color: _TXT, opacity: 0.85 }}
             >
               &ldquo;{c.quote as string}&rdquo;
             </blockquote>
           </Anim>
           {!!c.source && (
             <Anim variant="fadeIn" delay={360}>
-              <p className="mt-4 text-xs uppercase tracking-widest" style={{ color: P, opacity: 0.6 }}>
+              <p className="mt-4 text-xs uppercase tracking-widest" style={{ color: _P, opacity: 0.6 }}>
                 — {c.source as string}
               </p>
             </Anim>
@@ -418,11 +432,11 @@ function FloralSection({
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-10 text-center"
-          style={{ backgroundColor: BG, ...snap }}
+          style={{ backgroundColor: _BG, ...snap }}
         >
           <div className="max-w-lg mx-auto w-full">
             <Anim variant="fadeIn" delay={0}>
-              <p className="mb-4 text-[10px] uppercase tracking-widest" style={{ color: P, opacity: 0.6 }}>
+              <p className="mb-4 text-[10px] uppercase tracking-widest" style={{ color: _P, opacity: 0.6 }}>
                 {(c.label as string) || "Lokasi Acara"}
               </p>
             </Anim>
@@ -439,7 +453,7 @@ function FloralSection({
             )}
             {(c.address as string) && (
               <Anim variant="fadeIn" delay={280}>
-                <p className="mt-3 text-sm opacity-65" style={{ color: TXT }}>{c.address as string}</p>
+                <p className="mt-3 text-sm opacity-65" style={{ color: _TXT }}>{c.address as string}</p>
               </Anim>
             )}
             {dirUrl && (
@@ -447,7 +461,7 @@ function FloralSection({
                 <a
                   href={dirUrl} target="_blank" rel="noopener noreferrer"
                   className="mt-4 inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-medium transition-opacity hover:opacity-80"
-                  style={{ border: `1.5px solid ${P}`, color: P }}
+                  style={{ border: `1.5px solid ${_P}`, color: _P }}
                 >
                   <Navigation className="h-4 w-4" />
                   Petunjuk Arah
@@ -465,7 +479,7 @@ function FloralSection({
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center px-8 py-20 text-center overflow-hidden"
-          style={{ background: `linear-gradient(160deg, #FFF0F3 0%, ${BG} 60%, #F0F7EE 100%)`, ...snap }}
+          style={{ background: `linear-gradient(160deg, #FFF0F3 0%, ${_BG} 60%, #F0F7EE 100%)`, ...snap }}
         >
           {/* corner bouquets faint */}
           <div className="absolute bottom-0 left-0 opacity-40 pointer-events-none"><CornerBouquet rotate={270} /></div>
@@ -474,7 +488,7 @@ function FloralSection({
           <div className="relative z-10">
             <Anim variant="scaleIn" delay={0}><Rose size={60} /></Anim>
             <Anim variant="fadeUp" delay={200}>
-              <p className="mx-auto max-w-xs text-base leading-relaxed mt-6" style={{ color: TXT, opacity: 0.72 }}>
+              <p className="mx-auto max-w-xs text-base leading-relaxed mt-6" style={{ color: _TXT, opacity: 0.72 }}>
                 {(c.message as string) ||
                   "Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan hadir."}
               </p>
@@ -483,7 +497,7 @@ function FloralSection({
               <FloralDivider />
             </Anim>
             <Anim variant="fadeIn" delay={480}>
-              <p className="text-xl font-bold" style={{ color: P, fontFamily: "Cormorant Garamond, serif" }}>
+              <p className="text-xl font-bold" style={{ color: _P, fontFamily: "Cormorant Garamond, serif" }}>
                 {inv.groomName} & {inv.brideName}
               </p>
             </Anim>
@@ -499,10 +513,10 @@ function FloralSection({
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center py-12 text-center"
-          style={{ backgroundColor: BG, ...snap }}
+          style={{ backgroundColor: _BG, ...snap }}
         >
           <Anim variant="fadeIn" delay={0}>
-            <p className="mb-6 text-[10px] tracking-[0.35em] uppercase" style={{ color: P, opacity: 0.6 }}>
+            <p className="mb-6 text-[10px] tracking-[0.35em] uppercase" style={{ color: _P, opacity: 0.6 }}>
               Gallery
             </p>
           </Anim>
@@ -532,7 +546,7 @@ function FloralSection({
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-16"
-          style={{ backgroundColor: BG, color: TXT, ...snap }}
+          style={{ backgroundColor: _BG, color: _TXT, ...snap }}
         >
           <div className="max-w-sm mx-auto w-full">
             <Anim variant="fadeUp" delay={0}>
@@ -544,7 +558,7 @@ function FloralSection({
                 qrisImage={c.qrisImage as string | null | undefined}
                 banks={banks}
                 allowTransferProof={c.allowTransferProof as boolean | undefined}
-                primaryColor={P}
+                primaryColor={_P}
                 accentColor={BLSH}
               />
             </Anim>
@@ -559,7 +573,7 @@ function FloralSection({
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center py-12"
-          style={{ backgroundColor: BG, color: TXT, ...snap }}
+          style={{ backgroundColor: _BG, color: _TXT, ...snap }}
         >
           <div className="w-full max-w-sm px-8">
             <Anim variant="fadeIn" delay={0}>
@@ -568,7 +582,7 @@ function FloralSection({
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={120}>
-              <UcapanWall invitationId={inv.id} primaryColor={P} />
+              <UcapanWall invitationId={inv.id} primaryColor={_P} />
             </Anim>
           </div>
         </section>
@@ -581,7 +595,9 @@ function FloralSection({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export function RomanticFloralTheme({ inv, sections, activeSection, onSectionClick }: ThemeTemplateProps) {
+export function RomanticFloralTheme({ inv, sections, activeSection, onSectionClick, themeConfig }: ThemeTemplateProps) {
+  const tc = resolveThemeColors(themeConfig, { primary: P, accent: BLSH, bg: BG, text: TXT, border: SAGE })
+
   const sorted = [...sections].sort((a, b) => a.order - b.order)
 
   return (
@@ -591,9 +607,12 @@ export function RomanticFloralTheme({ inv, sections, activeSection, onSectionCli
           key={section.id}
           onClick={() => onSectionClick?.(section.id)}
           className={onSectionClick ? "cursor-pointer" : ""}
-          style={activeSection === section.id ? { outline: "2px solid rgba(0,0,0,0.25)", outlineOffset: "-2px" } : undefined}
+          style={{
+            ...sectionStyle(section),
+            ...(activeSection === section.id ? { outline: "2px solid rgba(0,0,0,0.25)", outlineOffset: "-2px" } : {}),
+          }}
         >
-          <FloralSection section={section} inv={inv} />
+          <FloralSection section={section} inv={inv} _P={tc.primary} _BG={tc.bg} _TXT={tc.text} />
         </div>
       ))}
     </>

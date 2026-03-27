@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { DEFAULT_CONFIGS } from "@/lib/tier"
+import { invalidate } from "@/lib/redis"
 
 const ROLE_TYPES = ["USER", "VENDOR"] as const
 const TIERS = ["BASIC", "PRO", "PLATINUM", "LUXURY"] as const
@@ -58,6 +59,8 @@ export async function PATCH(req: Request) {
     update: data,
     create: { roleType, tier, ...DEFAULT_CONFIGS[roleType][tier], ...data },
   })
+
+  await invalidate("tier-configs", "landing:tiers")
 
   return NextResponse.json(updated)
 }

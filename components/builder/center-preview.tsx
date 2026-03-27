@@ -67,8 +67,11 @@ export function CenterPreview({
     "--inv-accent": themeConfig.accentColor,
     "--inv-bg": themeConfig.bgColor,
     "--inv-font": themeConfig.fontFamily,
+    "--inv-text": themeConfig.textColor || "#1a1a1a",
+    "--inv-border": themeConfig.borderColor || "#d4d4d4",
     backgroundColor: themeConfig.bgColor,
     fontFamily: `"${themeConfig.fontFamily}", serif`,
+    color: themeConfig.textColor || "#1a1a1a",
   } as React.CSSProperties
 
   return (
@@ -101,17 +104,6 @@ export function CenterPreview({
         )}
         style={style}
       >
-        {/* Splash overlay inside the card */}
-        {showSplash && (
-          <SplashScreen
-            groomName={groomName}
-            brideName={brideName}
-            themeConfig={themeConfig}
-            onEnter={() => setShowSplash(false)}
-            fullscreen={false}
-          />
-        )}
-
         {(() => {
           const registryEntry = themeSlug ? getThemeBySlug(themeSlug) : undefined
           if (registryEntry) {
@@ -126,23 +118,37 @@ export function CenterPreview({
               eventAddress: eventAddress || null,
             }
             return (
-              <ThemeComponent
-                inv={inv}
-                sections={visible}
-                themeConfig={themeConfig}
-                activeSection={activeSection}
-                onSectionClick={onSelectSection}
-              />
+              <div className="relative">
+                <ThemeComponent
+                  inv={inv}
+                  sections={visible}
+                  themeConfig={themeConfig}
+                  activeSection={activeSection}
+                  onSectionClick={onSelectSection}
+                />
+                {/* Splash overlay on the first section area only */}
+                {showSplash && visible.length > 0 && (
+                  <div className="absolute top-0 left-0 right-0 z-20" style={{ height: "100dvh" }}>
+                    <SplashScreen
+                      groomName={groomName}
+                      brideName={brideName}
+                      themeConfig={themeConfig}
+                      onEnter={() => setShowSplash(false)}
+                      fullscreen={false}
+                    />
+                  </div>
+                )}
+              </div>
             )
           }
 
-          return visible.map((section) => (
+          return visible.map((section, idx) => (
             <div
               key={section.id}
               onClick={() => onSelectSection(section.id)}
               style={{ scrollSnapAlign: "start" }}
               className={cn(
-                "cursor-pointer transition-all",
+                "relative cursor-pointer transition-all",
                 activeSection === section.id &&
                   "outline-2 outline-primary -outline-offset-2"
               )}
@@ -158,6 +164,16 @@ export function CenterPreview({
                 isActive={activeSection === section.id}
                 onUpdateContent={onUpdateContent}
               />
+              {/* Splash overlay on the first section only */}
+              {idx === 0 && showSplash && (
+                <SplashScreen
+                  groomName={groomName}
+                  brideName={brideName}
+                  themeConfig={themeConfig}
+                  onEnter={() => setShowSplash(false)}
+                  fullscreen={false}
+                />
+              )}
             </div>
           ))
         })()}

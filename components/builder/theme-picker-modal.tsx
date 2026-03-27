@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Palette, Check, Sliders } from "lucide-react"
+import { Palette, Check, Sliders, Lock } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -11,12 +11,14 @@ import {
 } from "@/components/ui/dialog"
 import { themeRegistry } from "@/lib/themeRegistry"
 import type { ThemeConfig } from "@/types"
+import type { TierConfigData } from "@/lib/tier"
 
 interface ThemePickerModalProps {
   themeSlug: string
   themeConfig: ThemeConfig
   onThemeChange: (slug: string) => void
   onThemeConfigChange: (config: Partial<ThemeConfig>) => void
+  tierConfig?: TierConfigData | null
 }
 
 const COLOR_FIELDS: { key: keyof ThemeConfig; label: string }[] = [
@@ -40,6 +42,7 @@ export function ThemePickerModal({
   themeConfig,
   onThemeChange,
   onThemeConfigChange,
+  tierConfig,
 }: ThemePickerModalProps) {
   const [open, setOpen] = useState(false)
   const [tab, setTab] = useState<"presets" | "custom">("presets")
@@ -93,19 +96,34 @@ export function ThemePickerModal({
           <div className="grid grid-cols-2 gap-2">
             {themeRegistry.map((entry) => {
               const isActive = entry.id === themeSlug
+              const isAllowed =
+                !tierConfig ||
+                tierConfig.allThemes ||
+                (tierConfig.allowedThemeIds as string[]).includes(entry.id)
               return (
                 <button
                   key={entry.id}
                   onClick={() => {
+                    if (!isAllowed) return
                     onThemeChange(entry.id)
                     setOpen(false)
                   }}
+                  disabled={!isAllowed}
                   className={`relative flex flex-col gap-2 rounded-xl border p-3 text-left transition-all ${
-                    isActive
+                    !isAllowed
+                      ? "border-border bg-muted/40 opacity-50 cursor-not-allowed"
+                      : isActive
                       ? "border-primary bg-primary/5"
                       : "border-border bg-card hover:border-muted-foreground/40"
                   }`}
                 >
+                  {/* PRO badge for locked themes */}
+                  {!isAllowed && (
+                    <span className="absolute top-2 right-2 inline-flex items-center gap-0.5 rounded-md bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
+                      <Lock className="h-2.5 w-2.5" />
+                      PRO
+                    </span>
+                  )}
                   {/* Color preview strip */}
                   <div className="flex gap-1">
                     <div

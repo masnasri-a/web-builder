@@ -18,6 +18,7 @@ import type { ThemeTemplateProps } from "./index"
 import type { GuestInvitation } from "@/components/invitation/guest-sections"
 import { GiftSection } from "@/components/invitation/gift-section"
 import { UcapanWall } from "@/components/invitation/ucapan-wall"
+import { resolveThemeColors, sectionStyle } from "./theme-utils"
 
 const Masonry = dynamic(
   () => import("@/components/ui/masonry").then((m) => ({ default: m.Masonry })),
@@ -32,6 +33,7 @@ const BG       = "#FAFAF5"
 const TXT      = "#3D2B4A"
 const PETAL    = "#F4B8C8"
 
+// `snap` kept only for the PersonCard; sections now use sectionStyle()
 const snap: React.CSSProperties = {
   scrollSnapAlign: "start",
   scrollSnapStop: "always",
@@ -140,7 +142,23 @@ function SerenityPersonCard({ photo, name, parents, bio, instagram }: { photo?: 
 
 // ─── Section renderer ─────────────────────────────────────────────────────────
 
-function SerenityBlossomSection({ section, inv }: { section: Section; inv: GuestInvitation }) {
+function SerenityBlossomSection({
+  section,
+  inv,
+  _P = SAKURA,
+  _ACC = LAVENDER,
+  _BG = BG,
+  _TXT = TXT,
+  _BORDER = SAGE,
+}: {
+  section: Section
+  inv: GuestInvitation
+  _P?: string
+  _ACC?: string
+  _BG?: string
+  _TXT?: string
+  _BORDER?: string
+}) {
   const c = section.content as Record<string, unknown>
   const showWatermark = useShowWatermark()
 
@@ -152,7 +170,7 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center overflow-hidden text-center"
-          style={{ backgroundColor: BG, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           {/* top-left blossom branch */}
           <div className="absolute top-0 left-0 pointer-events-none">
@@ -175,32 +193,32 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
               <div className="flex justify-center mb-4"><CherryBlossom size={64} cx={32} cy={32} r={26} /></div>
             </Anim>
             <Anim variant="fadeIn" delay={120}>
-              <p className="mb-3 text-[10px] tracking-[0.5em] uppercase" style={{ color: LAVENDER, opacity: 0.75 }}>
+              <p className="mb-3 text-[10px] tracking-[0.5em] uppercase" style={{ color: _ACC, opacity: 0.75 }}>
                 The Wedding of
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={240}>
-              <h1 className="text-5xl font-bold leading-tight" style={{ color: SAKURA, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+              <h1 className="text-5xl font-bold leading-tight" style={{ color: _P, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
                 {inv.groomName}
               </h1>
             </Anim>
             <Anim variant="scaleIn" delay={360}>
-              <p className="my-3 text-3xl font-light italic" style={{ color: LAVENDER }}>&amp;</p>
+              <p className="my-3 text-3xl font-light italic" style={{ color: _ACC }}>&amp;</p>
             </Anim>
             <Anim variant="fadeUp" delay={420}>
-              <h1 className="text-5xl font-bold leading-tight" style={{ color: SAKURA, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+              <h1 className="text-5xl font-bold leading-tight" style={{ color: _P, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
                 {inv.brideName}
               </h1>
             </Anim>
             {(c.subtitle as string) && (
               <Anim variant="fadeUp" delay={520}>
-                <p className="mt-5 text-sm italic" style={{ color: TXT, opacity: 0.6 }}>
+                <p className="mt-5 text-sm italic" style={{ color: _TXT, opacity: 0.6 }}>
                   {c.subtitle as string}
                 </p>
               </Anim>
             )}
             <Anim variant="fadeIn" delay={600}>
-              <p className="mt-5 text-sm" style={{ color: TXT, opacity: 0.6 }}>
+              <p className="mt-5 text-sm" style={{ color: _TXT, opacity: 0.6 }}>
                 {inv.eventDate
                   ? new Date(inv.eventDate).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
                   : "Wedding Date TBD"}
@@ -216,13 +234,13 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-16 text-center"
-          style={{ background: `linear-gradient(160deg, ${BG} 0%, ${PETAL}30 100%)`, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <Anim variant="fadeIn" delay={0}>
             <div className="flex justify-center mb-4"><CherryBlossom size={48} cx={24} cy={24} r={20} /></div>
           </Anim>
           <Anim variant="fadeIn" delay={60}>
-            <p className="mb-8 text-[10px] tracking-[0.45em] uppercase" style={{ color: LAVENDER, opacity: 0.75 }}>
+            <p className="mb-8 text-[10px] tracking-[0.45em] uppercase" style={{ color: _ACC, opacity: 0.75 }}>
               The Couple
             </p>
           </Anim>
@@ -231,7 +249,7 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
               <SerenityPersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} instagram={c.groomInstagram as string} />
             </Anim>
             <Anim variant="scaleIn" delay={300}>
-              <span className="text-3xl italic font-light" style={{ color: LAVENDER }}>&amp;</span>
+              <span className="text-3xl italic font-light" style={{ color: _ACC }}>&amp;</span>
             </Anim>
             <Anim variant="slideRight" delay={150}>
               <SerenityPersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} instagram={c.brideInstagram as string} />
@@ -249,7 +267,7 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-16 text-center"
-          style={{ background: `linear-gradient(180deg, ${BG} 0%, ${LAVENDER}15 100%)`, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="max-w-lg mx-auto w-full">
             <Anim variant="fadeIn" delay={0}>
@@ -260,12 +278,12 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
               </div>
             </Anim>
             <Anim variant="fadeIn" delay={100}>
-              <p className="mb-4 text-[10px] tracking-[0.45em] uppercase" style={{ color: LAVENDER, opacity: 0.75 }}>
+              <p className="mb-4 text-[10px] tracking-[0.45em] uppercase" style={{ color: _ACC, opacity: 0.75 }}>
                 Save The Date
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={200}>
-              <p className="text-2xl font-bold" style={{ color: TXT, fontFamily: "Cormorant Garamond, serif" }}>
+              <p className="text-2xl font-bold" style={{ color: _TXT, fontFamily: "Cormorant Garamond, serif" }}>
                 {inv.eventDate
                   ? new Date(inv.eventDate).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
                   : "Wedding Date TBD"}
@@ -273,9 +291,9 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
             </Anim>
             <Anim variant="fadeUp" delay={300}>
               <div className="mt-4">
-                <p className="text-lg font-medium" style={{ color: TXT }}>{inv.eventVenue}</p>
+                <p className="text-lg font-medium" style={{ color: _TXT }}>{inv.eventVenue}</p>
                 {inv.eventAddress && (
-                  <p className="mt-1 text-sm opacity-60" style={{ color: TXT }}>{inv.eventAddress}</p>
+                  <p className="mt-1 text-sm opacity-60" style={{ color: _TXT }}>{inv.eventAddress}</p>
                 )}
               </div>
             </Anim>
@@ -286,17 +304,17 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
                     <div
                       key={i}
                       className="rounded-2xl px-5 py-4 text-center min-w-32.5"
-                      style={{ border: `1.5px solid ${SAKURA}50`, backgroundColor: `${PETAL}30` }}
+                      style={{ border: `1.5px solid ${_P}50`, backgroundColor: `${PETAL}30` }}
                     >
-                      <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: SAKURA }}>
+                      <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: _P }}>
                         {ev.name || `Acara ${i + 1}`}
                       </p>
                       {ev.date && (
-                        <p className="mt-1.5 text-sm font-medium" style={{ color: TXT }}>
+                        <p className="mt-1.5 text-sm font-medium" style={{ color: _TXT }}>
                           {new Date(ev.date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
                         </p>
                       )}
-                      {ev.time && <p className="text-sm opacity-65" style={{ color: TXT }}>{ev.time}</p>}
+                      {ev.time && <p className="text-sm opacity-65" style={{ color: _TXT }}>{ev.time}</p>}
                     </div>
                   ))}
                 </div>
@@ -315,11 +333,11 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col"
-          style={{ backgroundColor: BG, ...snap }}
+          style={{ ...sectionStyle(section, _BG) }}
         >
           <div className="px-4 py-12">
             <Anim variant="fadeIn" delay={0}>
-              <p className="mb-6 text-center text-xs font-semibold uppercase tracking-widest opacity-60" style={{ color: SAKURA }}>
+              <p className="mb-6 text-center text-xs font-semibold uppercase tracking-widest opacity-60" style={{ color: _P }}>
                 Gallery
               </p>
             </Anim>
@@ -341,15 +359,15 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-12 text-center"
-          style={{ background: `linear-gradient(180deg, ${BG} 0%, ${PETAL}25 100%)`, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <Anim variant="fadeIn" delay={0}>
-            <p className="mb-6 text-[10px] tracking-[0.45em] uppercase" style={{ color: LAVENDER, opacity: 0.75 }}>
+            <p className="mb-6 text-[10px] tracking-[0.45em] uppercase" style={{ color: _ACC, opacity: 0.75 }}>
               Menghitung Hari
             </p>
           </Anim>
           <Anim variant="scaleIn" delay={160}>
-            <CountdownTimer eventDate={inv.eventDate} primaryColor={SAKURA} />
+            <CountdownTimer eventDate={inv.eventDate} primaryColor={_P} />
           </Anim>
           <Anim variant="fadeIn" delay={340}>
             <div className="mt-8 flex justify-center gap-3">
@@ -367,18 +385,18 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center"
-          style={{ background: `linear-gradient(160deg, ${PETAL}20 0%, ${BG} 100%)`, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="w-full max-w-sm px-8">
             <Anim variant="fadeIn" delay={0}>
               <div className="flex justify-center mb-4"><CherryBlossom size={48} cx={24} cy={24} r={20} /></div>
             </Anim>
             <Anim variant="fadeIn" delay={80}>
-              <p className="mb-6 text-center text-[10px] tracking-[0.4em] uppercase" style={{ color: LAVENDER, opacity: 0.75 }}>
+              <p className="mb-6 text-center text-[10px] tracking-[0.4em] uppercase" style={{ color: _ACC, opacity: 0.75 }}>
                 {(c.title as string) || "RSVP"}
               </p>
             </Anim>
-            <RsvpForm invitationId={inv.id} primaryColor={SAKURA} />
+            <RsvpForm invitationId={inv.id} primaryColor={_P} />
           </div>
         </section>
       )
@@ -389,7 +407,7 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center px-8 py-20 text-center overflow-hidden"
-          style={{ background: `linear-gradient(160deg, ${BG} 0%, ${PETAL}35 60%, ${LAVENDER}20 100%)`, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="absolute top-0 left-0 pointer-events-none opacity-60">
             <BlossomBranch width={130} height={100} />
@@ -402,12 +420,12 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
               <div className="flex justify-center mb-4"><CherryBlossom size={60} cx={30} cy={30} r={24} /></div>
             </Anim>
             <Anim variant="fadeUp" delay={200}>
-              <p className="text-3xl font-bold" style={{ color: SAKURA, fontFamily: "Cormorant Garamond, serif" }}>
+              <p className="text-3xl font-bold" style={{ color: _P, fontFamily: "Cormorant Garamond, serif" }}>
                 {inv.groomName} &amp; {inv.brideName}
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={340}>
-              <p className="mx-auto max-w-xs text-sm leading-relaxed mt-5" style={{ color: TXT, opacity: 0.7 }}>
+              <p className="mx-auto max-w-xs text-sm leading-relaxed mt-5" style={{ color: _TXT, opacity: 0.7 }}>
                 {(c.message as string) || "Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan hadir."}
               </p>
             </Anim>
@@ -425,7 +443,7 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center"
-          style={{ backgroundColor: BG, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="w-full max-w-lg px-8">
             <Anim variant="fadeIn" delay={0}>
@@ -435,7 +453,7 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
             </Anim>
             {gmapsUrl ? (
               <Anim variant="fadeUp" delay={150}>
-                <div className="overflow-hidden rounded-xl" style={{ border: `1.5px solid ${SAKURA}50` }}>
+                <div className="overflow-hidden rounded-xl" style={{ border: `1.5px solid ${_P}50` }}>
                   <iframe src={gmapsUrl} width="100%" height="240" style={{ border: 0 }} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
                 </div>
               </Anim>
@@ -467,7 +485,7 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-12 text-center"
-          style={{ background: `linear-gradient(180deg, ${BG} 0%, ${LAVENDER}18 100%)`, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <Anim variant="scaleIn" delay={0}>
             <div className="flex justify-center gap-2 mb-2">
@@ -479,14 +497,14 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
           <Anim variant="fadeUp" delay={160}>
             <blockquote
               className="mx-auto max-w-sm text-base italic leading-relaxed mt-4"
-              style={{ color: TXT, opacity: 0.85 }}
+              style={{ color: _TXT, opacity: 0.85 }}
             >
               &ldquo;{c.quote as string}&rdquo;
             </blockquote>
           </Anim>
           {!!c.source && (
             <Anim variant="fadeIn" delay={360}>
-              <p className="mt-4 text-xs uppercase tracking-widest" style={{ color: LAVENDER, opacity: 0.7 }}>
+              <p className="mt-4 text-xs uppercase tracking-widest" style={{ color: _ACC, opacity: 0.7 }}>
                 — {c.source as string}
               </p>
             </Anim>
@@ -501,7 +519,7 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-16"
-          style={{ backgroundColor: BG, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="max-w-sm mx-auto w-full">
             <Anim variant="fadeUp" delay={0}>
@@ -513,8 +531,8 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
                 qrisImage={c.qrisImage as string | null | undefined}
                 banks={banks}
                 allowTransferProof={c.allowTransferProof as boolean | undefined}
-                primaryColor={SAKURA}
-                accentColor={LAVENDER}
+                primaryColor={_P}
+                accentColor={_ACC}
               />
             </Anim>
           </div>
@@ -528,7 +546,7 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center py-12"
-          style={{ backgroundColor: BG, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="w-full max-w-sm px-8">
             <Anim variant="fadeIn" delay={0}>
@@ -537,7 +555,7 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={120}>
-              <UcapanWall invitationId={inv.id} primaryColor={SAKURA} />
+              <UcapanWall invitationId={inv.id} primaryColor={_P} />
             </Anim>
           </div>
         </section>
@@ -550,7 +568,8 @@ function SerenityBlossomSection({ section, inv }: { section: Section; inv: Guest
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 
-export function SerenityBlossomTheme({ inv, sections, activeSection, onSectionClick }: ThemeTemplateProps) {
+export function SerenityBlossomTheme({ inv, sections, themeConfig, activeSection, onSectionClick }: ThemeTemplateProps) {
+  const tc = resolveThemeColors(themeConfig, { primary: SAKURA, accent: LAVENDER, bg: BG, text: TXT, border: SAGE })
   const sorted = [...sections].sort((a, b) => a.order - b.order)
   return (
     <>
@@ -561,7 +580,7 @@ export function SerenityBlossomTheme({ inv, sections, activeSection, onSectionCl
           className={onSectionClick ? "cursor-pointer" : ""}
           style={activeSection === s.id ? { outline: "2px solid rgba(0,0,0,0.25)", outlineOffset: "-2px" } : undefined}
         >
-          <SerenityBlossomSection section={s} inv={inv} />
+          <SerenityBlossomSection section={s} inv={inv} _P={tc.primary} _ACC={tc.accent} _BG={tc.bg} _TXT={tc.text} _BORDER={tc.border} />
         </div>
       ))}
     </>

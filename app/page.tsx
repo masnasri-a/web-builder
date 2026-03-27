@@ -4,6 +4,7 @@ import Link from "next/link"
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { db } from "@/lib/db"
+import { cached } from "@/lib/redis"
 import { Cormorant_Garamond } from "next/font/google"
 import { Check, ArrowRight, Star, ChevronRight } from "lucide-react"
 import { ChatbotWidget } from "@/components/chatbot/chatbot-widget"
@@ -102,10 +103,12 @@ export default async function LandingPage() {
   if (session) redirect("/dashboard")
 
   const [tiers, latestInvitation] = await Promise.all([
-    db.tierConfig.findMany({
-      where: { roleType: "USER", isVisible: true },
-      orderBy: { price: "asc" },
-    }),
+    cached("landing:tiers", 600, () =>
+      db.tierConfig.findMany({
+        where: { roleType: "USER", isVisible: true },
+        orderBy: { price: "asc" },
+      }),
+    ),
     db.invitation.findFirst({
       where: { isPublished: true },
       orderBy: { updatedAt: "desc" },

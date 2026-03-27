@@ -10,8 +10,10 @@ import { Palette, Settings2, X } from "lucide-react"
 import Image from "next/image"
 import type { Section, ThemeConfig } from "@/types"
 import { FONT_OPTIONS } from "@/types"
+import type { TierConfigData } from "@/lib/tier"
 import { ImageUploader } from "./image-uploader"
 import { GalleryManager } from "./gallery-manager"
+import { BackgroundPickerModal } from "./background-picker-modal"
 import dynamic from "next/dynamic"
 import { Loader2 } from "lucide-react"
 
@@ -115,6 +117,7 @@ interface RightPanelProps {
   onUpdateContent: (id: string, content: Record<string, unknown>) => void
   onUpdateTheme: (config: Partial<ThemeConfig>) => void
   onSetField: (field: string, value: string) => void
+  tierConfig?: TierConfigData | null
 }
 
 export function RightPanel({
@@ -130,6 +133,7 @@ export function RightPanel({
   onUpdateContent,
   onUpdateTheme,
   onSetField,
+  tierConfig,
 }: RightPanelProps) {
   const section = sections.find((s) => s.id === activeSection)
 
@@ -155,6 +159,7 @@ export function RightPanel({
               eventAddress={eventAddress}
               onUpdateContent={onUpdateContent}
               onSetField={onSetField}
+              tierConfig={tierConfig}
             />
           ) : (
             <p className="text-sm text-muted-foreground">
@@ -187,6 +192,16 @@ export function RightPanel({
                 label="Background"
                 value={themeConfig.bgColor}
                 onChange={(v) => onUpdateTheme({ bgColor: v })}
+              />
+              <ColorField
+                label="Text Color"
+                value={themeConfig.textColor || "#1a1a1a"}
+                onChange={(v) => onUpdateTheme({ textColor: v })}
+              />
+              <ColorField
+                label="Border Color"
+                value={themeConfig.borderColor || "#d4d4d4"}
+                onChange={(v) => onUpdateTheme({ borderColor: v })}
               />
             </div>
           </div>
@@ -236,6 +251,7 @@ interface SectionConfigProps {
   eventAddress: string
   onUpdateContent: (id: string, content: Record<string, unknown>) => void
   onSetField: (field: string, value: string) => void
+  tierConfig?: TierConfigData | null
 }
 
 function SectionConfig({
@@ -248,6 +264,7 @@ function SectionConfig({
   eventAddress,
   onUpdateContent,
   onSetField,
+  tierConfig,
 }: SectionConfigProps) {
   const { id, type, content } = section
   const c = content as Record<string, string>
@@ -328,10 +345,10 @@ function SectionConfig({
               </button>
             </div>
           )}
-          <ImageUploader
+          <BackgroundPickerModal
             invitationId={invitationId}
-            type="background"
-            onUploaded={(url) => onUpdateContent(id, { bgImage: url })}
+            value={c.bgImage as string | undefined}
+            onChange={(url) => onUpdateContent(id, { bgImage: url || "" })}
           />
         </div>
 
@@ -478,6 +495,7 @@ function SectionConfig({
             invitationId={invitationId}
             images={(c.images as unknown as string[]) || []}
             onUpdateImages={(images) => onUpdateContent(id, { images })}
+            maxGalleryImages={tierConfig?.maxGalleryImages ?? 0}
           />
         )}
         {type === "maps" && (

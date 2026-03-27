@@ -10,6 +10,7 @@ import { LeftPanel } from "./left-panel"
 import { CenterPreview } from "./center-preview"
 import { RightPanel } from "./right-panel"
 import { useBuilder } from "@/hooks/use-builder"
+import { useTierConfig } from "@/hooks/use-tier-config"
 import type { InvitationWithRelations } from "@/types"
 import { getThemeBySlug } from "@/lib/themeRegistry"
 
@@ -18,6 +19,8 @@ interface BuilderShellProps {
 }
 
 export function BuilderShell({ invitation }: BuilderShellProps) {
+  const { tierConfig } = useTierConfig()
+
   const {
     state,
     setField,
@@ -216,6 +219,7 @@ export function BuilderShell({ invitation }: BuilderShellProps) {
           onMusicChange={(url) => setField("musicUrl", url)}
           onThemeChange={handleThemeChange}
           onThemeConfigChange={updateThemeConfig}
+          tierConfig={tierConfig}
         />
 
         <CenterPreview
@@ -251,6 +255,7 @@ export function BuilderShell({ invitation }: BuilderShellProps) {
           onSetField={(field, value) =>
             setField(field as keyof typeof state, value)
           }
+          tierConfig={tierConfig}
         />
       </div>
     </div>

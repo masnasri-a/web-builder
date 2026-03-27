@@ -18,6 +18,7 @@ import type { ThemeTemplateProps } from "./index"
 import type { GuestInvitation } from "@/components/invitation/guest-sections"
 import { GiftSection } from "@/components/invitation/gift-section"
 import { UcapanWall } from "@/components/invitation/ucapan-wall"
+import { resolveThemeColors, sectionStyle } from "./theme-utils"
 
 const Masonry = dynamic(
   () => import("@/components/ui/masonry").then((m) => ({ default: m.Masonry })),
@@ -25,17 +26,11 @@ const Masonry = dynamic(
 )
 
 // ─── Palette ──────────────────────────────────────────────────────────────────
-const NIGHT  = "#080E1C"
 const NAVY   = "#0E1F42"
 const SILVER = "#C8D4E0"
 const GOLD   = "#E8C547"
 const BG     = "#080E1C"
 const TXT    = "#E8F0F8"
-
-const snap: React.CSSProperties = {
-  scrollSnapAlign: "start",
-  scrollSnapStop: "always",
-}
 
 // ─── SVG Decorations ──────────────────────────────────────────────────────────
 
@@ -158,9 +153,25 @@ function CelestiaPersonCard({ photo, name, parents, bio, instagram }: { photo?: 
 
 // ─── Section renderer ─────────────────────────────────────────────────────────
 
-function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitation }) {
-  const c = section.content as Record<string, unknown>
+function CelestiaSection({
+  section,
+  inv,
+  _P = SILVER,
+  _ACC = GOLD,
+  _BG = BG,
+  _TXT = TXT,
+  _BORDER = NAVY,
+}: {
+  section: Section
+  inv: GuestInvitation
+  _P?: string
+  _ACC?: string
+  _BG?: string
+  _TXT?: string
+  _BORDER?: string
+}) {
   const showWatermark = useShowWatermark()
+  const c = section.content as Record<string, unknown>
 
   switch (section.type) {
 
@@ -170,7 +181,7 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center overflow-hidden text-center"
-          style={{ backgroundColor: NIGHT, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           {/* Star field background */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden flex items-start justify-center">
@@ -192,32 +203,32 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
               </div>
             </Anim>
             <Anim variant="fadeIn" delay={120}>
-              <p className="mb-3 text-[10px] tracking-[0.5em] uppercase" style={{ color: SILVER, opacity: 0.6 }}>
+              <p className="mb-3 text-[10px] tracking-[0.5em] uppercase" style={{ color: _P, opacity: 0.6 }}>
                 The Wedding of
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={240}>
-              <h1 className="text-5xl font-bold leading-tight" style={{ color: SILVER, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+              <h1 className="text-5xl font-bold leading-tight" style={{ color: _P, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
                 {inv.groomName}
               </h1>
             </Anim>
             <Anim variant="scaleIn" delay={360}>
-              <p className="my-3 text-3xl font-light italic" style={{ color: GOLD }}>&amp;</p>
+              <p className="my-3 text-3xl font-light italic" style={{ color: _ACC }}>&amp;</p>
             </Anim>
             <Anim variant="fadeUp" delay={420}>
-              <h1 className="text-5xl font-bold leading-tight" style={{ color: SILVER, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
+              <h1 className="text-5xl font-bold leading-tight" style={{ color: _P, fontFamily: "Cormorant Garamond, Georgia, serif" }}>
                 {inv.brideName}
               </h1>
             </Anim>
             {(c.subtitle as string) && (
               <Anim variant="fadeUp" delay={520}>
-                <p className="mt-5 text-sm italic" style={{ color: TXT, opacity: 0.5 }}>
+                <p className="mt-5 text-sm italic" style={{ color: _TXT, opacity: 0.5 }}>
                   {c.subtitle as string}
                 </p>
               </Anim>
             )}
             <Anim variant="fadeIn" delay={600}>
-              <p className="mt-5 text-sm" style={{ color: SILVER, opacity: 0.6 }}>
+              <p className="mt-5 text-sm" style={{ color: _P, opacity: 0.6 }}>
                 {inv.eventDate
                   ? new Date(inv.eventDate).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
                   : "Wedding Date TBD"}
@@ -233,13 +244,13 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-16 text-center"
-          style={{ backgroundColor: NIGHT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <Anim variant="fadeIn" delay={0}>
             <div className="flex justify-center mb-4"><CrescentMoon size={40} /></div>
           </Anim>
           <Anim variant="fadeIn" delay={60}>
-            <p className="mb-8 text-[10px] tracking-[0.45em] uppercase" style={{ color: SILVER, opacity: 0.55 }}>
+            <p className="mb-8 text-[10px] tracking-[0.45em] uppercase" style={{ color: _P, opacity: 0.55 }}>
               The Couple
             </p>
           </Anim>
@@ -248,7 +259,7 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
               <CelestiaPersonCard photo={c.groomPhoto as string} name={inv.groomName} parents={c.groomParents as string} bio={c.groomBio as string} instagram={c.groomInstagram as string} />
             </Anim>
             <Anim variant="scaleIn" delay={300}>
-              <span className="text-3xl italic font-light" style={{ color: GOLD }}>&amp;</span>
+              <span className="text-3xl italic font-light" style={{ color: _ACC }}>&amp;</span>
             </Anim>
             <Anim variant="slideRight" delay={150}>
               <CelestiaPersonCard photo={c.bridePhoto as string} name={inv.brideName} parents={c.brideParents as string} bio={c.brideBio as string} instagram={c.brideInstagram as string} />
@@ -266,19 +277,19 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-16 text-center"
-          style={{ backgroundColor: NAVY, ...snap }}
+          style={{ ...sectionStyle(section, _BORDER), color: _TXT }}
         >
           <div className="max-w-lg mx-auto w-full">
             <Anim variant="fadeIn" delay={0}>
               <div className="flex justify-center mb-4"><ConstellationDots opacity={0.5} /></div>
             </Anim>
             <Anim variant="fadeIn" delay={100}>
-              <p className="mb-4 text-[10px] tracking-[0.45em] uppercase" style={{ color: SILVER, opacity: 0.6 }}>
+              <p className="mb-4 text-[10px] tracking-[0.45em] uppercase" style={{ color: _P, opacity: 0.6 }}>
                 Save The Date
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={200}>
-              <p className="text-2xl font-bold" style={{ color: TXT, fontFamily: "Cormorant Garamond, serif" }}>
+              <p className="text-2xl font-bold" style={{ color: _TXT, fontFamily: "Cormorant Garamond, serif" }}>
                 {inv.eventDate
                   ? new Date(inv.eventDate).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
                   : "Wedding Date TBD"}
@@ -286,9 +297,9 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
             </Anim>
             <Anim variant="fadeUp" delay={300}>
               <div className="mt-4">
-                <p className="text-lg font-medium" style={{ color: SILVER }}>{inv.eventVenue}</p>
+                <p className="text-lg font-medium" style={{ color: _P }}>{inv.eventVenue}</p>
                 {inv.eventAddress && (
-                  <p className="mt-1 text-sm opacity-55" style={{ color: TXT }}>{inv.eventAddress}</p>
+                  <p className="mt-1 text-sm opacity-55" style={{ color: _TXT }}>{inv.eventAddress}</p>
                 )}
               </div>
             </Anim>
@@ -299,17 +310,17 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
                     <div
                       key={i}
                       className="rounded-xl px-5 py-4 text-center min-w-32.5"
-                      style={{ border: `1px solid ${GOLD}50`, backgroundColor: `${GOLD}10` }}
+                      style={{ border: `1px solid ${_ACC}50`, backgroundColor: `${_ACC}10` }}
                     >
-                      <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: GOLD }}>
+                      <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: _ACC }}>
                         {ev.name || `Acara ${i + 1}`}
                       </p>
                       {ev.date && (
-                        <p className="mt-1.5 text-sm font-medium" style={{ color: TXT }}>
+                        <p className="mt-1.5 text-sm font-medium" style={{ color: _TXT }}>
                           {new Date(ev.date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
                         </p>
                       )}
-                      {ev.time && <p className="text-sm opacity-60" style={{ color: TXT }}>{ev.time}</p>}
+                      {ev.time && <p className="text-sm opacity-60" style={{ color: _TXT }}>{ev.time}</p>}
                     </div>
                   ))}
                 </div>
@@ -328,16 +339,16 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col"
-          style={{ backgroundColor: NIGHT, ...snap }}
+          style={{ ...sectionStyle(section, _BG) }}
         >
           <div className="px-4 py-12">
             <Anim variant="fadeIn" delay={0}>
-              <p className="mb-6 text-center text-xs font-semibold uppercase tracking-widest" style={{ color: SILVER, opacity: 0.6 }}>
+              <p className="mb-6 text-center text-xs font-semibold uppercase tracking-widest" style={{ color: _P, opacity: 0.6 }}>
                 Gallery
               </p>
             </Anim>
             {images.length === 0 ? (
-              <div className="mx-4 flex h-32 items-center justify-center rounded-xl text-sm opacity-40" style={{ backgroundColor: `${SILVER}15` }}>
+              <div className="mx-4 flex h-32 items-center justify-center rounded-xl text-sm opacity-40" style={{ backgroundColor: `${_P}15` }}>
                 Belum ada foto
               </div>
             ) : (
@@ -354,15 +365,15 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-12 text-center"
-          style={{ backgroundColor: NIGHT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <Anim variant="fadeIn" delay={0}>
-            <p className="mb-6 text-[10px] tracking-[0.45em] uppercase" style={{ color: SILVER, opacity: 0.6 }}>
+            <p className="mb-6 text-[10px] tracking-[0.45em] uppercase" style={{ color: _P, opacity: 0.6 }}>
               Menghitung Hari
             </p>
           </Anim>
           <Anim variant="scaleIn" delay={160}>
-            <CountdownTimer eventDate={inv.eventDate} primaryColor={GOLD} />
+            <CountdownTimer eventDate={inv.eventDate} primaryColor={_ACC} />
           </Anim>
           <Anim variant="fadeIn" delay={340}>
             <div className="mt-8 flex justify-center"><StarField width={200} height={60} count={8} opacity={0.5} /></div>
@@ -376,18 +387,18 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center"
-          style={{ backgroundColor: NIGHT, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="w-full max-w-sm px-8">
             <Anim variant="fadeIn" delay={0}>
               <div className="flex justify-center mb-4"><CrescentMoon size={36} /></div>
             </Anim>
             <Anim variant="fadeIn" delay={80}>
-              <p className="mb-6 text-center text-[10px] tracking-[0.4em] uppercase" style={{ color: SILVER, opacity: 0.6 }}>
+              <p className="mb-6 text-center text-[10px] tracking-[0.4em] uppercase" style={{ color: _P, opacity: 0.6 }}>
                 {(c.title as string) || "RSVP"}
               </p>
             </Anim>
-            <RsvpForm invitationId={inv.id} primaryColor={GOLD} />
+            <RsvpForm invitationId={inv.id} primaryColor={_ACC} />
           </div>
         </section>
       )
@@ -398,7 +409,7 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center px-8 py-20 text-center overflow-hidden"
-          style={{ backgroundColor: NIGHT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="absolute top-6 left-0 right-0 flex justify-center pointer-events-none">
             <StarField width={300} height={100} count={12} opacity={0.4} />
@@ -408,12 +419,12 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
               <div className="flex justify-center mb-4"><CrescentMoon size={52} /></div>
             </Anim>
             <Anim variant="fadeUp" delay={200}>
-              <p className="text-3xl font-bold" style={{ color: SILVER, fontFamily: "Cormorant Garamond, serif" }}>
+              <p className="text-3xl font-bold" style={{ color: _P, fontFamily: "Cormorant Garamond, serif" }}>
                 {inv.groomName} &amp; {inv.brideName}
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={340}>
-              <p className="mx-auto max-w-xs text-sm leading-relaxed mt-5" style={{ color: TXT, opacity: 0.65 }}>
+              <p className="mx-auto max-w-xs text-sm leading-relaxed mt-5" style={{ color: _TXT, opacity: 0.65 }}>
                 {(c.message as string) || "Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Anda berkenan hadir."}
               </p>
             </Anim>
@@ -436,7 +447,7 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center"
-          style={{ backgroundColor: NIGHT, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="w-full max-w-lg px-8">
             <Anim variant="fadeIn" delay={0}>
@@ -446,12 +457,12 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
             </Anim>
             {gmapsUrl ? (
               <Anim variant="fadeUp" delay={150}>
-                <div className="overflow-hidden rounded-xl" style={{ border: `1px solid ${SILVER}30` }}>
+                <div className="overflow-hidden rounded-xl" style={{ border: `1px solid ${_P}30` }}>
                   <iframe src={gmapsUrl} width="100%" height="240" style={{ border: 0 }} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
                 </div>
               </Anim>
             ) : (
-              <div className="flex h-40 items-center justify-center rounded-xl text-sm opacity-40" style={{ backgroundColor: `${SILVER}15` }}>
+              <div className="flex h-40 items-center justify-center rounded-xl text-sm opacity-40" style={{ backgroundColor: `${_P}15` }}>
                 Pilih lokasi di panel kanan
               </div>
             )}
@@ -478,20 +489,20 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-12 text-center"
-          style={{ backgroundColor: NAVY, ...snap }}
+          style={{ ...sectionStyle(section, _BORDER), color: _TXT }}
         >
           <Anim variant="fadeIn" delay={0}><ConstellationDots opacity={0.5} /></Anim>
           <Anim variant="fadeUp" delay={160}>
             <blockquote
               className="mx-auto max-w-sm text-base italic leading-relaxed mt-6"
-              style={{ color: TXT, opacity: 0.85 }}
+              style={{ color: _TXT, opacity: 0.85 }}
             >
               &ldquo;{c.quote as string}&rdquo;
             </blockquote>
           </Anim>
           {!!c.source && (
             <Anim variant="fadeIn" delay={360}>
-              <p className="mt-4 text-xs uppercase tracking-widest" style={{ color: GOLD, opacity: 0.7 }}>
+              <p className="mt-4 text-xs uppercase tracking-widest" style={{ color: _ACC, opacity: 0.7 }}>
                 — {c.source as string}
               </p>
             </Anim>
@@ -506,7 +517,7 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
         <section
           id={section.id}
           className="min-h-dvh flex flex-col items-center justify-center px-8 py-16"
-          style={{ backgroundColor: BG, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="max-w-sm mx-auto w-full">
             <Anim variant="fadeUp" delay={0}>
@@ -518,8 +529,8 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
                 qrisImage={c.qrisImage as string | null | undefined}
                 banks={banks}
                 allowTransferProof={c.allowTransferProof as boolean | undefined}
-                primaryColor={GOLD}
-                accentColor={SILVER}
+                primaryColor={_ACC}
+                accentColor={_P}
               />
             </Anim>
           </div>
@@ -533,7 +544,7 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
         <section
           id={section.id}
           className="relative min-h-dvh flex flex-col items-center justify-center py-12"
-          style={{ backgroundColor: BG, color: TXT, ...snap }}
+          style={{ ...sectionStyle(section, _BG), color: _TXT }}
         >
           <div className="w-full max-w-sm px-8">
             <Anim variant="fadeIn" delay={0}>
@@ -542,7 +553,7 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
               </p>
             </Anim>
             <Anim variant="fadeUp" delay={120}>
-              <UcapanWall invitationId={inv.id} primaryColor={GOLD} />
+              <UcapanWall invitationId={inv.id} primaryColor={_ACC} />
             </Anim>
           </div>
         </section>
@@ -555,7 +566,8 @@ function CelestiaSection({ section, inv }: { section: Section; inv: GuestInvitat
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 
-export function CelestiaTheme({ inv, sections, activeSection, onSectionClick }: ThemeTemplateProps) {
+export function CelestiaTheme({ inv, sections, themeConfig, activeSection, onSectionClick }: ThemeTemplateProps) {
+  const tc = resolveThemeColors(themeConfig, { primary: SILVER, accent: GOLD, bg: BG, text: TXT, border: NAVY })
   const sorted = [...sections].sort((a, b) => a.order - b.order)
   return (
     <>
@@ -566,7 +578,7 @@ export function CelestiaTheme({ inv, sections, activeSection, onSectionClick }: 
           className={onSectionClick ? "cursor-pointer" : ""}
           style={activeSection === s.id ? { outline: "2px solid rgba(200,212,224,0.4)", outlineOffset: "-2px" } : undefined}
         >
-          <CelestiaSection section={s} inv={inv} />
+          <CelestiaSection section={s} inv={inv} _P={tc.primary} _ACC={tc.accent} _BG={tc.bg} _TXT={tc.text} _BORDER={tc.border} />
         </div>
       ))}
     </>

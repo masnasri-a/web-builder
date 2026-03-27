@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { invalidate } from "@/lib/redis"
 
 export async function GET(
   _req: Request,
@@ -67,6 +68,12 @@ export async function PATCH(
         ...(isPublished !== undefined && { isPublished }),
       },
     })
+
+    // Invalidate public invitation cache
+    await invalidate(`inv:${existing.slug}`)
+    if (slug && slug !== existing.slug) {
+      await invalidate(`inv:${slug}`)
+    }
 
     return NextResponse.json(updated)
   } catch {
