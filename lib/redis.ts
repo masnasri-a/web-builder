@@ -49,3 +49,13 @@ export async function invalidate(...keys: string[]) {
     // Redis unavailable — ignore
   }
 }
+
+/** Delete all keys matching a glob pattern, e.g. "backgrounds:user:abc123:*" */
+export async function invalidatePattern(pattern: string) {
+  try {
+    const keys = await redis.keys(pattern)
+    if (keys.length > 0) await redis.del(...keys)
+  } catch {
+    // Redis unavailable — ignore
+  }
+}

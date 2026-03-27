@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { isAdminRole } from "@/lib/utils"
 
 // PATCH /api/vouchers/[id] — update isActive, expiry, maxClaims, description
 export async function PATCH(
@@ -24,7 +25,7 @@ export async function PATCH(
     if (!vendor || voucher.vendorProfileId !== vendor.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
-  } else if (role !== "SUPER_ADMIN") {
+  } else if (!isAdminRole(role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
@@ -60,7 +61,7 @@ export async function DELETE(
     if (!vendor || voucher.vendorProfileId !== vendor.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
-  } else if (role !== "SUPER_ADMIN") {
+  } else if (!isAdminRole(role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 

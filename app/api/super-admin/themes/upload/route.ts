@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
+import { isAdminRole } from "@/lib/utils"
 import { uploadFile, BG_IMAGE_BUCKET } from "@/lib/s3"
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5 MB
@@ -7,7 +8,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5 MB
 // POST /api/super-admin/themes/upload
 export async function POST(req: Request) {
   const session = await auth()
-  if (!session || session.user.role !== "SUPER_ADMIN") {
+  if (!session || !isAdminRole(session.user.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 

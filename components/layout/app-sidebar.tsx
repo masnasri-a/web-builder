@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Users, Palette, Heart,
   Tag, MessageCircle, Settings2, Mail,
   Gift, CreditCard, BarChart3, Settings,
-  QrCode, ImageIcon,
+  QrCode, ImageIcon, Megaphone,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -22,15 +22,12 @@ const NAV_CONFIGS: Record<string, NavItem[]> = {
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/users", label: "Users", icon: Users },
     { href: "/admin/themes", label: "Themes", icon: Palette },
-  ],
-  "super-admin": [
-    { href: "/super-admin", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/super-admin/themes", label: "Themes", icon: Palette },
-    { href: "/super-admin/backgrounds", label: "Backgrounds", icon: ImageIcon },
-    { href: "/super-admin/vendors", label: "Vendors", icon: Users },
-    { href: "/super-admin/vouchers", label: "Vouchers", icon: Tag },
-    { href: "/super-admin/tiers", label: "Tier Config", icon: Settings2 },
-    { href: "/super-admin/faq", label: "FAQ & Support", icon: MessageCircle },
+    { href: "/admin/backgrounds", label: "Backgrounds", icon: ImageIcon },
+    { href: "/admin/vendors", label: "Vendors", icon: Users },
+    { href: "/admin/vouchers", label: "Vouchers", icon: Tag },
+    { href: "/admin/tiers", label: "Tier Config", icon: Settings2 },
+    { href: "/admin/faq", label: "FAQ & Support", icon: MessageCircle },
+    { href: "/admin/popup-ads", label: "Popup Ads", icon: Megaphone },
   ],
   vendor: [
     { href: "/vendor", label: "Dashboard", icon: LayoutDashboard },
@@ -59,8 +56,7 @@ const NAV_CONFIGS: Record<string, NavItem[]> = {
 }
 
 const SECTION_LABELS: Record<string, string> = {
-  admin: "Admin CMS",
-  "super-admin": "Super Admin",
+  admin: "Admin Panel",
   vendor: "Vendor Portal",
   individual: "Individual",
   dashboard: "Dashboard",

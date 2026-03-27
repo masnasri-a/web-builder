@@ -1,15 +1,18 @@
 import { db } from "@/lib/db"
 import { StatCard } from "@/components/dashboard/stat-card"
-import { Users, Heart, CreditCard, TrendingUp } from "lucide-react"
+import { Users, Heart, CreditCard, TrendingUp, Tag, Gift } from "lucide-react"
 import { MusicManagerWrapper } from "@/components/admin/music-manager-wrapper"
 
 export default async function AdminPage() {
-  const [totalUsers, totalInvitations, liveInvitations, totalGuests] =
+  const [totalUsers, totalInvitations, liveInvitations, totalGuests, totalVendors, totalVouchers, totalClaims] =
     await Promise.all([
       db.user.count(),
       db.invitation.count(),
       db.invitation.count({ where: { isPublished: true } }),
       db.guest.count(),
+      db.vendorProfile.count(),
+      db.voucher.count(),
+      db.voucherClaim.count(),
     ])
 
   const recentUsers = await db.user.findMany({
@@ -63,11 +66,20 @@ export default async function AdminPage() {
           icon={TrendingUp}
         />
         <StatCard
-          title="Pro Subscribers"
-          value={0}
-          subtitle="Coming soon"
-          icon={CreditCard}
+          title="Total Vendors"
+          value={totalVendors}
+          icon={Users}
           variant="teal"
+        />
+        <StatCard
+          title="Total Vouchers"
+          value={totalVouchers}
+          icon={Tag}
+        />
+        <StatCard
+          title="Total Claims"
+          value={totalClaims}
+          icon={Gift}
         />
       </div>
 

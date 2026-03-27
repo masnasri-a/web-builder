@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { VouchersManager } from "@/app/super-admin/vouchers/vouchers-manager"
+import { VouchersManager } from "@/app/admin/vouchers/vouchers-manager"
 import { redirect } from "next/navigation"
 
 export default async function VendorVouchersPage() {

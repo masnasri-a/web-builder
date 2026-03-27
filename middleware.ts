@@ -20,12 +20,16 @@ function detectLocale(req: Parameters<Parameters<typeof auth>[0]>[0]): Locale {
 
 type UserRole = "USER" | "ADMIN" | "SUPER_ADMIN" | "VENDOR" | "INDIVIDUAL"
 
+function isAdminRole(role?: string): boolean {
+  return role === "ADMIN" || role === "SUPER_ADMIN"
+}
+
 function getRoleHome(role: UserRole): string {
   switch (role) {
-    case "SUPER_ADMIN": return "/super-admin"
+    case "SUPER_ADMIN":
+    case "ADMIN":       return "/admin"
     case "VENDOR":      return "/vendor"
     case "INDIVIDUAL":  return "/individual"
-    case "ADMIN":       return "/admin"
     default:            return "/dashboard"
   }
 }
@@ -40,16 +44,15 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/login", req.url))
   }
 
-  // Protect admin routes — require ADMIN role
-  if (pathname.startsWith("/admin")) {
-    if (!session || role !== "ADMIN") {
-      return NextResponse.redirect(new URL("/login", req.url))
-    }
+  // Redirect legacy /super-admin → /admin
+  if (pathname.startsWith("/super-admin")) {
+    const newPath = pathname.replace(/^\/super-admin/, "/admin")
+    return NextResponse.redirect(new URL(newPath, req.url))
   }
 
-  // Protect super-admin routes
-  if (pathname.startsWith("/super-admin")) {
-    if (!session || role !== "SUPER_ADMIN") {
+  // Protect admin routes — require ADMIN or SUPER_ADMIN role
+  if (pathname.startsWith("/admin")) {
+    if (!session || !isAdminRole(role)) {
       return NextResponse.redirect(new URL("/login", req.url))
     }
   }

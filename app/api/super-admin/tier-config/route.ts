@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { isAdminRole } from "@/lib/utils"
 import { DEFAULT_CONFIGS } from "@/lib/tier"
 import { invalidate } from "@/lib/redis"
 
@@ -26,7 +27,7 @@ async function ensureAllConfigs() {
 // GET /api/super-admin/tier-config — all 6 configs + themes list
 export async function GET() {
   const session = await auth()
-  if (!session || session.user.role !== "SUPER_ADMIN") {
+  if (!session || !isAdminRole(session.user.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
@@ -44,7 +45,7 @@ export async function GET() {
 // body: { roleType, tier, ...fields }
 export async function PATCH(req: Request) {
   const session = await auth()
-  if (!session || session.user.role !== "SUPER_ADMIN") {
+  if (!session || !isAdminRole(session.user.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 

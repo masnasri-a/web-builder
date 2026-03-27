@@ -38,3 +38,8 @@ export function getContrastColor(bgColor: string): string {
   return luminance > 0.55 ? "#1a1a1a" : "#ffffff"
 }
 
+/** Returns true when the user role is ADMIN or SUPER_ADMIN (they share identical privileges). */
+export function isAdminRole(role?: string | null): boolean {
+  return role === "ADMIN" || role === "SUPER_ADMIN"
+}
+

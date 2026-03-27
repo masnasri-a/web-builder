@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { isAdminRole } from "@/lib/utils"
 
 // GET /api/vouchers — super admin gets all, vendor gets own, individual gets active/public
 export async function GET() {
@@ -9,7 +10,7 @@ export async function GET() {
 
   const role = session.user.role
 
-  if (role === "SUPER_ADMIN") {
+  if (isAdminRole(role)) {
     const vouchers = await db.voucher.findMany({
       include: { vendorProfile: { select: { shopName: true } }, _count: { select: { claims: true } } },
       orderBy: { createdAt: "desc" },
@@ -44,7 +45,7 @@ export async function POST(req: Request) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const role = session.user.role
-  if (role !== "SUPER_ADMIN" && role !== "VENDOR") {
+  if (!isAdminRole(role) && role !== "VENDOR") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 

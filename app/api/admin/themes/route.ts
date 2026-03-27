@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { isAdminRole } from "@/lib/utils"
 import { z } from "zod"
 
 const themeSchema = z.object({
@@ -19,7 +20,7 @@ const themeSchema = z.object({
 
 export async function GET() {
   const session = await auth()
-  if (!session || session.user.role !== "ADMIN") {
+  if (!session || !isAdminRole(session.user.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
@@ -29,7 +30,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const session = await auth()
-  if (!session || session.user.role !== "ADMIN") {
+  if (!session || !isAdminRole(session.user.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 

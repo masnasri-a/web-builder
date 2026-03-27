@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { isAdminRole } from "@/lib/utils"
 import sharp from "sharp"
 import { uploadFile, BG_IMAGE_BUCKET } from "@/lib/s3"
 
@@ -9,7 +10,7 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10 MB
 // GET /api/super-admin/backgrounds — list all preset backgrounds
 export async function GET() {
   const session = await auth()
-  if (!session || session.user.role !== "SUPER_ADMIN") {
+  if (!session || !isAdminRole(session.user.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
@@ -24,7 +25,7 @@ export async function GET() {
 // POST /api/super-admin/backgrounds — upload a new preset background
 export async function POST(req: Request) {
   const session = await auth()
-  if (!session || session.user.role !== "SUPER_ADMIN") {
+  if (!session || !isAdminRole(session.user.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
@@ -66,7 +67,7 @@ export async function POST(req: Request) {
 // DELETE /api/super-admin/backgrounds — delete a preset background
 export async function DELETE(req: Request) {
   const session = await auth()
-  if (!session || session.user.role !== "SUPER_ADMIN") {
+  if (!session || !isAdminRole(session.user.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 

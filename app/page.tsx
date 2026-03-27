@@ -9,6 +9,7 @@ import { Cormorant_Garamond } from "next/font/google"
 import { Check, ArrowRight, Star, ChevronRight } from "lucide-react"
 import { ChatbotWidget } from "@/components/chatbot/chatbot-widget"
 import { AnimateOnScroll } from "@/components/landing/animate-on-scroll"
+import { LandingPopupAd } from "@/components/landing/landing-popup-ad"
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://selembar.id"
 
@@ -528,6 +529,7 @@ export default async function LandingPage() {
         </footer>
 
         <ChatbotWidget />
+        <LandingPopupAd />
       </div>
     </>
   )
