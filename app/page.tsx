@@ -230,7 +230,7 @@ export default async function LandingPage() {
             <div className="relative flex justify-center" data-anim="right" data-delay="150">
               <div className="relative h-[500px] w-full max-w-[480px] overflow-hidden rounded-3xl shadow-2xl lg:h-[600px]">
                 <Image
-                  src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?auto=format&fit=crop&w=1400&q=80"
+                  src="/hero.jpeg"
                   alt="Wedding venue decoration"
                   fill
                   className="object-cover"
